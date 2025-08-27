@@ -227,6 +227,35 @@
       filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.5));
     }
   }
+
+  @keyframes globe-rotate {
+    0% {
+      transform: rotateY(0deg);
+    }
+    100% {
+      transform: rotateY(360deg);
+    }
+  }
+
+  @keyframes globe-glow {
+    0%, 100% {
+      opacity: 0.3;
+    }
+    50% {
+      opacity: 0.6;
+    }
+  }
+
+  @keyframes dot-pulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 0.7;
+    }
+    50% {
+      transform: scale(1.2);
+      opacity: 1;
+    }
+  }
   
   /* Animation Classes */
   .animate-blob {
@@ -302,6 +331,18 @@
 
   .animate-particles {
     animation: particles 6s linear infinite;
+  }
+
+  .animate-globe-rotate {
+    animation: globe-rotate 60s linear infinite;
+  }
+
+  .animate-globe-glow {
+    animation: globe-glow 4s ease-in-out infinite;
+  }
+
+  .animate-dot-pulse {
+    animation: dot-pulse 3s ease-in-out infinite;
   }
   
   /* Animation Delays */
