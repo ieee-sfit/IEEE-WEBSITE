@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, Zap } from 'lucide-react';
+import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const { ref: logoRef, isVisible: logoVisible } = useScrollAnimation({
+    threshold: 0.1,
+    triggerOnce: false
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,31 +33,37 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
-          <div className="flex items-center space-x-3">
+          <div ref={logoRef} className="flex items-center space-x-3 group cursor-pointer">
             <div className="relative">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <Zap className="w-6 h-6 text-white" />
+              <div className={`w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110 ${
+                logoVisible ? 'animate-logo-glow' : ''
+              }`}>
+                <Zap className="w-6 h-6 text-white group-hover:animate-bounce" />
               </div>
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-pink-500 rounded-full animate-pulse"></div>
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-pink-500 rounded-full animate-pulse group-hover:animate-ping"></div>
             </div>
-            <div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <div className="transition-transform duration-300 group-hover:scale-105">
+              <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent animate-gradient-shift">
                 IEEE×WIE
               </h1>
-              <p className="text-xs text-gray-600">SFIT</p>
+              <p className="text-xs text-gray-600 group-hover:text-blue-600 transition-colors duration-300">SFIT</p>
             </div>
           </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">
-            {navItems.map((item) => (
+            {navItems.map((item, index) => (
               <a
                 key={item.name}
                 href={item.href}
-                className="relative text-gray-700 hover:text-blue-600 transition-colors duration-200 group"
+                className="relative text-gray-700 hover:text-blue-600 transition-all duration-300 group py-2 px-1"
+                style={{ animationDelay: `${index * 100}ms` }}
               >
-                {item.name}
+                <span className="relative z-10 transition-transform duration-300 group-hover:scale-105">
+                  {item.name}
+                </span>
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 transition-all duration-300 group-hover:w-full"></span>
+                <span className="absolute inset-0 bg-blue-50 rounded-lg opacity-0 transition-opacity duration-300 group-hover:opacity-100 -z-10"></span>
               </a>
             ))}
           </nav>
@@ -60,25 +71,57 @@ const Header = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+            className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-all duration-200 group relative overflow-hidden"
+            aria-label="Toggle menu"
           >
-            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            <div className="relative w-6 h-6">
+              {/* Hamburger Lines */}
+              <span
+                className={`absolute left-0 w-6 h-0.5 bg-gray-600 transition-all duration-300 transform origin-center ${
+                  isMenuOpen
+                    ? 'top-3 rotate-45'
+                    : 'top-1 rotate-0'
+                }`}
+              ></span>
+              <span
+                className={`absolute left-0 top-3 w-6 h-0.5 bg-gray-600 transition-all duration-300 ${
+                  isMenuOpen ? 'opacity-0 scale-0' : 'opacity-100 scale-100'
+                }`}
+              ></span>
+              <span
+                className={`absolute left-0 w-6 h-0.5 bg-gray-600 transition-all duration-300 transform origin-center ${
+                  isMenuOpen
+                    ? 'top-3 -rotate-45'
+                    : 'top-5 rotate-0'
+                }`}
+              ></span>
+            </div>
           </button>
         </div>
 
         {/* Mobile Navigation */}
-        <div className={`md:hidden transition-all duration-300 overflow-hidden ${
+        <div className={`md:hidden transition-all duration-500 ease-in-out overflow-hidden ${
           isMenuOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'
         }`}>
           <nav className="py-4 space-y-2">
-            {navItems.map((item) => (
+            {navItems.map((item, index) => (
               <a
                 key={item.name}
                 href={item.href}
-                className="block px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                className={`block px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-300 transform ${
+                  isMenuOpen
+                    ? 'translate-x-0 opacity-100'
+                    : '-translate-x-4 opacity-0'
+                } hover:scale-105 hover:translate-x-2`}
+                style={{
+                  transitionDelay: isMenuOpen ? `${index * 100}ms` : '0ms'
+                }}
                 onClick={() => setIsMenuOpen(false)}
               >
-                {item.name}
+                <span className="relative">
+                  {item.name}
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 transition-all duration-300 group-hover:w-full"></span>
+                </span>
               </a>
             ))}
           </nav>
