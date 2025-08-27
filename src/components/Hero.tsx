@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowRight, Sparkles, Users, Calendar } from 'lucide-react';
 import Counter from './Counter';
+import RotatingGlobe from './RotatingGlobe';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 const Hero = () => {
@@ -20,6 +21,9 @@ const Hero = () => {
         <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
         <div className="absolute top-40 right-10 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
         <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+
+        {/* Rotating Globe */}
+        <RotatingGlobe />
 
         {/* Floating particles */}
         <div className="particles">
