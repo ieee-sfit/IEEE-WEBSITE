@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, Zap } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 const Header = () => {
@@ -18,13 +19,31 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const location = useLocation();
+
   const navItems = [
-    { name: 'Home', href: '#home' },
-    { name: 'About', href: '#about' },
-    { name: 'Events', href: '#events' },
-    { name: 'Team', href: '#team' },
-    { name: 'Contact', href: '#contact' },
+    { name: 'Home', href: '/', type: 'route' },
+    { name: 'About', href: '#about', type: 'scroll' },
+    { name: 'Events', href: '/events', type: 'route' },
+    { name: 'Team', href: '/team', type: 'route' },
+    { name: 'Contact', href: '#contact', type: 'scroll' },
   ];
+
+  const handleNavClick = (item) => {
+    if (item.type === 'scroll') {
+      // If we're not on the home page, navigate to home first
+      if (location.pathname !== '/') {
+        window.location.href = '/' + item.href;
+      } else {
+        // Smooth scroll to section
+        const element = document.querySelector(item.href);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    }
+    setIsMenuOpen(false);
+  };
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -33,7 +52,7 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
-          <div ref={logoRef} className="flex items-center space-x-3 group cursor-pointer">
+          <Link to="/" ref={logoRef} className="flex items-center space-x-3 group cursor-pointer">
             <div className="relative">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110 logo-glow-subtle">
                 <Zap className="w-6 h-6 text-white group-hover:animate-bounce" />
@@ -46,24 +65,47 @@ const Header = () => {
               </h1>
               <p className="text-xs text-gray-600 group-hover:text-blue-600 transition-colors duration-300">SFIT</p>
             </div>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">
-            {navItems.map((item, index) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className="relative text-gray-700 hover:text-blue-600 transition-all duration-300 group py-2 px-1"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <span className="relative z-10 transition-transform duration-300 group-hover:scale-105">
-                  {item.name}
-                </span>
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 transition-all duration-300 group-hover:w-full"></span>
-                <span className="absolute inset-0 bg-blue-50 rounded-lg opacity-0 transition-opacity duration-300 group-hover:opacity-100 -z-10"></span>
-              </a>
-            ))}
+            {navItems.map((item, index) => {
+              if (item.type === 'route') {
+                return (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    className={`relative text-gray-700 hover:text-blue-600 transition-all duration-300 group py-2 px-1 ${
+                      location.pathname === item.href ? 'text-blue-600' : ''
+                    }`}
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
+                    <span className="relative z-10 transition-transform duration-300 group-hover:scale-105">
+                      {item.name}
+                    </span>
+                    <span className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 transition-all duration-300 ${
+                      location.pathname === item.href ? 'w-full' : 'w-0 group-hover:w-full'
+                    }`}></span>
+                    <span className="absolute inset-0 bg-blue-50 rounded-lg opacity-0 transition-opacity duration-300 group-hover:opacity-100 -z-10"></span>
+                  </Link>
+                );
+              } else {
+                return (
+                  <button
+                    key={item.name}
+                    onClick={() => handleNavClick(item)}
+                    className="relative text-gray-700 hover:text-blue-600 transition-all duration-300 group py-2 px-1"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
+                    <span className="relative z-10 transition-transform duration-300 group-hover:scale-105">
+                      {item.name}
+                    </span>
+                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 transition-all duration-300 group-hover:w-full"></span>
+                    <span className="absolute inset-0 bg-blue-50 rounded-lg opacity-0 transition-opacity duration-300 group-hover:opacity-100 -z-10"></span>
+                  </button>
+                );
+              }
+            })}
           </nav>
 
           {/* Mobile Menu Button */}
@@ -102,26 +144,52 @@ const Header = () => {
           isMenuOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'
         }`}>
           <nav className="py-4 space-y-2">
-            {navItems.map((item, index) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className={`block px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-300 transform ${
-                  isMenuOpen
-                    ? 'translate-x-0 opacity-100'
-                    : '-translate-x-4 opacity-0'
-                } hover:scale-105 hover:translate-x-2`}
-                style={{
-                  transitionDelay: isMenuOpen ? `${index * 100}ms` : '0ms'
-                }}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <span className="relative">
-                  {item.name}
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 transition-all duration-300 group-hover:w-full"></span>
-                </span>
-              </a>
-            ))}
+            {navItems.map((item, index) => {
+              if (item.type === 'route') {
+                return (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    className={`block px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-300 transform ${
+                      isMenuOpen
+                        ? 'translate-x-0 opacity-100'
+                        : '-translate-x-4 opacity-0'
+                    } hover:scale-105 hover:translate-x-2 ${
+                      location.pathname === item.href ? 'text-blue-600 bg-blue-50' : ''
+                    }`}
+                    style={{
+                      transitionDelay: isMenuOpen ? `${index * 100}ms` : '0ms'
+                    }}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <span className="relative">
+                      {item.name}
+                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 transition-all duration-300 group-hover:w-full"></span>
+                    </span>
+                  </Link>
+                );
+              } else {
+                return (
+                  <button
+                    key={item.name}
+                    onClick={() => handleNavClick(item)}
+                    className={`block w-full text-left px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-300 transform ${
+                      isMenuOpen
+                        ? 'translate-x-0 opacity-100'
+                        : '-translate-x-4 opacity-0'
+                    } hover:scale-105 hover:translate-x-2`}
+                    style={{
+                      transitionDelay: isMenuOpen ? `${index * 100}ms` : '0ms'
+                    }}
+                  >
+                    <span className="relative">
+                      {item.name}
+                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 transition-all duration-300 group-hover:w-full"></span>
+                    </span>
+                  </button>
+                );
+              }
+            })}
           </nav>
         </div>
       </div>
