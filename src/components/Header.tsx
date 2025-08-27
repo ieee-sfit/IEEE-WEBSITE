@@ -35,9 +35,7 @@ const Header = () => {
           {/* Logo */}
           <div ref={logoRef} className="flex items-center space-x-3 group cursor-pointer">
             <div className="relative">
-              <div className={`w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110 ${
-                logoVisible ? 'animate-logo-glow' : ''
-              }`}>
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110 logo-glow-subtle">
                 <Zap className="w-6 h-6 text-white group-hover:animate-bounce" />
               </div>
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-pink-500 rounded-full animate-pulse group-hover:animate-ping"></div>
