@@ -49,7 +49,7 @@ const Hero = () => {
           <h1 className={`text-5xl md:text-7xl font-bold mb-6 transition-all duration-700 ${
             heroVisible ? 'animate-text-reveal opacity-100' : 'opacity-0'
           } animation-delay-200`}>
-            <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-gradient-shift animate-logo-glow">
+            <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-gradient-shift">
               IEEE×WIE
             </span>
             <br />
