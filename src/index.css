@@ -221,10 +221,10 @@
 
   @keyframes logo-glow {
     0%, 100% {
-      filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.5));
+      filter: drop-shadow(0 0 3px rgba(59, 130, 246, 0.3));
     }
     50% {
-      filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.8)) drop-shadow(0 0 30px rgba(139, 92, 246, 0.6));
+      filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.5));
     }
   }
   
@@ -287,7 +287,17 @@
   }
 
   .animate-logo-glow {
-    animation: logo-glow 3s ease-in-out infinite;
+    animation: logo-glow 4s ease-in-out infinite;
+  }
+
+  /* Subtle logo glow for header */
+  .logo-glow-subtle {
+    filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.3));
+    transition: filter 0.3s ease;
+  }
+
+  .logo-glow-subtle:hover {
+    filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.5));
   }
 
   .animate-particles {
