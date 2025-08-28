@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Menu, X, Zap } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
-
+import logo1 from "./assets/ieee-logo.png";
+import logo2 from "./assets/wie--logo.png";
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -51,21 +52,28 @@ const Header = () => {
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
-          {/* Logo */}
-          <Link to="/" ref={logoRef} className="flex items-center space-x-3 group cursor-pointer">
-            <div className="relative">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110 logo-glow-subtle">
-                <Zap className="w-6 h-6 text-white group-hover:animate-bounce" />
-              </div>
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-pink-500 rounded-full animate-pulse group-hover:animate-ping"></div>
-            </div>
-            <div className="transition-transform duration-300 group-hover:scale-105">
-              <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent animate-gradient-shift">
-                IEEE×WIE
-              </h1>
-              <p className="text-xs text-gray-600 group-hover:text-blue-600 transition-colors duration-300">SFIT</p>
-            </div>
-          </Link>
+         <div className="flex items-center space-x-4">
+      {/* First Logo */}
+      <Link to="/" className="group cursor-pointer">
+        <img
+          src={logo1}
+          alt="Logo 1"
+          className="h-20 w-auto transition-transform duration-300 group-hover:scale-110"
+        />
+      </Link>
+
+      {/* Vertical Divider */}
+      <div className="w-px h-12 bg-gray-300"></div>
+
+      {/* Second Logo */}
+      <Link to="/" className="group cursor-pointer">
+        <img
+          src={logo2}
+          alt="Logo 2"
+          className="h-16 w-auto transition-transform duration-300 group-hover:scale-110"
+        />
+      </Link>
+    </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">

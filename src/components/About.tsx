@@ -85,7 +85,8 @@ const About = () => {
               </div>
 
               {/* Decorative corner element */}
-              <div className="absolute top-2 right-2 w-4 h-4 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
+              <div className="absolute top-2 right-2 w-3 h-3 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-pulse transition-all duration-300"></div>
+
             </div>
           ))}
         </div>
