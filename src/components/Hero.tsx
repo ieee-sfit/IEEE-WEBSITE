@@ -1,8 +1,9 @@
 import React from 'react';
 import { ArrowRight, Sparkles, Users, Calendar } from 'lucide-react';
 import Counter from './Counter';
-import RotatingGlobe from './RotatingGlobe';
+
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
+import SplashCursor from './ui/SplashCursor/SplashCursor';
 
 const Hero = () => {
   const { ref: heroRef, isVisible: heroVisible } = useScrollAnimation({
@@ -16,14 +17,14 @@ const Hero = () => {
       id="home"
       className="min-h-screen relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50 animate-gradient-shift"
     >
+      <SplashCursor SPLAT_RADIUS={0.1}/>
       {/* Animated Background Elements */}
       <div className="absolute inset-0">
         <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
         <div className="absolute top-40 right-10 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
         <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
 
-        {/* Rotating Globe */}
-        <RotatingGlobe />
+
 
         {/* Floating particles */}
         <div className="particles">
