@@ -18,17 +18,17 @@ const Footer = () => {
   });
 
   const quickLinks = [
-    { name: 'About Us', href: '#about' },
-    { name: 'Events', href: '#events' },
-    { name: 'Team', href: '#team' },
-    { name: 'Contact', href: '#contact' },
+    { name: 'About Us', href: '/#about' },   // Scrolls to #about on home
+    { name: 'Events', href: '/events' },     // Navigates to /events page
+    { name: 'Team', href: '/team' },         // Navigates to /team page
+    { name: 'Contact', href: '/#contact' },  // Scrolls to #contact on home
   ];
 
   const resources = [
-    { name: 'IEEE Main Site', href: '#' },
-    { name: 'WIE Global', href: '#' },
-    { name: 'SFIT Website', href: '#' },
-    { name: 'Student Portal', href: '#' },
+    { name: 'IEEE Main Site', href: 'https://www.ieee.org/' },
+    { name: 'WIE Global', href: 'https://wie.ieee.org/' },
+    { name: 'SFIT Website', href: 'https://www.sfit.ac.in/' },
+    { name: 'Student Portal', href: 'https://sfiterp.sfit.co.in:98/' },
   ];
 
   return (
@@ -66,9 +66,8 @@ const Footer = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
-        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 transition-all duration-700 ${
-          footerVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0 translate-y-8'
-        }`}>
+        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 transition-all duration-700 ${footerVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0 translate-y-8'
+          }`}>
           {/* Brand Section */}
           <div className="lg:col-span-2">
             <div className="flex items-center space-x-3 mb-6 group cursor-pointer">
@@ -82,32 +81,53 @@ const Footer = () => {
                 <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent animate-gradient-shift group-hover:scale-105 transition-transform duration-300">
                   IEEE×WIE SFIT
                 </h3>
-                <p className={`text-gray-400 text-sm transition-all duration-1000 ${
-                  sloganVisible ? 'animate-fade-in-left opacity-100' : 'opacity-70'
-                }`}>Empowering Women in Engineering</p>
+                <p className={`text-gray-400 text-sm transition-all duration-1000 ${sloganVisible ? 'animate-fade-in-left opacity-100' : 'opacity-70'
+                  }`}>Empowering Women in Engineering</p>
               </div>
             </div>
-            
-            <p className={`text-gray-300 leading-relaxed mb-6 max-w-md transition-all duration-700 ${
-              footerVisible ? 'animate-fade-in-right opacity-100' : 'opacity-0 translate-x-8'
-            } animation-delay-300`}>
+
+            <p className={`text-gray-300 leading-relaxed mb-6 max-w-md transition-all duration-700 ${footerVisible ? 'animate-fade-in-right opacity-100' : 'opacity-0 translate-x-8'
+              } animation-delay-300`}>
               The IEEE Women in Engineering Student Branch at St. Francis Institute of Technology
               is dedicated to inspiring and empowering women engineers through innovative programs,
               mentorship, and professional development opportunities.
             </p>
-            
-            <div className={`flex space-x-4 transition-all duration-700 ${
-              footerVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0 translate-y-4'
-            } animation-delay-500`}>
+
+            <div
+              className={`flex space-x-4 transition-all duration-700 ${footerVisible ? "animate-fade-in-up opacity-100" : "opacity-0 translate-y-4"
+                } animation-delay-500`}
+            >
               {[
-                { icon: Instagram, gradient: 'from-pink-500 to-rose-500', delay: '0ms' },
-                { icon: Linkedin, gradient: 'from-blue-500 to-blue-600', delay: '100ms' },
-                { icon: Twitter, gradient: 'from-blue-400 to-blue-500', delay: '200ms' },
-                { icon: Globe, gradient: 'from-gray-600 to-gray-700', delay: '300ms' }
+                {
+                  icon: Instagram,
+                  gradient: "from-pink-500 to-rose-500",
+                  delay: "0ms",
+                  href: "https://www.instagram.com/ieeesfit?utm_source=ig_web_button_share_sheet&igsh=MTR4Y2p6MjBqNHhlcQ==#",
+                },
+                {
+                  icon: Linkedin,
+                  gradient: "from-blue-500 to-blue-600",
+                  delay: "100ms",
+                  href: "https://www.linkedin.com/company/ieeesfit/",
+                },
+                {
+                  icon: Twitter, // Keeping Twitter icon but linking it to X
+                  gradient: "from-blue-400 to-blue-500",
+                  delay: "200ms",
+                  href: "https://x.com/ieee_sfit",
+                },
+                {
+                  icon: Globe,
+                  gradient: "from-gray-600 to-gray-700",
+                  delay: "300ms",
+                  href: "https://www.ieee.org/",
+                },
               ].map((social, index) => (
                 <a
                   key={index}
-                  href="#"
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className={`w-10 h-10 bg-gradient-to-r ${social.gradient} rounded-lg flex items-center justify-center hover:scale-110 hover:rotate-12 transition-all duration-300 hover:shadow-lg group`}
                   style={{ animationDelay: social.delay }}
                 >
@@ -118,15 +138,13 @@ const Footer = () => {
           </div>
 
           {/* Quick Links */}
-          <div ref={linksRef} className={`transition-all duration-700 ${
-            footerVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0 translate-y-8'
-          } animation-delay-700`}>
+          <div ref={linksRef} className={`transition-all duration-700 ${footerVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0 translate-y-8'
+            } animation-delay-700`}>
             <h4 className="text-lg font-semibold mb-6 text-blue-400">Quick Links</h4>
             <ul className="space-y-3">
               {quickLinks.map((link, index) => (
-                <li key={link.name} className={`transition-all duration-500 ${
-                  linksVisible[index] ? 'animate-fade-in-left opacity-100' : 'opacity-0 -translate-x-4'
-                }`} style={{ transitionDelay: `${800 + index * 100}ms` }}>
+                <li key={link.name} className={`transition-all duration-500 ${linksVisible[index] ? 'animate-fade-in-left opacity-100' : 'opacity-0 -translate-x-4'
+                  }`} style={{ transitionDelay: `${800 + index * 100}ms` }}>
                   <a
                     href={link.href}
                     className="text-gray-300 hover:text-blue-400 transition-all duration-300 hover:translate-x-2 transform inline-block group relative"
@@ -140,15 +158,13 @@ const Footer = () => {
           </div>
 
           {/* Resources */}
-          <div className={`transition-all duration-700 ${
-            footerVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0 translate-y-8'
-          } animation-delay-900`}>
+          <div className={`transition-all duration-700 ${footerVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0 translate-y-8'
+            } animation-delay-900`}>
             <h4 className="text-lg font-semibold mb-6 text-purple-400">Resources</h4>
             <ul className="space-y-3">
               {resources.map((resource, index) => (
-                <li key={resource.name} className={`transition-all duration-500 ${
-                  linksVisible[index + 4] ? 'animate-fade-in-left opacity-100' : 'opacity-0 -translate-x-4'
-                }`} style={{ transitionDelay: `${1000 + index * 100}ms` }}>
+                <li key={resource.name} className={`transition-all duration-500 ${linksVisible[index + 4] ? 'animate-fade-in-left opacity-100' : 'opacity-0 -translate-x-4'
+                  }`} style={{ transitionDelay: `${1000 + index * 100}ms` }}>
                   <a
                     href={resource.href}
                     className="text-gray-300 hover:text-purple-400 transition-all duration-300 hover:translate-x-2 transform inline-block group relative"
@@ -163,24 +179,23 @@ const Footer = () => {
         </div>
 
         {/* Contact Info */}
-        <div className={`border-t border-gray-800 mt-12 pt-8 transition-all duration-700 ${
-          footerVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0 translate-y-8'
-        } animation-delay-1200`}>
+        <div className={`border-t border-gray-800 mt-12 pt-8 transition-all duration-700 ${footerVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0 translate-y-8'
+          } animation-delay-1200`}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <h4 className="text-lg font-semibold mb-4 text-green-400">Contact Information</h4>
               <div className="space-y-3">
                 <div className="flex items-center space-x-3 group hover:scale-105 transition-transform duration-300">
                   <Mail className="w-5 h-5 text-blue-400 group-hover:animate-bounce" />
-                  <span className="text-gray-300 group-hover:text-blue-400 transition-colors duration-300">ieee.wie@sfit.ac.in</span>
+                  <span className="text-gray-300 group-hover:text-blue-400 transition-colors duration-300">ieeesfitsb@gmail.com</span>
                 </div>
                 <div className="flex items-center space-x-3 group hover:scale-105 transition-transform duration-300">
                   <Phone className="w-5 h-5 text-green-400 group-hover:animate-bounce" />
-                  <span className="text-gray-300 group-hover:text-green-400 transition-colors duration-300">+91 98765 43210</span>
+                  <span className="text-gray-300 group-hover:text-green-400 transition-colors duration-300">+91 88282 32392</span>
                 </div>
               </div>
             </div>
-            
+
             <div>
               <h4 className="text-lg font-semibold mb-4 text-pink-400">Address</h4>
               <p className="text-gray-300 hover:text-gray-200 transition-colors duration-300 leading-relaxed">
@@ -193,15 +208,13 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className={`border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center transition-all duration-700 ${
-          footerVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0 translate-y-4'
-        } animation-delay-1500`}>
+        <div className={`border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center transition-all duration-700 ${footerVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0 translate-y-4'
+          } animation-delay-1500`}>
           <p className="text-gray-400 text-sm mb-4 md:mb-0 hover:text-gray-300 transition-colors duration-300">
             © {currentYear} IEEE×WIE SFIT. All rights reserved.
           </p>
-          <div ref={sloganRef} className={`flex items-center space-x-2 text-gray-400 text-sm transition-all duration-1000 ${
-            sloganVisible ? 'animate-pulse opacity-100' : 'opacity-80'
-          }`}>
+          <div ref={sloganRef} className={`flex items-center space-x-2 text-gray-400 text-sm transition-all duration-1000 ${sloganVisible ? 'animate-pulse opacity-100' : 'opacity-80'
+            }`}>
             <span className="hover:text-gray-300 transition-colors duration-300">Made with</span>
             <Heart className="w-4 h-4 text-red-500 animate-pulse hover:animate-bounce hover:scale-125 transition-transform duration-300" />
             <span className="hover:text-gray-300 transition-colors duration-300">by IEEE×WIE SFIT Team</span>
@@ -210,9 +223,8 @@ const Footer = () => {
       </div>
 
       {/* Animated motivational quote that fades in and out */}
-      <div className={`absolute bottom-20 left-1/2 transform -translate-x-1/2 text-center transition-all duration-2000 ${
-        sloganVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0'
-      }`}>
+      <div className={`absolute bottom-20 left-1/2 transform -translate-x-1/2 text-center transition-all duration-2000 ${sloganVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0'
+        }`}>
         <p className="text-blue-400 text-lg font-medium italic animate-pulse">
           "Empowering today's women engineers to build tomorrow's innovations"
         </p>

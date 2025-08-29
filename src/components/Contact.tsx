@@ -11,7 +11,7 @@ const Contact = () => {
             Get In <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Touch</span>
           </h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            Have questions about our events, want to collaborate, or interested in joining our community? 
+            Have questions about our events, want to collaborate, or interested in joining our community?
             We'd love to hear from you!
           </p>
         </div>
@@ -21,7 +21,7 @@ const Contact = () => {
           <div className="space-y-8">
             <div>
               <h3 className="text-2xl font-bold mb-6">Contact Information</h3>
-              
+
               <div className="space-y-6">
                 <div className="flex items-start space-x-4">
                   <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -29,8 +29,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h4 className="font-semibold mb-1">Email</h4>
-                    <p className="text-gray-300">ieee.wie@sfit.ac.in</p>
-                    <p className="text-gray-300">contact@ieeewiesfit.org</p>
+                    <p className="text-gray-300">ieeesfitsb@gmail.com</p>
                   </div>
                 </div>
 
@@ -40,8 +39,8 @@ const Contact = () => {
                   </div>
                   <div>
                     <h4 className="font-semibold mb-1">Phone</h4>
-                    <p className="text-gray-300">+91 98765 43210</p>
-                    <p className="text-gray-300">+91 87654 32109</p>
+                    <p className="text-gray-300">+91 87882 58440</p>
+                    <p className="text-gray-300">+91 88282 32392</p>
                   </div>
                 </div>
 
@@ -77,25 +76,25 @@ const Contact = () => {
               <h3 className="text-2xl font-bold mb-6">Follow Us</h3>
               <div className="flex space-x-4">
                 <a
-                  href="#"
+                  href="https://www.instagram.com/ieeesfit?utm_source=ig_web_button_share_sheet&igsh=MTR4Y2p6MjBqNHhlcQ==#"
                   className="w-12 h-12 bg-gradient-to-r from-pink-500 to-rose-500 rounded-lg flex items-center justify-center hover:scale-110 transition-transform duration-300"
                 >
                   <Instagram className="w-6 h-6" />
                 </a>
                 <a
-                  href="#"
+                  href="https://www.linkedin.com/company/ieeesfit/"
                   className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center hover:scale-110 transition-transform duration-300"
                 >
                   <Linkedin className="w-6 h-6" />
                 </a>
                 <a
-                  href="#"
+                  href="https://x.com/ieee_sfit"
                   className="w-12 h-12 bg-gradient-to-r from-blue-400 to-blue-500 rounded-lg flex items-center justify-center hover:scale-110 transition-transform duration-300"
                 >
                   <Twitter className="w-6 h-6" />
                 </a>
                 <a
-                  href="#"
+                  href="https://www.ieee.org/"
                   className="w-12 h-12 bg-gradient-to-r from-gray-600 to-gray-700 rounded-lg flex items-center justify-center hover:scale-110 transition-transform duration-300"
                 >
                   <Globe className="w-6 h-6" />
@@ -126,7 +125,7 @@ const Contact = () => {
                   />
                 </div>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium mb-2">Email</label>
                 <input
@@ -135,7 +134,7 @@ const Contact = () => {
                   placeholder="Enter your email"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium mb-2">Subject</label>
                 <input
@@ -144,7 +143,7 @@ const Contact = () => {
                   placeholder="What's this about?"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium mb-2">Message</label>
                 <textarea
@@ -153,7 +152,7 @@ const Contact = () => {
                   placeholder="Tell us more about your inquiry..."
                 ></textarea>
               </div>
-              
+
               <button
                 type="submit"
                 className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white py-4 rounded-lg font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center"
