@@ -1,407 +1,357 @@
-import React, { useState } from 'react';
-import { Linkedin, Mail, Github, Award, Users, Star, ChevronDown } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Linkedin, Mail, Github, Award, Users, Star, ChevronDown, Instagram, Frown } from 'lucide-react';
+// Make sure your hooks are correctly imported from their location
 import { useScrollAnimation, useStaggeredAnimation } from '../hooks/useScrollAnimation';
 
-const TeamPage = () => {
-  const [activeCategory, setActiveCategory] = useState('all');
-  
-  const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation({
-    threshold: 0.3,
-    triggerOnce: true
-  });
-  
-  const { ref: teamRef, visibleItems: teamVisible } = useStaggeredAnimation(12, 150);
+// --- TYPE DEFINITIONS ---
+interface SocialLinks {
+  linkedin: string;
+  email: string;
+  github: string;
+  instagram: string;
+}
 
-  const teamMembers = [
-    {
-      id: 1,
-      name: "Priya Sharma",
-      role: "Chapter President",
-      category: "executive",
-      year: "Final Year",
-      branch: "Computer Engineering",
-      image: "https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=400",
-      bio: "Leading IEEE×WIE SFIT with passion for women empowerment in technology and innovation.",
-      achievements: ["Best Student Leader 2023", "Google WTM Ambassador", "Hackathon Winner"],
-      skills: ["Leadership", "Machine Learning", "Public Speaking"],
-      social: {
-        linkedin: "#",
-        email: "priya@ieee.sfit.ac.in",
-        github: "#"
-      },
-      featured: true
-    },
-    {
-      id: 2,
-      name: "Anita Gupta",
-      role: "Vice President",
-      category: "executive",
-      year: "Third Year",
-      branch: "Electronics Engineering",
-      image: "https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=400",
-      bio: "Driving technical excellence and fostering innovation in electronics and IoT domains.",
-      achievements: ["IEEE Student Ambassador", "Best Project Award", "Tech Innovation Contest Winner"],
-      skills: ["IoT", "Electronics Design", "Project Management"],
-      social: {
-        linkedin: "#",
-        email: "anita@ieee.sfit.ac.in",
-        github: "#"
-      },
-      featured: true
-    },
-    {
-      id: 3,
-      name: "Kavita Singh",
-      role: "Technical Secretary",
-      category: "executive",
-      year: "Final Year",
-      branch: "Information Technology",
-      image: "https://images.pexels.com/photos/1181533/pexels-photo-1181533.jpeg?auto=compress&cs=tinysrgb&w=400",
-      bio: "Organizing technical workshops and ensuring quality in all IEEE×WIE technical initiatives.",
-      achievements: ["Microsoft Student Partner", "Coding Competition Winner", "Research Paper Published"],
-      skills: ["Full Stack Development", "Data Science", "Research"],
-      social: {
-        linkedin: "#",
-        email: "kavita@ieee.sfit.ac.in",
-        github: "#"
-      }
-    },
-    {
-      id: 4,
-      name: "Riya Desai",
-      role: "Event Coordinator",
-      category: "executive",
-      year: "Third Year",
-      branch: "Computer Engineering",
-      image: "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=400",
-      bio: "Coordinating and managing all IEEE×WIE events with creativity and attention to detail.",
-      achievements: ["Event Management Excellence", "Cultural Fest Organizer", "Volunteer Recognition"],
-      skills: ["Event Planning", "Team Coordination", "Creative Design"],
-      social: {
-        linkedin: "#",
-        email: "riya@ieee.sfit.ac.in",
-        github: "#"
-      }
-    },
-    {
-      id: 5,
-      name: "Meera Patel",
-      role: "Publicity Head",
-      category: "executive",
-      year: "Second Year",
-      branch: "Electronics Engineering",
-      image: "https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg?auto=compress&cs=tinysrgb&w=400",
-      bio: "Managing social media presence and promoting IEEE×WIE initiatives across platforms.",
-      achievements: ["Digital Marketing Certification", "Social Media Growth Award", "Content Creation Excellence"],
-      skills: ["Digital Marketing", "Content Creation", "Social Media"],
-      social: {
-        linkedin: "#",
-        email: "meera@ieee.sfit.ac.in",
-        github: "#"
-      }
-    },
-    {
-      id: 6,
-      name: "Shreya Agarwal",
-      role: "Treasurer",
-      category: "executive",
-      year: "Third Year",
-      branch: "Information Technology",
-      image: "https://images.pexels.com/photos/5380664/pexels-photo-5380664.jpeg?auto=compress&cs=tinysrgb&w=400",
-      bio: "Managing finances and ensuring proper resource allocation for all chapter activities.",
-      achievements: ["Finance Management Certificate", "Budget Planning Excellence", "Audit Appreciation"],
-      skills: ["Financial Planning", "Budget Management", "Analytics"],
-      social: {
-        linkedin: "#",
-        email: "shreya@ieee.sfit.ac.in",
-        github: "#"
-      }
-    },
-    {
-      id: 7,
-      name: "Nisha Agrawal",
-      role: "Web Development Lead",
-      category: "technical",
-      year: "Second Year",
-      branch: "Computer Engineering",
-      image: "https://images.pexels.com/photos/6963944/pexels-photo-6963944.jpeg?auto=compress&cs=tinysrgb&w=400",
-      bio: "Leading web development initiatives and maintaining IEEE×WIE digital presence.",
-      achievements: ["Web Development Competition Winner", "Open Source Contributor", "UI/UX Design Award"],
-      skills: ["React", "Node.js", "UI/UX Design"],
-      social: {
-        linkedin: "#",
-        email: "nisha@ieee.sfit.ac.in",
-        github: "#"
-      }
-    },
-    {
-      id: 8,
-      name: "Pooja Sharma",
-      role: "AI/ML Coordinator",
-      category: "technical",
-      year: "Final Year",
-      branch: "Computer Engineering",
-      image: "https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=400",
-      bio: "Coordinating AI/ML workshops and research activities within the chapter.",
-      achievements: ["ML Research Paper", "Data Science Competition", "AI Workshop Organizer"],
-      skills: ["Machine Learning", "Python", "Data Science"],
-      social: {
-        linkedin: "#",
-        email: "pooja@ieee.sfit.ac.in",
-        github: "#"
-      }
-    },
-    {
-      id: 9,
-      name: "Asha Patel",
-      role: "Workshop Coordinator",
-      category: "operations",
-      year: "Second Year",
-      branch: "Electronics Engineering",
-      image: "https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=400",
-      bio: "Organizing and coordinating technical workshops and training sessions.",
-      achievements: ["Workshop Excellence Award", "Training Coordinator", "Skill Development Recognition"],
-      skills: ["Workshop Planning", "Training", "Technical Communication"],
-      social: {
-        linkedin: "#",
-        email: "asha@ieee.sfit.ac.in",
-        github: "#"
-      }
-    },
-    {
-      id: 10,
-      name: "Sunita Rai",
-      role: "Content Writer",
-      category: "operations",
-      year: "First Year",
-      branch: "Information Technology",
-      image: "https://images.pexels.com/photos/1181533/pexels-photo-1181533.jpeg?auto=compress&cs=tinysrgb&w=400",
-      bio: "Creating engaging content for IEEE×WIE publications and digital platforms.",
-      achievements: ["Content Writing Competition", "Blog Post Featured", "Newsletter Recognition"],
-      skills: ["Content Writing", "Research", "Creative Writing"],
-      social: {
-        linkedin: "#",
-        email: "sunita@ieee.sfit.ac.in",
-        github: "#"
-      }
-    },
-    {
-      id: 11,
-      name: "Divya Shah",
-      role: "Social Media Manager",
-      category: "operations",
-      year: "Second Year",
-      branch: "Computer Engineering",
-      image: "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=400",
-      bio: "Managing social media strategies and online community engagement.",
-      achievements: ["Social Media Growth", "Community Building", "Engagement Excellence"],
-      skills: ["Social Media Strategy", "Community Management", "Analytics"],
-      social: {
-        linkedin: "#",
-        email: "divya@ieee.sfit.ac.in",
-        github: "#"
-      }
-    },
-    {
-      id: 12,
-      name: "Neha Verma",
-      role: "Research Coordinator",
-      category: "technical",
-      year: "Final Year",
-      branch: "Electronics Engineering",
-      image: "https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg?auto=compress&cs=tinysrgb&w=400",
-      bio: "Coordinating research activities and promoting academic excellence in engineering.",
-      achievements: ["Research Excellence Award", "Conference Paper", "Innovation Contest"],
-      skills: ["Research", "Technical Writing", "Innovation"],
-      social: {
-        linkedin: "#",
-        email: "neha@ieee.sfit.ac.in",
-        github: "#"
-      }
-    }
-  ];
-
-  const filteredMembers = activeCategory === 'all' 
-    ? teamMembers 
-    : teamMembers.filter(member => member.category === activeCategory);
-
-  const categories = [
-    { id: 'all', name: 'All Members', count: teamMembers.length },
-    { id: 'executive', name: 'Executive Team', count: teamMembers.filter(m => m.category === 'executive').length },
-    { id: 'technical', name: 'Technical Team', count: teamMembers.filter(m => m.category === 'technical').length },
-    { id: 'operations', name: 'Operations Team', count: teamMembers.filter(m => m.category === 'operations').length }
-  ];
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-      {/* Header Section */}
-      <section className="pt-32 pb-20 relative overflow-hidden">
-        <div className="absolute top-20 left-5 w-40 h-40 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-        <div className="absolute bottom-10 right-10 w-32 h-32 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-2000"></div>
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div ref={headerRef} className="text-center mb-16">
-            <h1 className={`text-5xl md:text-6xl font-bold mb-6 transition-all duration-700 ${
-              headerVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0 translate-y-8'
-            }`}>
-              Our <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent animate-gradient-shift">Team</span>
-            </h1>
-            <p className={`text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed transition-all duration-700 ${
-              headerVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0 translate-y-8'
-            } animation-delay-200`}>
-              Meet the passionate women engineers who drive IEEE×WIE SFIT forward, 
-              dedicated to empowering the next generation of technology leaders.
+interface TeamMember {
+  id: number;
+  name: string;
+  role: string;
+  category: string;
+  year: string;
+  branch: string;
+  image: string;
+  bio: string;
+  achievements: string[];
+  skills: string[];
+  social: SocialLinks;
+  featured: boolean;
+  committee: string;
+}
+function TeamLoader() {
+    return (
+        <div className="fixed inset-0 z-50 flex flex-col justify-center items-center ">
+            <p className="text-xl text-black-700 flex items-center">
+                Loading Team Members
+                <span className="flex space-x-2 ml-4">
+                    <span className="animate-bounce text-4xl md:text-5xl">.</span>
+                    <span className="animate-bounce [animation-delay:200ms] text-4xl md:text-5xl">.</span>
+                    <span className="animate-bounce [animation-delay:400ms] text-4xl md:text-5xl">.</span>
+                </span>
             </p>
-          </div>
-
-          {/* Team Stats */}
-          <div className={`grid grid-cols-2 md:grid-cols-4 gap-6 mb-16 transition-all duration-700 ${
-            headerVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0 translate-y-8'
-          } animation-delay-400`}>
-            {[
-              { icon: Users, value: 50, suffix: '+', label: 'Active Members', color: 'blue' },
-              { icon: Award, value: 6, suffix: '', label: 'Executive Leaders', color: 'purple' },
-              { icon: Star, value: 15, suffix: '+', label: 'Award Winners', color: 'pink' },
-              { icon: Users, value: 4, suffix: '', label: 'Year Levels', color: 'indigo' }
-            ].map((stat, index) => (
-              <div 
-                key={stat.label}
-                className={`bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 card-tilt text-center animation-delay-${600 + index * 100}`}
-              >
-                <stat.icon className={`w-8 h-8 mx-auto mb-3 text-${stat.color}-600`} />
-                <div className={`text-3xl font-bold text-${stat.color}-600 mb-2`}>
-                  {stat.value}{stat.suffix}
-                </div>
-                <div className="text-gray-600 text-sm">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Category Filter */}
-          <div className={`flex justify-center mb-12 transition-all duration-700 ${
-            headerVisible ? 'animate-scale-in opacity-100' : 'opacity-0 scale-95'
-          } animation-delay-800`}>
-            <div className="bg-white rounded-full p-1 shadow-lg border border-gray-200 flex flex-wrap justify-center">
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => setActiveCategory(category.id)}
-                  className={`px-4 md:px-6 py-3 rounded-full font-semibold transition-all duration-300 m-1 ${
-                    activeCategory === category.id
-                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg scale-105'
-                      : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
-                  }`}
-                >
-                  {category.name} ({category.count})
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
-      </section>
+    );
+}
 
-      {/* Team Grid */}
-      <section className="pb-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div ref={teamRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {filteredMembers.map((member, index) => (
-              <div
-                key={member.id}
-                className={`bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 card-tilt overflow-hidden group relative ${
-                  teamVisible[index] ? 'animate-slide-in-up opacity-100' : 'opacity-0 translate-y-12'
-                }`}
-                style={{ transitionDelay: `${index * 150}ms` }}
-              >
-                {/* Featured badge */}
-                {member.featured && (
-                  <div className="absolute top-4 right-4 z-10">
-                    <div className="flex items-center px-3 py-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-sm font-medium rounded-full">
-                      <Star className="w-4 h-4 mr-1" />
-                      Featured
+
+// --- HELPER FUNCTIONS ---
+const getDirectImageLink = (googleDriveLink: string | undefined): string => {
+    if (!googleDriveLink || typeof googleDriveLink !== 'string') return '';
+    const fileIdMatch = googleDriveLink.match(/[-\w]{25,}/);
+    if (fileIdMatch && fileIdMatch[0]) {
+        return `https://drive.google.com/thumbnail?id=${fileIdMatch[0]}&sz=w2000`;
+    }
+    return googleDriveLink;
+};
+
+const normalizeYear = (abbr: string = ''): string => {
+    const yearMap: { [key: string]: string } = {
+        'se': 'Second Year', 'te': 'Third Year', 'be': 'Final Year', 'fe': 'First Year',
+    };
+    return yearMap[abbr.toLowerCase().trim()] || abbr;
+};
+
+const normalizeBranch = (abbr: string = ''): string => {
+    const branchMap: { [key: string]: string } = {
+        'cmpn': 'Computer Engineering', 'inft': 'Information Technology', 'extc': 'Electronics & Telecommunication', 'aiml': 'AI & Machine Learning', 'ecs': 'Electronics & Computer Science', 'mech': 'Mechanical Engineering',
+    };
+    return branchMap[abbr.toLowerCase().trim()] || abbr;
+};
+
+const getRolePriority = (role: string, committee: string): number => {
+    const lowerRole = role.toLowerCase();
+    const upperCommittee = committee.toUpperCase();
+    const isWIE = upperCommittee.includes('WIE');
+
+    if (lowerRole.includes('head') && !lowerRole.includes('joint') && !lowerRole.includes('vice')) {
+        return isWIE ? 2 : 1;
+    }
+    if (lowerRole.includes('joint head') || lowerRole.includes('vice head')) {
+        return isWIE ? 4 : 3;
+    }
+    if (lowerRole.includes('executive')) {
+        return isWIE ? 6 : 5;
+    }
+    return 99;
+};
+
+
+const TeamPage: React.FC = () => {
+    const [activeCategory, setActiveCategory] = useState<string>('all');
+    const [activeRole, setActiveRole] = useState<string>('all');
+    const [activeCommittee, setActiveCommittee] = useState<string>('all');
+    const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+
+    const { ref: headerRef } = useScrollAnimation({ threshold: 0.3, triggerOnce: true });
+    const { ref: teamRef, visibleItems: teamVisible } = useStaggeredAnimation(teamMembers.length, 150);
+
+    // This effect resets the Role and Committee filters when the main Category changes
+    useEffect(() => {
+        setActiveRole('all');
+        setActiveCommittee('all');
+    }, [activeCategory]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch("https://script.google.com/macros/s/AKfycbzGTQv525hbcuS2wHFHlynwo4dcBRztbkK1_hBn3SyP1TykvC-oq1wqQEwSpj9iDnsw/exec");
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                
+                const rawData: (string | number)[][] = await response.json();
+                if (!Array.isArray(rawData) || rawData.length < 2) throw new Error("Invalid or empty data format received from API.");
+
+                const headers = rawData[0].map(header => String(header).trim());
+                const memberRows = rawData.slice(1);
+                
+                const transformedData: TeamMember[] = memberRows.map((row, rowIndex) => {
+                    const memberObject: { [key: string]: string | number } = headers.reduce((acc, header, i) => {
+                        acc[header] = row[i]; return acc;
+                    }, {} as { [key: string]: string | number });
+                    
+                    const cleanMember = memberObject;
+                    const domainRoleParts = String(cleanMember['Domain-Role'] || '').split('-');
+                    const domain = domainRoleParts[0]?.trim() || '';
+                    const role = domainRoleParts.slice(1).join('-').trim() || 'Member';
+                    const [yearAbbr = '', branchAbbr = ''] = String(cleanMember['Year-Branch'] || '').split('-').map(s => s.trim());
+                    const skills = String(cleanMember['Skills'] || '').split(',').map(skill => skill.trim()).filter(Boolean);
+                    const formatName = (name: string) => name.split(' ').map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()).join(' ');
+
+                    // Helper to capitalize first letter of each sentence and proper nouns
+                    const capitalizeSentences = (text: string) => {
+                        if (!text) return '';
+                        // Split by sentence-ending punctuation
+                        return text
+                            .split(/([.!?]\s+)/)
+                            .map((part, idx, arr) => {
+                                // If it's a sentence (not just punctuation)
+                                if (part.trim().length > 0 && !/[.!?]\s+/.test(part)) {
+                                    // Capitalize first letter of each word (for proper nouns)
+                                    return part
+                                        .split(' ')
+                                        .map((word, i) => {
+                                            // Capitalize first word, or if previous part ends with punctuation
+                                            if (i === 0 || (idx > 0 && /[.!?]\s+$/.test(arr[idx - 1]))) {
+                                                return word.charAt(0).toUpperCase() + word.slice(1);
+                                            }
+                                            // Otherwise, keep as is
+                                            return word;
+                                        })
+                                        .join(' ');
+                                }
+                                return part;
+                            })
+                            .join('');
+                    };
+
+                    return {
+                        id: rowIndex + 1,
+                        name: formatName(String(cleanMember['Full Name'] || 'N/A')),
+                        role: role
+                            .split(' ')
+                            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                            .join(' '),
+                        category: domain.toLowerCase() || 'general',
+                        year: normalizeYear(yearAbbr),
+                        branch: normalizeBranch(branchAbbr),
+                        image: getDirectImageLink(String(cleanMember['Picture'])),
+                        bio: capitalizeSentences(String(cleanMember['About Bio'] || 'A passionate member of the team.').toLowerCase()),
+                        achievements: [],
+                        skills: skills.map(skill =>
+                            skill
+                                .split(' ')
+                                .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                                .join(' ')
+                        ),
+                        social: {
+                            linkedin: String(cleanMember['LinkedIn Profile Link'] || '#'),
+                            email: `mailto:${cleanMember['Email Address']}` || '#',
+                            github: String(cleanMember['Github Link'] || '#'),
+                            instagram: String(cleanMember['Instagram Link'] || '#')
+                        },
+                        featured: (domain.toLowerCase() === 'core'),
+                        committee: String(cleanMember['Committee'] || 'N/A').toUpperCase(),
+                    };
+                });
+                
+                const sortedData = transformedData.sort((a, b) => {
+                    const categoryComparison = a.category.localeCompare(b.category);
+                    if (categoryComparison !== 0) return categoryComparison;
+                    if (a.category === 'core') return a.id - b.id;
+                    const priorityA = getRolePriority(a.role, a.committee);
+                    const priorityB = getRolePriority(b.role, b.committee);
+                    if (priorityA !== priorityB) return priorityA - priorityB;
+                    return a.name.localeCompare(b.name);
+                });
+                
+                setTeamMembers(sortedData);
+            } catch (e: any) {
+                console.error("Failed to fetch team data:", e);
+                setError(e.message || "Could not load team members.");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchData();
+    }, []);
+
+    // --- DYNAMIC FILTER OPTIONS ---
+    const mainCategories = [
+        { id: 'all', name: 'All Members', count: teamMembers.length },
+        ...[...new Set(teamMembers.map(m => m.category))].sort().map(cat => ({
+            id: cat, name: `${cat.charAt(0).toUpperCase() + cat.slice(1)}`, count: teamMembers.filter(m => m.category === cat).length
+        }))
+    ];
+
+    // Options for dropdowns are now based on the selected category
+    const membersInActiveCategory = teamMembers.filter(member => activeCategory === 'all' || member.category === activeCategory);
+    const roleOptions = [...new Set(membersInActiveCategory.map(m => m.role))].sort();
+    const committeeOptions = [...new Set(membersInActiveCategory.map(m => m.committee))].sort();
+
+    // Final filtering logic for displaying members
+    const filteredMembers = membersInActiveCategory
+        .filter(member => activeRole === 'all' || member.role === activeRole)
+        .filter(member => activeCommittee === 'all' || member.committee === activeCommittee);
+    
+    const executiveCount = teamMembers.filter(m => m.category === 'core').length;
+
+    if (isLoading) return <TeamLoader />;
+    if (error) return <div className="flex items-center justify-center min-h-screen text-xl font-semibold text-red-500">{error}</div>;
+    
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+            {/* Header Section */}
+            <section className="pt-32 pb-12 relative overflow-hidden ">
+                  <div className="absolute top-10 left-5 w-40 h-40 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+  <div className="absolute top-20 right-10 w-32 h-32 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-2000"></div>
+  <div className="absolute top-40 left-1/3 w-48 h-48 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-4000"></div>
+  <div className="absolute top-60 right-1/4 w-28 h-28 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-1000"></div>
+  <div className="absolute top-80 left-10 w-36 h-36 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-3000"></div>
+
+  {/* Row 2 */}
+  <div className="absolute top-[30rem] left-1/5 w-44 h-44 bg-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+  <div className="absolute top-[34rem] right-20 w-52 h-52 bg-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-1500"></div>
+  <div className="absolute top-[38rem] left-1/2 w-24 h-24 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-2500"></div>
+  <div className="absolute top-[42rem] right-1/3 w-60 h-60 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-3500"></div>
+  <div className="absolute top-[46rem] left-16 w-30 h-30 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-500"></div>
+
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+                    <div ref={headerRef} className="text-center mb-16">
+                        <h1 className="text-5xl md:text-6xl font-bold mb-6 opacity-100">Our <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent animate-gradient-shift">Team</span></h1>
+                        <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed opacity-100">Meet the passionate individuals who drive our committee forward, dedicated to empowering the next generation of technology leaders.</p>
                     </div>
-                  </div>
-                )}
 
-                {/* Profile Image */}
-                <div className="relative overflow-hidden">
-                  <img
-                    src={member.image}
-                    alt={member.name}
-                    className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  
-                  {/* Social Links Overlay */}
-                  <div className="absolute bottom-4 left-4 right-4 flex justify-center space-x-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <a href={member.social.linkedin} className="w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300">
-                      <Linkedin className="w-4 h-4 text-blue-600" />
-                    </a>
-                    <a href={member.social.email} className="w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300">
-                      <Mail className="w-4 h-4 text-green-600" />
-                    </a>
-                    <a href={member.social.github} className="w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300">
-                      <Github className="w-4 h-4 text-gray-800" />
-                    </a>
-                  </div>
-                </div>
-
-                {/* Member Info */}
-                <div className="p-6">
-                  <div className="mb-4">
-                    <h3 className="text-xl font-bold text-gray-800 mb-1 group-hover:text-blue-600 transition-colors duration-300">
-                      {member.name}
-                    </h3>
-                    <p className="text-blue-600 font-semibold text-sm mb-1">{member.role}</p>
-                    <p className="text-gray-500 text-sm">{member.year} • {member.branch}</p>
-                  </div>
-
-                  <p className="text-gray-600 text-sm leading-relaxed mb-4">
-                    {member.bio}
-                  </p>
-
-                  {/* Skills */}
-                  <div className="mb-4">
-                    <h4 className="text-sm font-semibold text-gray-800 mb-2">Skills:</h4>
-                    <div className="flex flex-wrap gap-1">
-                      {member.skills.map((skill, skillIndex) => (
-                        <span 
-                          key={skillIndex}
-                          className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full hover:bg-blue-200 transition-colors duration-300"
-                        >
-                          {skill}
-                        </span>
-                      ))}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16 opacity-100">
+                        {[
+                            { icon: Users, value: teamMembers.length, suffix: '', label: 'Active Members', color: 'blue' },
+                            { icon: Award, value: executiveCount, suffix: '', label: 'Core Leaders', color: 'purple' },
+                            { icon: Star, value: 15, suffix: '+', label: 'Events Hosted', color: 'pink' },
+                            { icon: Users, value: 4, suffix: '', label: 'Year Levels', color: 'indigo' }
+                        ].map((stat) => (
+                            <div key={stat.label} className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 card-tilt text-center">
+                                <stat.icon className={`w-8 h-8 mx-auto mb-3 text-${stat.color}-600`} />
+                                <div className={`text-3xl font-bold text-${stat.color}-600 mb-2`}>{stat.value}{stat.suffix}</div>
+                                <div className="text-gray-600 text-sm">{stat.label}</div>
+                            </div>
+                        ))}
                     </div>
-                  </div>
 
-                  {/* Achievements */}
-                  <div>
-                    <h4 className="text-sm font-semibold text-gray-800 mb-2">Achievements:</h4>
-                    <div className="space-y-1">
-                      {member.achievements.slice(0, 2).map((achievement, achIndex) => (
-                        <div key={achIndex} className="flex items-start">
-                          <Award className="w-3 h-3 text-yellow-500 mt-0.5 mr-2 flex-shrink-0" />
-                          <span className="text-xs text-gray-600">{achievement}</span>
+                    <div className="flex flex-col items-center justify-center gap-6 mb-12">
+                        <div className="bg-white rounded-full p-1 shadow-lg border border-gray-200 flex flex-wrap justify-center">
+                            {mainCategories.map((category) => (
+                                <button
+                                    key={category.id}
+                                    onClick={() => setActiveCategory(category.id)}
+                                    className={`px-4 md:px-6 py-3 rounded-full font-semibold transition-all duration-300 m-1 ${activeCategory === category.id ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg scale-105' : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'}`}
+                                >
+                                    {category.name} ({category.count})
+                                </button>
+                            ))}
                         </div>
-                      ))}
-                      {member.achievements.length > 2 && (
-                        <button className="flex items-center text-xs text-blue-600 hover:text-blue-800 transition-colors duration-300">
-                          <ChevronDown className="w-3 h-3 mr-1" />
-                          View more
-                        </button>
-                      )}
+
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                            <div className="relative">
+                                <select value={activeRole} onChange={(e) => setActiveRole(e.target.value)} className="appearance-none w-full bg-white border border-gray-200 rounded-full pl-4 pr-8 py-2 text-gray-700 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-sm">
+                                    <option value="all">All Roles</option>
+                                    {roleOptions.map(role => (<option key={role} value={role}>{role}</option>))}
+                                </select>
+                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700"><ChevronDown className="h-4 w-4" /></div>
+                            </div>
+
+                            <div className="relative">
+                                <select value={activeCommittee} onChange={(e) => setActiveCommittee(e.target.value)} className="appearance-none w-full bg-white border border-gray-200 rounded-full pl-4 pr-8 py-2 text-gray-700 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-sm">
+                                    <option value="all">All Committees</option>
+                                    {committeeOptions.map(com => (<option key={com} value={com}>{com}</option>))}
+                                </select>
+                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700"><ChevronDown className="h-4 w-4" /></div>
+                            </div>
+                        </div>
                     </div>
-                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+            </section>
+
+            {/* Team Grid */}
+            <section className="pb-20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div ref={teamRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                        {filteredMembers.length > 0 ? (
+                            filteredMembers.map((member, index) => (
+                               <div key={member.id} className={`bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 card-tilt overflow-hidden group relative ${teamVisible[index] ? 'animate-slide-in-up opacity-100' : 'opacity-0 translate-y-12'}`} style={{ transitionDelay: `${index * 150}ms` }}>
+                                   {member.featured && (<div className="absolute top-4 right-4 z-10"><div className="flex items-center px-3 py-1 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-sm font-medium rounded-full"><Star className="w-4 h-4 mr-1" /> Core</div></div>)}
+                                   <div className="relative overflow-hidden">
+                                       <img src={member.image} alt={member.name} className="w-full h-64 object-cover object-center group-hover:scale-110 group-hover:brightness-125 transition duration-700" />
+                                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                                       <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-3 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:bottom-6">
+                                           <a href={member.social.linkedin} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"><Linkedin className="w-5 h-5 text-blue-700" /></a>
+                                           <a href={member.social.github} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"><Github className="w-5 h-5 text-gray-800" /></a>
+                                           <a href={member.social.instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"><Instagram className="w-5 h-5 text-pink-600" /></a>
+                                           <a href={member.social.email} className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"><Mail className="w-5 h-5 text-green-600" /></a>
+                                       </div>
+                                   </div>
+                                   <div className="p-6">
+                                       <h3 className="text-xl font-bold text-gray-800 mb-1 group-hover:text-blue-600">{member.name}</h3>
+                                       <p className="text-blue-600 font-semibold text-sm mb-1">{member.role}</p>
+                                       <p className="text-gray-500 text-sm mb-4">{member.year} • {member.branch}</p>
+                                    <p className="text-gray-600 text-sm leading-relaxed mb-4 h-20 overflow-hidden">
+                                        {member.bio.length > 100
+                                            ? (() => {
+                                                const truncated = member.bio.slice(0, 100);
+                                                const lastSpace = truncated.lastIndexOf(' ');
+                                                const safeTruncate = lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated;
+                                                return <>{safeTruncate}...</>;
+                                            })()
+                                            : member.bio}
+                                    </p>
+                                       <div className="mb-4">
+                                           <h4 className="text-sm font-semibold text-gray-800 mb-2">Skills:</h4>
+                                           <div className="flex flex-wrap gap-1">
+                                               {member.skills.slice(0, 5).map((skill, skillIndex) => (<span key={skillIndex} className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">{skill}</span>))}
+                                           </div>
+                                       </div>
+                                   </div>
+                               </div>
+                            ))
+                        ) : (
+                            <div className="col-span-full text-center py-16 flex flex-col items-center justify-center">
+                                <Frown className="w-16 h-16 text-gray-400 mb-4" />
+                                <h3 className="text-2xl font-semibold text-gray-600">No Members Found</h3>
+                                <p className="text-gray-500 mt-2">Try adjusting your filters to find who you're looking for.</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </section>
         </div>
-      </section>
-    </div>
-  );
+    );
 };
 
 export default TeamPage;

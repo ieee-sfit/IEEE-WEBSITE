@@ -20,9 +20,18 @@ const Hero = () => {
       <SplashCursor SPLAT_RADIUS={0.05}/>
       {/* Animated Background Elements */}
       <div className="absolute inset-0">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-        <div className="absolute top-40 right-10 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+          <div className="absolute top-10 left-5 w-40 h-40 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+  <div className="absolute top-20 right-10 w-32 h-32 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-2000"></div>
+  <div className="absolute top-40 left-1/3 w-48 h-48 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-4000"></div>
+  <div className="absolute top-60 right-1/4 w-28 h-28 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-1000"></div>
+  <div className="absolute top-80 left-10 w-36 h-36 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-3000"></div>
+
+  {/* Row 2 */}
+  <div className="absolute top-[30rem] left-1/5 w-44 h-44 bg-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+  <div className="absolute top-[34rem] right-20 w-52 h-52 bg-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-1500"></div>
+  <div className="absolute top-[38rem] left-1/2 w-24 h-24 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-2500"></div>
+  <div className="absolute top-[42rem] right-1/3 w-60 h-60 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-3500"></div>
+  <div className="absolute top-[46rem] left-16 w-30 h-30 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-500"></div>
 
 
 
@@ -73,13 +82,19 @@ const Hero = () => {
           <div className={`flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 transition-all duration-700 ${
             heroVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0 translate-y-8'
           } animation-delay-800`}>
-            <button className="group btn-ripple btn-glow px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center relative overflow-hidden">
+            <a
+              href="/events"
+              className="group btn-ripple btn-glow px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center relative overflow-hidden"
+            >
               <span className="relative z-10">Explore Events</span>
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300 relative z-10" />
-            </button>
-            <button className="btn-ripple px-8 py-4 bg-white/80 backdrop-blur-sm text-gray-700 rounded-full font-semibold border border-gray-200 hover:bg-white hover:shadow-lg hover:scale-105 transition-all duration-300 relative overflow-hidden">
+            </a>
+            <a
+              href="/team"
+              className="btn-ripple px-8 py-4 bg-white/80 backdrop-blur-sm text-gray-700 rounded-full font-semibold border border-gray-200 hover:bg-white hover:shadow-lg hover:scale-105 transition-all duration-300 relative overflow-hidden"
+            >
               <span className="relative z-10">Meet Our Team</span>
-            </button>
+            </a>
           </div>
 
           {/* Stats */}

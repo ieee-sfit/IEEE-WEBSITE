@@ -1,5 +1,7 @@
 import React from 'react';
 import { Mail, Phone, MapPin, Instagram, Linkedin, Twitter, Send, Clock, Globe } from 'lucide-react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 
 const Contact = () => {
   return (
@@ -65,7 +67,6 @@ const Contact = () => {
                   <div>
                     <h4 className="font-semibold mb-1">Office Hours</h4>
                     <p className="text-gray-300">Monday - Friday: 9:00 AM - 5:00 PM</p>
-                    <p className="text-gray-300">Saturday: 9:00 AM - 1:00 PM</p>
                   </div>
                 </div>
               </div>
@@ -165,22 +166,51 @@ const Contact = () => {
         </div>
 
         {/* Map Section */}
-        <div className="mt-16">
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-            <h3 className="text-2xl font-bold mb-6 text-center">Find Us</h3>
-            <div className="w-full h-80 bg-gray-800 rounded-lg flex items-center justify-center">
-              <div className="text-center">
-                <MapPin className="w-16 h-16 text-blue-400 mx-auto mb-4" />
-                <h4 className="text-xl font-semibold mb-2">St. Francis Institute of Technology</h4>
-                <p className="text-gray-300">Mount Poinsur, S.V.P. Road, Borivali (West)</p>
-                <p className="text-gray-300">Mumbai - 400103, Maharashtra, India</p>
-                <button className="mt-4 px-6 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors duration-300">
-                  View on Google Maps
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+  {/* Map & Google Maps Button Section */}
+<div className="mt-16">
+  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
+    <h3 className="text-2xl font-bold mb-6 text-center">Find Us</h3>
+    <div className="flex flex-col md:flex-row gap-8 items-center">
+      {/* Map on the left, shorter width */}
+      <div className="w-full md:w-2/5 h-64 bg-gray-800 rounded-lg overflow-hidden">
+        <MapContainer
+          center={[19.2436, 72.8558]}
+          zoom={16}
+          scrollWheelZoom={false}
+          style={{ height: '100%', width: '100%' }}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          <Marker position={[19.2436, 72.8558]}>
+            <Popup>
+              St. Francis Institute of Technology<br />
+              Mount Poinsur, S.V.P. Road, Borivali (West)<br />
+              Mumbai - 400103, Maharashtra, India
+            </Popup>
+          </Marker>
+        </MapContainer>
+      </div>
+      {/* Button on the right */}
+      <div className="flex-1 flex flex-col items-center justify-center">
+        <h4 className="text-xl font-semibold mb-2 text-center">St. Francis Institute of Technology</h4>
+        <p className="text-gray-300 text-center mb-4">
+          Mount Poinsur, S.V.P. Road, Borivali (West)<br />
+          Mumbai - 400103, Maharashtra, India
+        </p>
+        <a
+          href="https://maps.app.goo.gl/NkA8QepgyUqsKYXn8"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-6 py-3 bg-blue-500 hover:bg-blue-600 rounded-lg text-white font-semibold transition-colors duration-300"
+        >
+          Open in Google Maps
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
       </div>
     </section>
   );

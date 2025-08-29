@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Github, Linkedin, Mail, Users, Crown, Code, Megaphone, TrendingUp, Palette, Share2 } from 'lucide-react';
+import { useEffect } from 'react';
 
 const Team = () => {
   const [activeCategory, setActiveCategory] = useState('convenors');

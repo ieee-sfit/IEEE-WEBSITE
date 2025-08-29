@@ -58,7 +58,7 @@ const Header = () => {
         <img
           src={logo1}
           alt="Logo 1"
-          className="h-20 w-auto transition-transform duration-300 group-hover:scale-110"
+          className="h-16 w-auto transition-transform duration-300 group-hover:scale-110"
         />
       </Link>
 
@@ -70,7 +70,7 @@ const Header = () => {
         <img
           src={logo2}
           alt="Logo 2"
-          className="h-16 w-auto transition-transform duration-300 group-hover:scale-110"
+          className="h-10 w-auto transition-transform duration-300 group-hover:scale-110"
         />
       </Link>
     </div>
