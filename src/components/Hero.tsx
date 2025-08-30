@@ -10,6 +10,7 @@ const Hero = () => {
     threshold: 0.2,
     triggerOnce: true
   });
+  const isLaptop = window.innerWidth > 768;
 
   return (
     <section
@@ -17,7 +18,8 @@ const Hero = () => {
       id="home"
       className="min-h-screen relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50 animate-gradient-shift"
     >
-      <SplashCursor SPLAT_RADIUS={0.05}/>
+      {isLaptop? <SplashCursor SPLAT_RADIUS={0.05}/>: null}
+      
       {/* Animated Background Elements */}
       <div className="absolute inset-0">
           <div className="absolute top-10 left-5 w-40 h-40 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>

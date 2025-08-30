@@ -149,8 +149,8 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         <div className={`md:hidden transition-all duration-500 ease-in-out overflow-hidden ${
-          isMenuOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'
-        }`}>
+  isMenuOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'
+} bg-white rounded-lg shadow-lg`}>
           <nav className="py-4 space-y-2">
             {navItems.map((item, index) => {
               if (item.type === 'route') {
