@@ -239,7 +239,7 @@ const TeamPage: React.FC = () => {
   <div className="absolute top-80 left-10 w-36 h-36 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-3000"></div>
 
   {/* Row 2 */}
-  <div className="absolute top-[30rem] left-1/5 w-44 h-44 bg-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+  <div className="absolute top-[30rem] left-1/5 w-44 h-44 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
   <div className="absolute top-[34rem] right-20 w-52 h-52 bg-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-1500"></div>
   <div className="absolute top-[38rem] left-1/2 w-24 h-24 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-2500"></div>
   <div className="absolute top-[42rem] right-1/3 w-60 h-60 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-3500"></div>
@@ -302,7 +302,99 @@ const TeamPage: React.FC = () => {
 
             {/* Team Grid */}
             <section className="pb-20">
+ {/* Animated Background Blobs for Team Grid */}
+                                                <div className="relative w-full">
+                                                    <div className="pointer-events-none absolute inset-0 z-0">
+                                                        {/* Row 1 */}
+                                                        <div className="absolute top-10 left-5 w-40 h-40 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-20 right-10 w-32 h-32 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-2000"></div>
+                                                        <div className="absolute top-40 left-1/3 w-48 h-48 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-4000"></div>
+                                                        <div className="absolute top-60 right-1/4 w-28 h-28 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-1000"></div>
+                                                        <div className="absolute top-80 left-10 w-36 h-36 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-3000"></div>
+                                                        {/* Row 2 */}
+                                                        <div className="absolute top-[35rem] left-1/5 w-44 h-44 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[40rem] right-20 w-52 h-52 bg-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[45rem] left-1/2 w-24 h-24 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[50rem] right-1/3 w-60 h-60 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[55rem] left-16 w-30 h-30 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        {/* Row 3 */}
+                                                        <div className="absolute top-[60rem] left-1/6 w-36 h-36 bg-teal-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[65rem] right-24 w-40 h-40bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[70rem] left-1/3 w-32 h-32 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[75rem] right-1/5 w-44 h-44 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[80rem] left-20 w-28 h-28 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        {/* Row 4 */}
+                                                        <div className="absolute top-[85rem] left-1/4 w-48 h-48 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[90rem] right-32 w-36 h-36 bg-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[95rem] left-1/2 w-24 h-24 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[100rem] right-1/3 w-60 h-60 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[105rem] left-24 w-30 h-30 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        {/* Row 5 */}
+                                                        <div className="absolute top-[110rem] left-1/5 w-44 h-44 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[115rem] right-20 w-52 h-52 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[120rem] left-1/2 w-24 h-24 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[125rem] right-1/3 w-60 h-60 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[130rem] left-16 w-30 h-30 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        {/* Row 6 */}
+                                                        <div className="absolute top-[135rem] left-1/6 w-36 h-36 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[140rem] right-24 w-40 h-40 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[145rem] left-1/3 w-32 h-32 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[150rem] right-1/5 w-44 h-44 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[155rem] left-20 w-28 h-28 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        {/* Row 7 */}
+                                                        <div className="absolute top-[160rem] left-1/4 w-48 h-48 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[165rem] right-32 w-36 h-36 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[170rem] left-1/2 w-24 h-24 bg-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[175rem] right-1/3 w-60 h-60 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[180rem] left-24 w-30 h-30 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        {/* Row 8 */}
+                                                        <div className="absolute top-[185rem] left-1/5 w-44 h-44 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[190rem] right-20 w-52 h-52 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[195rem] left-1/2 w-24 h-24 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[200rem] right-1/3 w-60 h-60 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[205rem] left-16 w-30 h-30 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        {/* Row 9 */}
+                                                        <div className="absolute top-[210rem] left-1/6 w-36 h-36 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[215rem] right-24 w-40 h-40 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[220rem] left-1/3 w-32 h-32 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[225rem] right-1/5 w-44 h-44 bg-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[230rem] left-20 w-28 h-28 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        {/* Row 10 */}
+                                                        <div className="absolute top-[235rem] left-1/4 w-48 h-48 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[240rem] right-32 w-36 h-36 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[245rem] left-1/2 w-24 h-24 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[250rem] right-1/3 w-60 h-60 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[255rem] left-24 w-30 h-30 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        {/* Row 11 */}
+                                                        <div className="absolute top-[260rem] left-1/5 w-44 h-44 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[265rem] right-20 w-52 h-52 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[270rem] left-1/2 w-24 h-24 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[275rem] right-1/3 w-60 h-60 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[280rem] left-16 w-30 h-30 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        {/* Row 12 */}
+                                                        <div className="absolute top-[285rem] left-1/6 w-36 h-36 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[290rem] right-24 w-40 h-40 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[295rem] left-1/3 w-32 h-32 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[300rem] right-1/5 w-44 h-44 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[305rem] left-20 w-28 h-28 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        {/* Row 13 */}
+                                                        <div className="absolute top-[310rem] left-1/4 w-48 h-48 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[315rem] right-32 w-36 h-36 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[320rem] left-1/2 w-24 h-24 bg-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[325rem] right-1/3 w-60 h-60 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[330rem] left-24 w-30 h-30 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        {/* Row 14 */}
+                                                        <div className="absolute top-[335rem] left-1/5 w-44 h-44 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[340rem] right-20 w-52 h-52 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[345rem] left-1/2 w-24 h-24 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[350rem] right-1/3 w-60 h-60 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+                                                        <div className="absolute top-[355rem] left-16 w-30 h-30 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+
+                                                    </div>
+                                                </div>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                                               
+
                     <div ref={teamRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         {filteredMembers.length > 0 ? (
                             filteredMembers.map((member, index) => (
@@ -320,7 +412,7 @@ const TeamPage: React.FC = () => {
                                    </div>
                                    <div className="p-6">
                                        <h3 className="text-xl font-bold text-gray-800 mb-1 group-hover:text-blue-600">{member.name}</h3>
-                                       <p className="text-blue-600 font-semibold text-sm mb-1">{member.committee}{' - '}{member.category=="core" ? '':(member.category=="pr"?'PR': member.category.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' '))}{' '}{member.role}</p>
+                                       <p className="text-blue-600 font-semibold text-sm mb-1">{member.committee.toLowerCase()=="ieeexwie" ? "IEEE x WIE" : member.committee}{' - '}{member.category=="core" ? '':(member.category=="pr"?'PR': member.category.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' '))}{' '}{member.role}</p>
                                        <p className="text-gray-500 text-sm mb-4">{member.year} • {member.branch}</p>
                                     <p className="text-gray-600 text-sm leading-relaxed mb-4 h-20 overflow-hidden">
                                         {member.bio.length > 100
