@@ -47,7 +47,8 @@ const getDirectImageLink = (googleDriveLink: string | undefined): string => {
     if (!googleDriveLink || typeof googleDriveLink !== 'string') return '';
     const fileIdMatch = googleDriveLink.match(/[-\w]{25,}/);
     if (fileIdMatch && fileIdMatch[0]) {
-        return `https://drive.google.com/thumbnail?id=${fileIdMatch[0]}&sz=w2000`;
+        console.log(`https://lh3.googleusercontent.com/d/${fileIdMatch[0]}=w2000`)
+        return `https://drive.google.com/uc?id=${fileIdMatch[0]}`;
     }
     return googleDriveLink;
 };
@@ -308,7 +309,7 @@ const TeamPage: React.FC = () => {
                                <div key={member.id} className={`bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 card-tilt overflow-hidden group relative ${teamVisible[index] ? 'animate-slide-in-up opacity-100' : 'opacity-0 translate-y-12'}`} style={{ transitionDelay: `${index * 150}ms` }}>
                                    {member.featured && (<div className="absolute top-4 right-4 z-10"><div className="flex items-center px-3 py-1 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-sm font-medium rounded-full"><Star className="w-4 h-4 mr-1" /> Core</div></div>)}
                                    <div className="relative overflow-hidden">
-                                       <img src={member.image} alt={member.name} className="w-full h-64 object-cover object-center group-hover:scale-110 group-hover:brightness-125 transition duration-700" />
+                                       <img src={member.image} alt={member.name} className="w-full h-64 brightness-100 object-cover object-center group-hover:scale-110 group-hover:brightness-125 transition duration-700 " />
                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                                        <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-3 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:bottom-6">
                                            <a href={member.social.linkedin} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"><Linkedin className="w-5 h-5 text-blue-700" /></a>
@@ -319,7 +320,7 @@ const TeamPage: React.FC = () => {
                                    </div>
                                    <div className="p-6">
                                        <h3 className="text-xl font-bold text-gray-800 mb-1 group-hover:text-blue-600">{member.name}</h3>
-                                       <p className="text-blue-600 font-semibold text-sm mb-1">{member.role}</p>
+                                       <p className="text-blue-600 font-semibold text-sm mb-1">{member.committee}{' - '}{member.category=="core" ? '':(member.category=="pr"?'PR': member.category.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' '))}{' '}{member.role}</p>
                                        <p className="text-gray-500 text-sm mb-4">{member.year} • {member.branch}</p>
                                     <p className="text-gray-600 text-sm leading-relaxed mb-4 h-20 overflow-hidden">
                                         {member.bio.length > 100
