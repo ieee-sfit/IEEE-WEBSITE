@@ -74,6 +74,12 @@ const getRolePriority = (role: string, committee: string): number => {
     const upperCommittee = committee.toUpperCase();
     const isWIE = upperCommittee.includes('WIE');
 
+    // --- ADD THIS BLOCK ---
+    if (lowerRole.includes('convenor')) {
+        return 0; // Highest priority
+    }
+    // --------------------
+
     if (lowerRole.includes('head') && !lowerRole.includes('joint') && !lowerRole.includes('vice')) {
         return isWIE ? 2 : 1;
     }
@@ -100,6 +106,50 @@ const TeamPage: React.FC = () => {
     const isLaptop = window.innerWidth > 768;
 
     const [visibleCards, setVisibleCards] = useState<number[]>([]);
+    // Add this right after the useState declarations in your TeamPage component
+
+const convenors: TeamMember[] = [
+    {
+        id: 0, // Use a unique ID like 0
+        name: 'Valentina Rani',
+        role: 'Convenor',
+        category: 'convenor', // Assign to 'core' to appear in that filter
+        year: '',
+        branch: 'Electronics & Telecommunication',
+        image: 'https://res.cloudinary.com/degzo3jzl/image/upload/v1726587187/valentinarani_zbvaxd.jpg', // <-- Replace with actual image URL
+        bio: 'Leading the team with a vision for innovation and excellence.',
+        achievements: [],
+        skills: ['Leadership', 'Management', 'Public Speaking'],
+        social: {
+            linkedin: 'https://www.linkedin.com/in/valentina-rani-39a49bb0/',
+            email: 'valentinabasker@sfit.ac.in',
+            github: '',
+            instagram: ''
+        },
+        featured: true, // Mark as featured
+        committee: 'IEEEXWIE', // Or the relevant committee name
+    },
+    {
+        id: -1, // Use another unique ID like -1
+        name: 'Dr. Dakshata Panchal',
+        role: 'Convenor',
+        category: 'convenor',
+        year: '',
+        branch: 'Computer Engineering',
+        image: 'https://res.cloudinary.com/degzo3jzl/image/upload/v1726587089/drdakshatapanchal_qkcqd2.png', // <-- Replace with actual image URL
+        bio: 'Dedicated to fostering a collaborative and empowering environment for all members.',
+        achievements: [],
+        skills: ['Strategy', 'Event Planning', 'Team Building'],
+        social: {
+            linkedin: 'https://www.linkedin.com/in/dr-dakshata-panchal-01b101210/',
+            email: 'dakshatapanchal@sfit.ac.in',
+            github: '',
+            instagram: ''
+        },
+        featured: true,
+        committee: 'IEEEXWIE',
+    }
+];
 
     const handleInView = (index: number) => {
         // On mobile, get the next 3 cards (current + next 2)
@@ -203,7 +253,9 @@ const TeamPage: React.FC = () => {
                     };
                 });
 
-                const sortedData = transformedData.sort((a, b) => {
+                 const combinedData = [...convenors, ...transformedData]; // <-- ADD THIS LINE
+
+          const sortedData = combinedData.sort((a, b) => {
                     const categoryComparison = a.category.localeCompare(b.category);
                     if (categoryComparison !== 0) return categoryComparison;
                     if (a.category === 'core') return a.id - b.id;
@@ -274,8 +326,8 @@ const TeamPage: React.FC = () => {
                         {[
                             { icon: Users, value: teamMembers.length, suffix: '', label: 'Active Members', color: 'blue' },
                             { icon: Award, value: executiveCount, suffix: '', label: 'Core Leaders', color: 'purple' },
-                            { icon: Star, value: 15, suffix: '+', label: 'Events Hosted', color: 'pink' },
-                            { icon: Users, value: 4, suffix: '', label: 'Year Levels', color: 'indigo' }
+                            { icon: Star, value: 10, suffix: '+', label: 'Events Hosted', color: 'pink' },
+                            { icon: Users, value: 2, suffix: '', label: 'Convenors', color: 'indigo' }
                         ].map((stat) => (
                             <div key={stat.label} className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 card-tilt text-center">
                                 <stat.icon className={`w-8 h-8 mx-auto mb-3 text-${stat.color}-600`} />
@@ -434,6 +486,14 @@ const TeamPage: React.FC = () => {
                                         </div>
                                     )}
 
+                                    {member.featured && member.role=="Convenor" &&(
+                                        <div className="absolute top-4 right-4 z-10">
+                                            <div className="flex items-center px-3 py-1 bg-gradient-to-r from-orange-500 to-yellow-500 text-white text-sm font-medium rounded-full">
+                                                <Star className="w-4 h-4 mr-1" /> Convenor
+                                            </div>
+                                        </div>
+                                    )}
+
                                     <div className="relative overflow-hidden">
                                         <img
                                             src={member.image}
@@ -442,11 +502,49 @@ const TeamPage: React.FC = () => {
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                                         <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-3 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:bottom-6">
-                                            <a href={member.social.linkedin} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"><Linkedin className="w-5 h-5 text-blue-700" /></a>
-                                            <a href={member.social.github} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"><Github className="w-5 h-5 text-gray-800" /></a>
-                                            <a href={member.social.instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"><Instagram className="w-5 h-5 text-pink-600" /></a>
-                                            <a href={member.social.email} className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"><Mail className="w-5 h-5 text-green-600" /></a>
-                                        </div>
+  {member.social.linkedin && member.social.linkedin!="#" && member.social.linkedin!="NA" && (
+    <a
+      href={member.social.linkedin}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
+    >
+      <Linkedin className="w-5 h-5 text-blue-700" />
+    </a>
+  )}
+  
+  {member.social.github && member.social.github!="#" && member.social.github!="NA" &&(
+    <a
+      href={member.social.github}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
+    >
+      <Github className="w-5 h-5 text-gray-800" />
+    </a>
+  )}
+  
+  {member.social.instagram && member.social.instagram!="#" && member.social.instagram!="NA" &&(
+    <a
+      href={member.social.instagram}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
+    >
+      <Instagram className="w-5 h-5 text-pink-600" />
+    </a>
+  )}
+  
+  {member.social.email && member.social.email!="#" && member.social.email!="NA" &&(
+    <a
+      href={`mailto:${member.social.email}`}
+      className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
+    >
+      <Mail className="w-5 h-5 text-green-600" />
+    </a>
+  )}
+</div>
+
                                     </div>
 
                                     <div className="p-6">
@@ -460,7 +558,7 @@ const TeamPage: React.FC = () => {
                                                     ? "PR"
                                                     : member.category.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ")}
                                             {" "}
-                                            {member.role}
+                                            {member.role=="Convenor" ? "": member.role }
                                         </p>
                                         <p className="text-gray-500 text-sm mb-4">{member.year} • {member.branch}</p>
                                         <p className="text-gray-600 text-sm leading-relaxed mb-4 h-20 overflow-hidden">
