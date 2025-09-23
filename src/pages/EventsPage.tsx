@@ -727,13 +727,7 @@ const EventsPage = () => {
                         }}
                       />
                       <span className="relative z-10">Coming Soon ✨</span>
-                      <motion.div
-                        whileHover={{ x: 10, scale: 1.2 }}
-                        transition={{ type: 'spring', stiffness: 300 }}
-                        className="relative z-10"
-                      >
-                        <ArrowRight className="ml-3 w-5 h-5" />
-                      </motion.div>
+                      
                     </motion.button>
                   </div>
                 </motion.div>
