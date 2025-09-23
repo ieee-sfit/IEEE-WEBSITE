@@ -18,7 +18,7 @@ const Hero = () => {
       id="home"
       className="min-h-screen relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50 animate-gradient-shift"
     >
-      {isLaptop? <SplashCursor SPLAT_RADIUS={0.05}/>: null}
+      {isLaptop? <SplashCursor SPLAT_RADIUS={0.02}/>: null}
       
       {/* Animated Background Elements */}
       <div className="absolute inset-0">
