@@ -12,7 +12,6 @@ const HomePage = () => {
       <Popup />
       <Hero />
       <About />
-      <EventsPreview />
       <Contact />
       <Footer />
     </div>
