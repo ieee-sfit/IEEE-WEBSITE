@@ -122,8 +122,8 @@ const hardcodedEvents = [
   {
     id: 1,
     title: "Git & Github Workshop",
-    date: "2024-10-15",
-    displaydate: "October 2024",
+    date: "2025-10-15",
+    displaydate: "October 2025",
     time: "Not specified",
     location: "Lab 2",
     attendees: 60,
@@ -142,8 +142,8 @@ const hardcodedEvents = [
   {
     id: 2,
     title: "Intra-College Hackathon",
-    date: "2024-09-22",
-    displaydate: "September 22, 2024",
+    date: "2025-09-22",
+    displaydate: "September 22, 2025",
     time: "9:00 AM - 5:00 PM",
     location: "Campus Halls",
     attendees: 120,
@@ -162,8 +162,8 @@ const hardcodedEvents = [
   {
     id: 3,
     title: "Mosaic (Tech Fest)",
-    date: "2024-09-19",
-    displaydate: "September 19–20, 2024",
+    date: "2025-09-19",
+    displaydate: "September 19–20, 2025",
     time: "Full Day",
     location: "College Campus",
     attendees: 500,
@@ -182,8 +182,8 @@ const hardcodedEvents = [
   {
     id: 4,
     title: "DSA Coding Challenge",
-    date: "2024-08-20",
-    displaydate: "August 20, 2024",
+    date: "2025-08-20",
+    displaydate: "August 20, 2025",
     time: "Not specified",
     location: "Not specified",
     attendees: 75,
@@ -202,7 +202,7 @@ const hardcodedEvents = [
   {
     id: 5,
     title: "AIML (Agentic AI)",
-    date: "2024-08-11",
+    date: "2025-08-11",
     displaydate: "August 11–12, 2025",
     time: "Not specified",
     location: "Not specified",
@@ -222,8 +222,8 @@ const hardcodedEvents = [
   {
     id: 6,
     title: "Committee Induction Meet",
-    date: "2024-07-24",
-    displaydate: "July 24, 2024",
+    date: "2025-07-24",
+    displaydate: "July 24, 2025",
     time: "Not specified",
     location: "Not specified",
     attendees: 50,
