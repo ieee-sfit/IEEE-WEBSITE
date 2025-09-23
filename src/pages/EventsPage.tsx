@@ -409,7 +409,7 @@ const EventsPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden select-none">
       {/* Loading Screen */}
-      <AnimatePresence>
+      {/* <AnimatePresence>
         {isLoading && (
           <motion.div
             initial={{ opacity: 1 }}
@@ -436,7 +436,7 @@ const EventsPage = () => {
             </motion.p>
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence> */}
 
       {/* Background orbs */}
       <div className="fixed inset-0 pointer-events-none">
