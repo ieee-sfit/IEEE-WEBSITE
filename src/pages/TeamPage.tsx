@@ -543,18 +543,13 @@ const TeamPage: React.FC = () => {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
                     <div ref={teamRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                        {filteredMembers.length > 0 ? (
-                            filteredMembers.map((member, index) => (
-                                <motion.div
-                                    key={member.id}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={visibleCards.includes(index) ? { opacity: 1, y: 0 } : {}}
-                                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                                    onViewportEnter={() => handleInView(index)}
-                                    viewport={{ once: true, amount: isLaptop ? 0.01 : 0.05 }}
-                                    className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 card-tilt overflow-hidden group relative will-change-transform will-change-opacity cursor-pointer"
-                                    onClick={() => handleMemberClick(member)}
-                                >
+                       {filteredMembers.length > 0 ? (
+    filteredMembers.map((member) => (
+        <div
+            key={member.id}
+            className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500  overflow-hidden group relative will-change-transform cursor-pointer"
+            onClick={() => handleMemberClick(member)}
+        >
                                     {member.featured && member.role !== "Convenor" && (
                                         <div className="absolute top-4 right-4 z-10">
                                             <div className="flex items-center px-3 py-1 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-sm font-medium rounded-full">
@@ -660,7 +655,7 @@ const TeamPage: React.FC = () => {
                                             </div>
                                         </div>
                                     </div>
-                                </motion.div>
+                                </div>
                             ))
                         ) : (
                             <div className="col-span-full text-center py-16 flex flex-col items-center justify-center">
