@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Linkedin, Mail, Github, Award, Users, Star, ChevronDown, Instagram, Frown } from 'lucide-react';
+import { Linkedin, Mail, Github, Award, Users, Star, ChevronDown, Instagram, Frown, X } from 'lucide-react';
 // Make sure your hooks are correctly imported from their location
 import { useScrollAnimation, useStaggeredAnimation } from '../hooks/useScrollAnimation';
 import { motion } from "framer-motion";
@@ -28,6 +28,7 @@ interface TeamMember {
     featured: boolean;
     committee: string;
 }
+
 function TeamLoader() {
     return (
         <div className="fixed inset-0 z-50 flex flex-col justify-center items-center ">
@@ -43,6 +44,144 @@ function TeamLoader() {
     );
 }
 
+// --- MODAL COMPONENT ---
+function MemberModal({ member, isOpen, onClose }: { member: TeamMember | null; isOpen: boolean; onClose: () => void }) {
+    if (!isOpen || !member) return null;
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-hidden">
+            {/* Backdrop with blur */}
+            <div 
+                className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                onClick={onClose}
+            ></div>
+            
+            {/* Modal Content */}
+            <div className="relative bg-white rounded-3xl shadow-2xl max-w-6xl w-full max-h-[95vh] overflow-y-auto overflow-x-hidden">
+                {/* Close Button */}
+                <button
+                    onClick={onClose}
+                    className="absolute top-4 right-4 z-10 w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors shadow-lg"
+                >
+                    <X className="w-6 h-6 text-gray-600" />
+                </button>
+
+                <div className="flex flex-col lg:flex-row">
+                    {/* Left Side - Image */}
+                    <div className="lg:w-2/5 relative">
+                        <img
+                            src={member.image}
+                            alt={member.name}
+                            className="w-full h-80 lg:h-full object-cover object-center rounded-t-3xl lg:rounded-l-3xl lg:rounded-tr-none"
+                        />
+                        {/* Featured Badge */}
+                        {member.featured && (
+                            <div className="absolute top-6 left-6">
+                                <div className="flex items-center px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-sm font-medium rounded-full shadow-lg">
+                                    <Star className="w-4 h-4 mr-2" />
+                                    {member.role === "Convenor" ? "Convenor" : "Core"}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Right Side - Information */}
+                    <div className="lg:w-3/5 p-6 sm:p-8 lg:p-10">
+                        {/* Header Info */}
+                        <div className="mb-8">
+                            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-3">{member.name}</h2>
+                            <p className="text-blue-600 font-semibold text-base sm:text-lg mb-2">
+                                {member.committee.toLowerCase() === "ieeexwie" ? "IEEE x WIE" : member.committee}
+                                {" - "}
+                                {member.category === "core"
+                                    ? ""
+                                    : member.category === "pr"
+                                        ? "PR"
+                                        : member.category.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ")}
+                                {" "}
+                                {member.role === "Convenor" ? "" : member.role}
+                            </p>
+                            <p className="text-gray-600 text-base sm:text-lg">{member.year} • {member.branch}</p>
+                        </div>
+
+                        {/* Bio */}
+                        <div className="mb-8">
+                            <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4">About</h3>
+                            <p className="text-gray-600 leading-relaxed text-sm sm:text-base">{member.bio}</p>
+                        </div>
+
+                        {/* Skills */}
+                        <div className="mb-8">
+                            <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4">Skills</h3>
+                            <div className="flex flex-wrap gap-2 sm:gap-3">
+                                {member.skills.map((skill, index) => (
+                                    <span
+                                        key={index}
+                                        className="px-3 py-2 bg-blue-100 text-blue-700 text-xs sm:text-sm font-medium rounded-full"
+                                    >
+                                        {skill}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Social Links */}
+                        <div className="mb-6">
+                            <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4">Connect</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                                {member.social.linkedin && member.social.linkedin !== "#" && member.social.linkedin !== "NA" && (
+                                    <a
+                                        href={member.social.linkedin}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors shadow-md"
+                                    >
+                                        <Linkedin className="w-5 h-5 mr-2 flex-shrink-0" />
+                                        <span className="text-sm sm:text-base font-medium">LinkedIn</span>
+                                    </a>
+                                )}
+                                
+                                {member.social.github && member.social.github !== "#" && member.social.github !== "NA" && (
+                                    <a
+                                        href={member.social.github}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center justify-center px-4 py-3 bg-gray-800 text-white rounded-xl hover:bg-gray-900 transition-colors shadow-md"
+                                    >
+                                        <Github className="w-5 h-5 mr-2 flex-shrink-0" />
+                                        <span className="text-sm sm:text-base font-medium">GitHub</span>
+                                    </a>
+                                )}
+                                
+                                {member.social.instagram && member.social.instagram !== "#" && member.social.instagram !== "NA" && (
+                                    <a
+                                        href={member.social.instagram}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center justify-center px-4 py-3 bg-pink-600 text-white rounded-xl hover:bg-pink-700 transition-colors shadow-md"
+                                    >
+                                        <Instagram className="w-5 h-5 mr-2 flex-shrink-0" />
+                                        <span className="text-sm sm:text-base font-medium">Instagram</span>
+                                    </a>
+                                )}
+                                
+                                {member.social.email && member.social.email !== "#" && member.social.email !== "NA" && (
+                                    <a
+                                        href={member.social.email.startsWith('mailto:') ? member.social.email : `mailto:${member.social.email}`}
+                                        className="flex items-center justify-center px-4 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors shadow-md"
+                                    >
+                                        <Mail className="w-5 h-5 mr-2 flex-shrink-0" />
+                                        <span className="text-sm sm:text-base font-medium">Email</span>
+                                    </a>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
 
 // --- HELPER FUNCTIONS ---
 const getDirectImageLink = (googleDriveLink: string | undefined): string => {
@@ -100,56 +239,58 @@ const TeamPage: React.FC = () => {
     const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
     const { ref: headerRef } = useScrollAnimation({ threshold: 0.3, triggerOnce: true });
     const { ref: teamRef, visibleItems: teamVisible } = useStaggeredAnimation(teamMembers.length, 150);
     const isLaptop = window.innerWidth > 768;
 
     const [visibleCards, setVisibleCards] = useState<number[]>([]);
-    // Add this right after the useState declarations in your TeamPage component
 
-const convenors: TeamMember[] = [
-    {
-        id: 0, // Use a unique ID like 0
-        name: 'Valentina Rani',
-        role: 'Convenor',
-        category: 'convenor', // Assign to 'core' to appear in that filter
-        year: '',
-        branch: 'Electronics & Telecommunication',
-        image: 'https://res.cloudinary.com/degzo3jzl/image/upload/v1726587187/valentinarani_zbvaxd.jpg', // <-- Replace with actual image URL
-        bio: 'Leading the team with a vision for innovation and excellence.',
-        achievements: [],
-        skills: ['Leadership', 'Management', 'Public Speaking'],
-        social: {
-            linkedin: 'https://www.linkedin.com/in/valentina-rani-39a49bb0/',
-            email: 'valentinabasker@sfit.ac.in',
-            github: '',
-            instagram: ''
+    // Add this right after the useState declarations in your TeamPage component
+    const convenors: TeamMember[] = [
+        {
+            id: 0, // Use a unique ID like 0
+            name: 'Valentina Rani',
+            role: 'Convenor',
+            category: 'convenor', // Assign to 'core' to appear in that filter
+            year: '',
+            branch: 'Electronics & Telecommunication',
+            image: 'https://res.cloudinary.com/degzo3jzl/image/upload/v1726587187/valentinarani_zbvaxd.jpg', // <-- Replace with actual image URL
+            bio: 'Leading the team with a vision for innovation and excellence.',
+            achievements: [],
+            skills: ['Leadership', 'Management', 'Public Speaking'],
+            social: {
+                linkedin: 'https://www.linkedin.com/in/valentina-rani-39a49bb0/',
+                email: 'valentinabasker@sfit.ac.in',
+                github: '',
+                instagram: ''
+            },
+            featured: true, // Mark as featured
+            committee: 'IEEEXWIE', // Or the relevant committee name
         },
-        featured: true, // Mark as featured
-        committee: 'IEEEXWIE', // Or the relevant committee name
-    },
-    {
-        id: -1, // Use another unique ID like -1
-        name: 'Dr. Dakshata Panchal',
-        role: 'Convenor',
-        category: 'convenor',
-        year: '',
-        branch: 'Computer Engineering',
-        image: 'https://res.cloudinary.com/degzo3jzl/image/upload/v1726587089/drdakshatapanchal_qkcqd2.png', // <-- Replace with actual image URL
-        bio: 'Dedicated to fostering a collaborative and empowering environment for all members.',
-        achievements: [],
-        skills: ['Strategy', 'Event Planning', 'Team Building'],
-        social: {
-            linkedin: 'https://www.linkedin.com/in/dr-dakshata-panchal-01b101210/',
-            email: 'dakshatapanchal@sfit.ac.in',
-            github: '',
-            instagram: ''
-        },
-        featured: true,
-        committee: 'IEEEXWIE',
-    }
-];
+        {
+            id: -1, // Use another unique ID like -1
+            name: 'Dr. Dakshata Panchal',
+            role: 'Convenor',
+            category: 'convenor',
+            year: '',
+            branch: 'Computer Engineering',
+            image: 'https://res.cloudinary.com/degzo3jzl/image/upload/v1726587089/drdakshatapanchal_qkcqd2.png', // <-- Replace with actual image URL
+            bio: 'Dedicated to fostering a collaborative and empowering environment for all members.',
+            achievements: [],
+            skills: ['Strategy', 'Event Planning', 'Team Building'],
+            social: {
+                linkedin: 'https://www.linkedin.com/in/dr-dakshata-panchal-01b101210/',
+                email: 'dakshatapanchal@sfit.ac.in',
+                github: '',
+                instagram: ''
+            },
+            featured: true,
+            committee: 'IEEEXWIE',
+        }
+    ];
 
     const handleInView = (index: number) => {
         // On mobile, get the next 3 cards (current + next 2)
@@ -164,6 +305,15 @@ const convenors: TeamMember[] = [
         setVisibleCards((prev) => [...prev, ...cardsToAdd]);
     };
 
+    const handleMemberClick = (member: TeamMember) => {
+        setSelectedMember(member);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedMember(null);
+    };
 
     // This effect resets the Role and Committee filters when the main Category changes
     useEffect(() => {
@@ -253,9 +403,9 @@ const convenors: TeamMember[] = [
                     };
                 });
 
-                 const combinedData = [...convenors, ...transformedData]; // <-- ADD THIS LINE
+                const combinedData = [...convenors, ...transformedData]; // <-- ADD THIS LINE
 
-          const sortedData = combinedData.sort((a, b) => {
+                const sortedData = combinedData.sort((a, b) => {
                     const categoryComparison = a.category.localeCompare(b.category);
                     if (categoryComparison !== 0) return categoryComparison;
                     if (a.category === 'core') return a.id - b.id;
@@ -388,83 +538,9 @@ const convenors: TeamMember[] = [
                         <div className="absolute top-[45rem] left-1/2 w-24 h-24 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
                         <div className="absolute top-[50rem] right-1/3 w-60 h-60 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
                         <div className="absolute top-[55rem] left-16 w-30 h-30 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        {/* Row 3 */}
-                        <div className="absolute top-[60rem] left-1/6 w-36 h-36 bg-teal-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[65rem] right-24 w-40 h-40bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[70rem] left-1/3 w-32 h-32 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[75rem] right-1/5 w-44 h-44 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[80rem] left-20 w-28 h-28 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        {/* Row 4 */}
-                        <div className="absolute top-[85rem] left-1/4 w-48 h-48 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[90rem] right-32 w-36 h-36 bg-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[95rem] left-1/2 w-24 h-24 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[100rem] right-1/3 w-60 h-60 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[105rem] left-24 w-30 h-30 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        {/* Row 5 */}
-                        <div className="absolute top-[110rem] left-1/5 w-44 h-44 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[115rem] right-20 w-52 h-52 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[120rem] left-1/2 w-24 h-24 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[125rem] right-1/3 w-60 h-60 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[130rem] left-16 w-30 h-30 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        {/* Row 6 */}
-                        <div className="absolute top-[135rem] left-1/6 w-36 h-36 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[140rem] right-24 w-40 h-40 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[145rem] left-1/3 w-32 h-32 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[150rem] right-1/5 w-44 h-44 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[155rem] left-20 w-28 h-28 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        {/* Row 7 */}
-                        <div className="absolute top-[160rem] left-1/4 w-48 h-48 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[165rem] right-32 w-36 h-36 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[170rem] left-1/2 w-24 h-24 bg-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[175rem] right-1/3 w-60 h-60 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[180rem] left-24 w-30 h-30 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        {/* Row 8 */}
-                        <div className="absolute top-[185rem] left-1/5 w-44 h-44 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[190rem] right-20 w-52 h-52 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[195rem] left-1/2 w-24 h-24 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[200rem] right-1/3 w-60 h-60 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[205rem] left-16 w-30 h-30 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        {/* Row 9 */}
-                        <div className="absolute top-[210rem] left-1/6 w-36 h-36 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[215rem] right-24 w-40 h-40 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[220rem] left-1/3 w-32 h-32 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[225rem] right-1/5 w-44 h-44 bg-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[230rem] left-20 w-28 h-28 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        {/* Row 10 */}
-                        <div className="absolute top-[235rem] left-1/4 w-48 h-48 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[240rem] right-32 w-36 h-36 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[245rem] left-1/2 w-24 h-24 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[250rem] right-1/3 w-60 h-60 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[255rem] left-24 w-30 h-30 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        {/* Row 11 */}
-                        <div className="absolute top-[260rem] left-1/5 w-44 h-44 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[265rem] right-20 w-52 h-52 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[270rem] left-1/2 w-24 h-24 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[275rem] right-1/3 w-60 h-60 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[280rem] left-16 w-30 h-30 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        {/* Row 12 */}
-                        <div className="absolute top-[285rem] left-1/6 w-36 h-36 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[290rem] right-24 w-40 h-40 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[295rem] left-1/3 w-32 h-32 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[300rem] right-1/5 w-44 h-44 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[305rem] left-20 w-28 h-28 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        {/* Row 13 */}
-                        <div className="absolute top-[310rem] left-1/4 w-48 h-48 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[315rem] right-32 w-36 h-36 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[320rem] left-1/2 w-24 h-24 bg-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[325rem] right-1/3 w-60 h-60 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[330rem] left-24 w-30 h-30 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        {/* Row 14 */}
-                        <div className="absolute top-[335rem] left-1/5 w-44 h-44 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[340rem] right-20 w-52 h-52 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[345rem] left-1/2 w-24 h-24 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[350rem] right-1/3 w-60 h-60 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-                        <div className="absolute top-[355rem] left-16 w-30 h-30 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-
                     </div>
                 </div>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
 
                     <div ref={teamRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         {filteredMembers.length > 0 ? (
@@ -476,9 +552,10 @@ const convenors: TeamMember[] = [
                                     transition={{ duration: 0.5, delay: index * 0.1 }}
                                     onViewportEnter={() => handleInView(index)}
                                     viewport={{ once: true, amount: isLaptop ? 0.01 : 0.05 }}
-                                    className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 card-tilt overflow-hidden group relative will-change-transform will-change-opacity"
+                                    className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 card-tilt overflow-hidden group relative will-change-transform will-change-opacity cursor-pointer"
+                                    onClick={() => handleMemberClick(member)}
                                 >
-                                    {member.featured && (
+                                    {member.featured && member.role !== "Convenor" && (
                                         <div className="absolute top-4 right-4 z-10">
                                             <div className="flex items-center px-3 py-1 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-sm font-medium rounded-full">
                                                 <Star className="w-4 h-4 mr-1" /> Core
@@ -486,7 +563,7 @@ const convenors: TeamMember[] = [
                                         </div>
                                     )}
 
-                                    {member.featured && member.role=="Convenor" &&(
+                                    {member.featured && member.role === "Convenor" && (
                                         <div className="absolute top-4 right-4 z-10">
                                             <div className="flex items-center px-3 py-1 bg-gradient-to-r from-orange-500 to-yellow-500 text-white text-sm font-medium rounded-full">
                                                 <Star className="w-4 h-4 mr-1" /> Convenor
@@ -502,49 +579,52 @@ const convenors: TeamMember[] = [
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                                         <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-3 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:bottom-6">
-  {member.social.linkedin && member.social.linkedin!="#" && member.social.linkedin!="NA" && (
-    <a
-      href={member.social.linkedin}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
-    >
-      <Linkedin className="w-5 h-5 text-blue-700" />
-    </a>
-  )}
-  
-  {member.social.github && member.social.github!="#" && member.social.github!="NA" &&(
-    <a
-      href={member.social.github}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
-    >
-      <Github className="w-5 h-5 text-gray-800" />
-    </a>
-  )}
-  
-  {member.social.instagram && member.social.instagram!="#" && member.social.instagram!="NA" &&(
-    <a
-      href={member.social.instagram}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
-    >
-      <Instagram className="w-5 h-5 text-pink-600" />
-    </a>
-  )}
-  
-  {member.social.email && member.social.email!="#" && member.social.email!="NA" &&(
-    <a
-      href={`mailto:${member.social.email}`}
-      className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
-    >
-      <Mail className="w-5 h-5 text-green-600" />
-    </a>
-  )}
-</div>
-
+                                            {member.social.linkedin && member.social.linkedin !== "#" && member.social.linkedin !== "NA" && (
+                                                <a
+                                                    href={member.social.linkedin}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    <Linkedin className="w-5 h-5 text-blue-700" />
+                                                </a>
+                                            )}
+                                            
+                                            {member.social.github && member.social.github !== "#" && member.social.github !== "NA" && (
+                                                <a
+                                                    href={member.social.github}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    <Github className="w-5 h-5 text-gray-800" />
+                                                </a>
+                                            )}
+                                            
+                                            {member.social.instagram && member.social.instagram !== "#" && member.social.instagram !== "NA" && (
+                                                <a
+                                                    href={member.social.instagram}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    <Instagram className="w-5 h-5 text-pink-600" />
+                                                </a>
+                                            )}
+                                            
+                                            {member.social.email && member.social.email !== "#" && member.social.email !== "NA" && (
+                                                <a
+                                                    href={member.social.email.startsWith('mailto:') ? member.social.email : `mailto:${member.social.email}`}
+                                                    className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    <Mail className="w-5 h-5 text-green-600" />
+                                                </a>
+                                            )}
+                                        </div>
                                     </div>
 
                                     <div className="p-6">
@@ -558,7 +638,7 @@ const convenors: TeamMember[] = [
                                                     ? "PR"
                                                     : member.category.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ")}
                                             {" "}
-                                            {member.role=="Convenor" ? "": member.role }
+                                            {member.role == "Convenor" ? "" : member.role}
                                         </p>
                                         <p className="text-gray-500 text-sm mb-4">{member.year} • {member.branch}</p>
                                         <p className="text-gray-600 text-sm leading-relaxed mb-4 h-20 overflow-hidden">
@@ -589,10 +669,16 @@ const convenors: TeamMember[] = [
                                 <p className="text-gray-500 mt-2">Try adjusting your filters to find who you're looking for.</p>
                             </div>
                         )}
-
                     </div>
                 </div>
             </section>
+
+            {/* Modal */}
+            <MemberModal 
+                member={selectedMember} 
+                isOpen={isModalOpen} 
+                onClose={handleCloseModal} 
+            />
         </div>
     );
 };
