@@ -320,9 +320,9 @@ const EventsPage = () => {
 
   const statsData = [
     { icon: Award, value: 25, suffix: '+', label: 'Events Organized', color: 'blue' },
-    { icon: Users, value: 850, suffix: '+', label: 'Total Participants', color: 'purple' },
+    { icon: Users, value: 1000, suffix: '+', label: 'Total Participants', color: 'purple' },
     { icon: TrendingUp, value: 94, suffix: '%', label: 'Avg Satisfaction', color: 'green' },
-    { icon: Target, value: 15, suffix: '+', label: 'Industry Partners', color: 'pink' }
+    { icon: Target, value: 5, suffix: '+', label: 'Completed Events', color: 'pink' }
   ];
 
   // Add 'comingsoon' to the filter options array

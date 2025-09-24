@@ -1,6 +1,7 @@
 import React from 'react';
-import { Heart, Zap, Instagram, Linkedin, Twitter, Globe, Mail, Phone } from 'lucide-react';
+import { Heart, Instagram, Linkedin, Globe, Mail, Phone ,Github, Facebook} from 'lucide-react';
 import { useScrollAnimation, useStaggeredAnimation } from '../hooks/useScrollAnimation';
+import { FaXTwitter } from "react-icons/fa6";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -106,7 +107,7 @@ const Footer = () => {
                   href: "https://www.linkedin.com/company/ieeesfit/",
                 },
                 {
-                  icon: Twitter, // Keeping Twitter icon but linking it to X
+                  icon: FaXTwitter, // Keeping Twitter icon but linking it to X
                   gradient: "from-blue-400 to-blue-500",
                   delay: "200ms",
                   href: "https://x.com/ieee_sfit",
@@ -117,6 +118,19 @@ const Footer = () => {
                   delay: "300ms",
                   href: "https://www.ieee.org/",
                 },
+                {
+                  icon: Facebook,
+                  gradient: "from-blue-500 to-blue-600",
+                  delay: "300ms",
+                  href: "https://www.facebook.com/IEEESFIT/",
+                },
+                {
+                  icon: Github,
+                  gradient: "from-gray-600 to-gray-700",
+                  delay: "300ms",
+                  href: "https://github.com/IEEESFIT1",
+                },
+                
               ].map((social, index) => (
                 <a
                   key={index}
