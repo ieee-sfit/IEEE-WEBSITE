@@ -4,10 +4,12 @@ import Header from './components/Header';
 import HomePage from './pages/HomePage';
 import EventsPage from './pages/EventsPage';
 import TeamPage from './pages/TeamPage';
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <div className="min-h-screen">
         <Header />
         <Routes>

@@ -1,8 +1,9 @@
 import React from 'react';
-import { Mail, Phone, MapPin, Instagram, Linkedin, Twitter, Send, Clock, Globe } from 'lucide-react';
+import { Mail, Phone, MapPin, Instagram, Linkedin, Send, Clock, Globe } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from "leaflet";
 import 'leaflet/dist/leaflet.css';
+import { FaXTwitter } from "react-icons/fa6";
 
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -103,7 +104,7 @@ const Contact = () => {
                   href="https://x.com/ieee_sfit"
                   className="w-12 h-12 bg-gradient-to-r from-blue-400 to-blue-500 rounded-lg flex items-center justify-center hover:scale-110 transition-transform duration-300"
                 >
-                  <Twitter className="w-6 h-6" />
+                  <FaXTwitter className="w-6 h-6" />
                 </a>
                 <a
                   href="https://www.ieee.org/"

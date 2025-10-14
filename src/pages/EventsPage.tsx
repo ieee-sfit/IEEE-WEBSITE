@@ -4,6 +4,7 @@ import {
   Calendar, MapPin, Users, ArrowRight, Clock, Star, Award, TrendingUp,
   Target, CheckCircle, Play
 } from 'lucide-react';
+import Footer from '../components/Footer';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 32 },
@@ -163,7 +164,7 @@ const hardcodedEvents = [
     id: 3,
     title: "Mosaic (Tech Fest)",
     date: "2025-09-19",
-    displaydate: "September 19–20, 2025",
+    displaydate: "October 19–20, 2025",
     time: "Full Day",
     location: "College Campus",
     attendees: 500,
@@ -183,7 +184,7 @@ const hardcodedEvents = [
     id: 4,
     title: "DSA Coding Challenge",
     date: "2025-08-20",
-    displaydate: "August 20, 2025",
+    displaydate: "October 20, 2025",
     time: "Not specified",
     location: "Not specified",
     attendees: 75,
@@ -319,9 +320,9 @@ const EventsPage = () => {
 
   const statsData = [
     { icon: Award, value: 25, suffix: '+', label: 'Events Organized', color: 'blue' },
-    { icon: Users, value: 850, suffix: '+', label: 'Total Participants', color: 'purple' },
+    { icon: Users, value: 1000, suffix: '+', label: 'Total Participants', color: 'purple' },
     { icon: TrendingUp, value: 94, suffix: '%', label: 'Avg Satisfaction', color: 'green' },
-    { icon: Target, value: 15, suffix: '+', label: 'Industry Partners', color: 'pink' }
+    { icon: Target, value: 5, suffix: '+', label: 'Completed Events', color: 'pink' }
   ];
 
   // Add 'comingsoon' to the filter options array
@@ -656,19 +657,6 @@ const EventsPage = () => {
                       transition={{ duration: 0.5 }}
                       className="absolute bottom-4 right-4"
                     >
-                      <motion.div
-                        className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/30 transition-all duration-300 cursor-pointer select-none group"
-                        animate={{
-                          boxShadow: [
-                            "0 0 0 0 rgba(255,255,255,0.4)",
-                            "0 0 0 10px rgba(255,255,255,0.1)",
-                            "0 0 0 0 rgba(255,255,255,0.4)"
-                          ]
-                        }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                      >
-                        <Play className="w-6 h-6 text-white ml-1 group-hover:scale-110 transition-transform duration-300" />
-                      </motion.div>
                     </motion.div>
                   </motion.div>
                   <div className="md:w-1/2 p-8 md:p-12 flex flex-col">
@@ -739,14 +727,8 @@ const EventsPage = () => {
                           ease: "easeInOut"
                         }}
                       />
-                      <span className="relative z-10">Register Now</span>
-                      <motion.div
-                        whileHover={{ x: 10, scale: 1.2 }}
-                        transition={{ type: 'spring', stiffness: 300 }}
-                        className="relative z-10"
-                      >
-                        <ArrowRight className="ml-3 w-5 h-5" />
-                      </motion.div>
+                      <span className="relative z-10">Coming Soon ✨</span>
+                      
                     </motion.button>
                   </div>
                 </motion.div>
@@ -1025,6 +1007,7 @@ const EventsPage = () => {
           </div>
         </motion.div>
       </section>
+       <Footer />
     </div>
   );
 };

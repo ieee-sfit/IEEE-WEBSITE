@@ -1,6 +1,7 @@
 import React from 'react';
-import { Heart, Zap, Instagram, Linkedin, Twitter, Globe, Mail, Phone } from 'lucide-react';
+import { Heart, Instagram, Linkedin, Globe, Mail, Phone ,Github, Facebook} from 'lucide-react';
 import { useScrollAnimation, useStaggeredAnimation } from '../hooks/useScrollAnimation';
+import { FaXTwitter } from "react-icons/fa6";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -71,12 +72,7 @@ const Footer = () => {
           {/* Brand Section */}
           <div className="lg:col-span-2">
             <div className="flex items-center space-x-3 mb-6 group cursor-pointer">
-              <div className="relative">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 animate-logo-glow">
-                  <Zap className="w-7 h-7 text-white group-hover:animate-spin" />
-                </div>
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-pink-500 rounded-full animate-pulse group-hover:animate-ping"></div>
-              </div>
+              
               <div>
                 <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent animate-gradient-shift group-hover:scale-105 transition-transform duration-300">
                   IEEE×WIE SFIT
@@ -111,7 +107,7 @@ const Footer = () => {
                   href: "https://www.linkedin.com/company/ieeesfit/",
                 },
                 {
-                  icon: Twitter, // Keeping Twitter icon but linking it to X
+                  icon: FaXTwitter, // Keeping Twitter icon but linking it to X
                   gradient: "from-blue-400 to-blue-500",
                   delay: "200ms",
                   href: "https://x.com/ieee_sfit",
@@ -122,6 +118,19 @@ const Footer = () => {
                   delay: "300ms",
                   href: "https://www.ieee.org/",
                 },
+                {
+                  icon: Facebook,
+                  gradient: "from-blue-500 to-blue-600",
+                  delay: "300ms",
+                  href: "https://www.facebook.com/IEEESFIT/",
+                },
+                {
+                  icon: Github,
+                  gradient: "from-gray-600 to-gray-700",
+                  delay: "300ms",
+                  href: "https://github.com/IEEESFIT1",
+                },
+                
               ].map((social, index) => (
                 <a
                   key={index}
