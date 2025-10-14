@@ -739,6 +739,7 @@ const EventsPage = () => {
                       whileTap={{ scale: 0.98 }}
                       className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 px-8 rounded-2xl font-bold text-lg flex items-center justify-center group select-none relative overflow-hidden"
                       aria-label="Register for featured event"
+                      onClick={() => window.open(featuredEvent.form, "_blank")}
                     >
                       <motion.div
                         className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
@@ -752,7 +753,8 @@ const EventsPage = () => {
                           ease: "easeInOut"
                         }}
                       />
-                      <span className="relative z-10">Coming Soon ✨</span>
+                      <span className="relative z-10">Register Now </span>
+                      ✨<ArrowRight className="ml-2 w-4 h-4" />
 
                     </motion.button>
                   </div>
