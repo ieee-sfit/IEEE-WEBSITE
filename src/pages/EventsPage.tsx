@@ -130,7 +130,7 @@ const hardcodedEvents = [
     category: "Workshop",
     status: "upcoming",
     description: "A beginner-friendly workshop on Git and Github covering version control, repositories, collaboration workflows, and open-source contributions.",
-    image: "https://i.postimg.cc/SRpf6kMD/download.jpg",    
+    image: "https://i.postimg.cc/SRpf6kMD/download.jpg",
     speakers: ["Technical Trainer"],
     topics: ["Git Basics", "Github Collaboration", "Open Source"],
     registrations: 50,
@@ -210,7 +210,7 @@ const hardcodedEvents = [
     category: "Workshop",
     status: "completed",
     description: "Hands-on workshop introducing Agentic AI concepts, tools, and applications, with coding exercises for CS/IT students.",
-    image: "https://i.postimg.cc/hvK3W15g/Agentic-Ai.png",    
+    image: "https://i.postimg.cc/hvK3W15g/Agentic-Ai.png",
     speakers: ["Craig D'Souza"],
     topics: ["Agentic AI Basics", "Coding with AI", "Real-World Applications"],
     registrations: 80,
@@ -325,54 +325,55 @@ const EventsPage = () => {
   ];
 
   // Add 'comingsoon' to the filter options array
-  const filteredEvents = activeFilter === 'all' 
+  const filteredEvents = activeFilter === 'all'
     ? allEvents
     : activeFilter === 'comingsoon'
-    ? allEvents.filter(event => event.status === 'upcoming' && !event.form)
-    : activeFilter === 'upcoming'
-    ? allEvents.filter(event => event.status === 'upcoming' && event.form)
-    : allEvents.filter(event => event.status === 'completed');
+      ? allEvents.filter(event => event.status === 'upcoming' && !event.form)
+      : activeFilter === 'upcoming'
+        ? allEvents.filter(event => event.status === 'upcoming' && event.form)
+        : allEvents.filter(event => event.status === 'completed');
 
   // And update the filter buttons array to:
-  {['all', 'upcoming', 'comingsoon', 'completed'].map((filter) => (
-    <motion.button
-      key={filter}
-      onClick={() => setActiveFilter(filter)}
-      className={`min-w-max px-4 md:px-6 py-2 md:py-3 rounded-full font-semibold transition-all capitalize whitespace-nowrap relative overflow-hidden text-sm md:text-base ${
-        activeFilter === filter
-          ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg scale-105'
-          : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
-      }`}
-      aria-pressed={activeFilter === filter}
-      aria-label={`Filter events by ${filter}`}
-      whileHover={{
-        scale: activeFilter === filter ? 1.05 : 1.02,
-        y: -2
-      }}
-      whileTap={{ scale: 0.98 }}
-      animate={activeFilter === filter ? {
-        boxShadow: [
-          "0 4px 20px rgba(59, 130, 246, 0.3)",
-          "0 4px 20px rgba(147, 51, 234, 0.3)", 
-          "0 4px 20px rgba(59, 130, 246, 0.3)"
-        ]
-      } : {}}
-      transition={{ duration: 2, repeat: Infinity }}
-    >
-      {activeFilter === filter && (
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full"
-          layoutId="activeFilter"
-          transition={{
-            type: "spring",
-            stiffness: 500,
-            damping: 30
-          }}
-        />
-      )}
-      <span className="relative z-10">{filter} Events</span>
-    </motion.button>
-  ))}
+  {
+    ['all', 'upcoming', 'comingsoon', 'completed'].map((filter) => (
+      <motion.button
+        key={filter}
+        onClick={() => setActiveFilter(filter)}
+        className={`min-w-max px-4 md:px-6 py-2 md:py-3 rounded-full font-semibold transition-all capitalize whitespace-nowrap relative overflow-hidden text-sm md:text-base ${activeFilter === filter
+            ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg scale-105'
+            : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+          }`}
+        aria-pressed={activeFilter === filter}
+        aria-label={`Filter events by ${filter}`}
+        whileHover={{
+          scale: activeFilter === filter ? 1.05 : 1.02,
+          y: -2
+        }}
+        whileTap={{ scale: 0.98 }}
+        animate={activeFilter === filter ? {
+          boxShadow: [
+            "0 4px 20px rgba(59, 130, 246, 0.3)",
+            "0 4px 20px rgba(147, 51, 234, 0.3)",
+            "0 4px 20px rgba(59, 130, 246, 0.3)"
+          ]
+        } : {}}
+        transition={{ duration: 2, repeat: Infinity }}
+      >
+        {activeFilter === filter && (
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full"
+            layoutId="activeFilter"
+            transition={{
+              type: "spring",
+              stiffness: 500,
+              damping: 30
+            }}
+          />
+        )}
+        <span className="relative z-10">{filter} Events</span>
+      </motion.button>
+    ))
+  }
 
   const orbColors = ['bg-purple-200', 'bg-blue-200', 'bg-pink-200', 'bg-yellow-200', 'bg-green-200', 'bg-indigo-200', 'bg-red-200', 'bg-teal-200', 'bg-orange-200'];
   const orbSizes = [16, 20, 24, 28, 32, 36, 40, 44, 48];
