@@ -122,6 +122,31 @@ const morphingCard = {
 const hardcodedEvents = [
   {
     id: 1,
+    title: "IEEEXtreme 19.0",
+    date: "2025-10-25",
+    displaydate: "October 25, 2025",
+    time: "24-Hour Global Event",
+    location: "Online (Global)",
+    attendees: 10000,
+    category: "Global Coding Marathon",
+    status: "upcoming",
+    description: "The most awaited 24-hour global coding marathon is BACK! Join thousands of brilliant programmers from around the world as IEEE Student Members compete in an electrifying 24-hour challenge — solving real-world problems, showcasing innovation, and pushing the limits of coding endurance. Guided by IEEE professionals and supported by Student Branches, this is where skill meets strategy and teamwork meets technology!",
+    image: "https://ieeextreme.org/wp-content/uploads/2024/09/ieeextreme-logo.png",
+    speakers: ["IEEE Professionals", "Student Branch Mentors"],
+    topics: ["Competitive Programming", "Innovation", "Teamwork", "Technology"],
+    registrations: 2500,
+    satisfaction: null,
+    featured: true,
+    highlights: [
+      "Global 24-hour coding marathon",
+      "Guidance from IEEE professionals",
+      "Exclusive prizes and global recognition",
+      "Opportunity to network with top developers worldwide"
+    ],
+    form: "https://ieeextreme.org"
+  },
+  {
+    id: 2,
     title: "Git & Github Workshop",
     date: "2025-10-15",
     displaydate: "October 2025",
@@ -140,28 +165,28 @@ const hardcodedEvents = [
     highlights: [],
     form: ""
   },
+  // {
+  //   id: 3,
+  //   title: "Intra-College Hackathon",
+  //   date: "2025-09-22",
+  //   displaydate: "September 22, 2025",
+  //   time: "9:00 AM - 5:00 PM",
+  //   location: "Campus Halls",
+  //   attendees: 120,
+  //   category: "Competition",
+  //   status: "upcoming",
+  //   description: "A day-long hackathon for teams of 2–4 members to develop innovative projects. Includes coding, mentoring, and prize distribution.",
+  //   image: "https://i.postimg.cc/SRpf6kMD/download.jpg",
+  //   speakers: ["Mentors", "Jury"],
+  //   topics: ["Innovation", "Teamwork", "Coding"],
+  //   registrations: 100,
+  //   satisfaction: 89,
+  //   featured: false,
+  //   highlights: [],
+  //   form: "" // No form yet
+  // },
   {
-    id: 2,
-    title: "Intra-College Hackathon",
-    date: "2025-09-22",
-    displaydate: "September 22, 2025",
-    time: "9:00 AM - 5:00 PM",
-    location: "Campus Halls",
-    attendees: 120,
-    category: "Competition",
-    status: "upcoming",
-    description: "A day-long hackathon for teams of 2–4 members to develop innovative projects. Includes coding, mentoring, and prize distribution.",
-    image: "https://i.postimg.cc/SRpf6kMD/download.jpg",
-    speakers: ["Mentors", "Jury"],
-    topics: ["Innovation", "Teamwork", "Coding"],
-    registrations: 100,
-    satisfaction: 89,
-    featured: false,
-    highlights: [],
-    form: "" // No form yet
-  },
-  {
-    id: 3,
+    id: 4,
     title: "Mosaic (Tech Fest)",
     date: "2025-09-19",
     displaydate: "October 19–20, 2025",
@@ -181,7 +206,7 @@ const hardcodedEvents = [
     form: ""
   },
   {
-    id: 4,
+    id: 5,
     title: "DSA Coding Challenge",
     date: "2025-08-20",
     displaydate: "October 20, 2025",
@@ -196,12 +221,12 @@ const hardcodedEvents = [
     topics: ["DSA Problems", "Problem-Solving", "Algorithms"],
     registrations: 65,
     satisfaction: 88,
-    featured: true,
+    featured: false,
     highlights: [],
     form: ""
   },
   {
-    id: 5,
+    id: 6,
     title: "AIML (Agentic AI)",
     date: "2025-08-11",
     displaydate: "August 11–12, 2025",
@@ -221,7 +246,7 @@ const hardcodedEvents = [
     form: ""
   },
   {
-    id: 6,
+    id: 7,
     title: "Committee Induction Meet",
     date: "2025-07-24",
     displaydate: "July 24, 2025",
@@ -241,7 +266,7 @@ const hardcodedEvents = [
     form: ""
   },
   {
-    id: 7,
+    id: 8,
     title: "Techno Art Showdown",
     date: "2024-08-23",
     displaydate: "August 23, 2024",
@@ -262,7 +287,7 @@ const hardcodedEvents = [
   },
   // All completed events without form link
   {
-    id: 8,
+    id: 9,
     title: "Radiant Rumble",
     date: "2023-09-15",
     displaydate: "September 15–16, 2023",
@@ -282,7 +307,7 @@ const hardcodedEvents = [
     form: ""
   },
   {
-    id: 9,
+    id: 10,
     title: "InQUIZitive",
     date: "2022-04-09",
     displaydate: "April 9, 2022",
@@ -341,8 +366,8 @@ const EventsPage = () => {
         key={filter}
         onClick={() => setActiveFilter(filter)}
         className={`min-w-max px-4 md:px-6 py-2 md:py-3 rounded-full font-semibold transition-all capitalize whitespace-nowrap relative overflow-hidden text-sm md:text-base ${activeFilter === filter
-            ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg scale-105'
-            : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+          ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg scale-105'
+          : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
           }`}
         aria-pressed={activeFilter === filter}
         aria-label={`Filter events by ${filter}`}
@@ -728,7 +753,7 @@ const EventsPage = () => {
                         }}
                       />
                       <span className="relative z-10">Coming Soon ✨</span>
-                      
+
                     </motion.button>
                   </div>
                 </motion.div>
@@ -1007,7 +1032,7 @@ const EventsPage = () => {
           </div>
         </motion.div>
       </section>
-       <Footer />
+      <Footer />
     </div>
   );
 };
