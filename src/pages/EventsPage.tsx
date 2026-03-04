@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import {
   Calendar, MapPin, Users, ArrowRight, Clock, Star, Award, TrendingUp,
   Target, CheckCircle, Play
 } from 'lucide-react';
 import Footer from '../components/Footer';
+import { eventsData } from '../data/eventsData';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 32 },
@@ -120,7 +122,7 @@ const morphingCard = {
 
 // Hardcoded events array with form link field and sorted with new IDs
 const hardcodedEvents = [
-  {
+    {
     id: 1,
     title: "IEEE Xtreme 19.0",
     date: "2025-10-25",
@@ -329,10 +331,13 @@ const hardcodedEvents = [
 ];
 
 const EventsPage = () => {
+  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState('all');
   const [isVisible, setIsVisible] = useState(false);
   const [imgErrorMap, setImgErrorMap] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+
+  const getSlug = (id: number) => eventsData.find((e) => e.id === id)?.slug ?? null;
 
   useEffect(() => {
     setIsVisible(true);
@@ -836,6 +841,10 @@ const EventsPage = () => {
                     whileHover="hover"
                     className="bg-white rounded-2xl shadow-xl hover:shadow-2xl overflow-hidden border border-gray-100 hover:border-gray-200 group h-full flex flex-col cursor-pointer select-none relative"
                     style={{ transformStyle: "preserve-3d" }}
+                    onClick={() => {
+                      const slug = getSlug(event.id);
+                      if (slug) navigate(`/events/${slug}`);
+                    }}
                   >
                     <motion.div className="relative h-48 w-full overflow-hidden">
                       <motion.img
