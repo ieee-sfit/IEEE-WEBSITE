@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
-  Calendar, MapPin, Users, ArrowRight, Clock, Star, Award, TrendingUp,
-  Target, CheckCircle, Play
+  MapPin, Users, ArrowRight, Clock, Star, Award, TrendingUp,
+  Target, CheckCircle
 } from 'lucide-react';
 import Footer from '../components/Footer';
 import { eventsData } from '../data/eventsData';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 32 },
-  visible: (i = 0) => ({
+  visible: (i: number = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.2, duration: 0.8, ease: 'easeOut' }
+    transition: { delay: i * 0.2, duration: 0.8, ease: 'easeOut' as const }
   })
 };
 const cardStagger = {
@@ -23,10 +23,10 @@ const cardStagger = {
 };
 const cardItem = {
   hidden: { opacity: 0, y: 36 },
-  visible: (i) => ({
+  visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.15 + 1, duration: 0.8, ease: 'easeOut' }
+    transition: { delay: i * 0.15 + 1, duration: 0.8, ease: 'easeOut' as const }
   })
 };
 const heroTitleReveal = {
@@ -40,7 +40,7 @@ const heroTitleReveal = {
     y: 0,
     scale: 1,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 100,
       damping: 15,
       duration: 1.2
@@ -74,7 +74,7 @@ const pulseGlow = {
     transition: {
       duration: 2,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "easeInOut" as const
     }
   }
 };
@@ -84,7 +84,7 @@ const slideInLeft = {
     x: 0,
     opacity: 1,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 120,
       damping: 20
     }
@@ -96,7 +96,7 @@ const slideInRight = {
     x: 0,
     opacity: 1,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 120,
       damping: 20
     }
@@ -113,45 +113,104 @@ const morphingCard = {
     rotateY: 5,
     z: 50,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 300,
       damping: 20
     }
   }
 };
 
+// Static config — defined outside component to avoid re-creation on every render
+const STATS_DATA = [
+  { icon: Award,      value: 10,   suffix: '+',  label: 'Events Organized',  color: 'blue'   },
+  { icon: Users,      value: 1200, suffix: '+',  label: 'Total Participants', color: 'purple' },
+  { icon: TrendingUp, value: 89,   suffix: '%',  label: 'Avg Satisfaction',   color: 'green'  },
+  { icon: Target,     value: 8,    suffix: '',   label: 'Completed Events',   color: 'pink'   },
+];
+
+// Fixed orb positions (deterministic — no Math.random on render)
+const ORB_CONFIG = [
+  { color: 'bg-purple-200', w: 40, h: 40, top: 8,  left: 5  },
+  { color: 'bg-blue-200',   w: 32, h: 32, top: 20, left: 80 },
+  { color: 'bg-pink-200',   w: 48, h: 48, top: 60, left: 15 },
+  { color: 'bg-yellow-200', w: 24, h: 24, top: 75, left: 70 },
+  { color: 'bg-green-200',  w: 36, h: 36, top: 40, left: 55 },
+  { color: 'bg-indigo-200', w: 28, h: 28, top: 15, left: 40 },
+  { color: 'bg-teal-200',   w: 44, h: 44, top: 85, left: 90 },
+  { color: 'bg-orange-200', w: 20, h: 20, top: 50, left: 30 },
+  { color: 'bg-purple-200', w: 32, h: 32, top: 30, left: 92 },
+  { color: 'bg-blue-200',   w: 48, h: 48, top: 70, left: 45 },
+  { color: 'bg-pink-200',   w: 24, h: 24, top: 5,  left: 65 },
+  { color: 'bg-green-200',  w: 36, h: 36, top: 92, left: 25 },
+];
+
 // Hardcoded events array with form link field and sorted with new IDs
 const hardcodedEvents = [
-    {
-    id: 1,
-    title: "IEEE Xtreme 19.0",
-    date: "2025-10-25",
-    displaydate: "October 25, 2025",
-    time: "24-Hour Global Event",
-    location: "Online (Global)",
-    attendees: 10000,
-    category: "Global Coding Marathon",
-    status: "completed",
-    description: "The most awaited 24-hour global coding marathon is BACK! Join thousands of brilliant programmers from around the world as IEEE Student Members compete in an electrifying 24-hour challenge — solving real-world problems, showcasing innovation, and pushing the limits of coding endurance. Guided by IEEE professionals and supported by Student Branches, this is where skill meets strategy and teamwork meets technology!",
-    image: "https://ieeextreme.org/wp-content/uploads/2024/09/ieeextreme-logo.png",
-    speakers: ["IEEE Professionals", "Student Branch Mentors"],
-    topics: ["Competitive Programming", "Innovation", "Teamwork", "Technology"],
-    registrations: 2500,
+  {
+    id: 13,
+    title: "Inquisite – Women in History",
+    date: "2026-03-13",
+    displaydate: "March 13, 2026",
+    time: "1:00 PM – 5:00 PM",
+    location: "Room 618, SFIT",
+    attendees: 40,
+    category: "Quiz Competition",
+    status: "upcoming",
+    description: "A WIE flagship quiz competition celebrating women pioneers in computing, AI, space research, and entrepreneurship across multiple engaging rounds.",
+    image: "https://placehold.co/800x500/9333ea/ffffff?text=Coming+Soon",
+    speakers: ["WIE SFIT Organizers"],
+    topics: ["Women in Technology", "History of Computing", "AI Pioneers", "Quiz Competition"],
+    registrations: 0,
     satisfaction: null,
     featured: false,
-    highlights: [
-      "Global 24-hour coding marathon",
-      "Guidance from IEEE professionals",
-      "Exclusive prizes and global recognition",
-      "Opportunity to network with top developers worldwide"
-    ],
-    form: "https://ieeextreme.org"
+    highlights: [],
+    form: ""
+  },
+  {
+    id: 12,
+    title: "Debugging Your Communication Skills",
+    date: "2026-03-10",
+    displaydate: "March 10, 2026",
+    time: "3:00 PM – 5:00 PM",
+    location: "Room 618, SFIT",
+    attendees: 30,
+    category: "Workshop",
+    status: "upcoming",
+    description: "An interactive session by IEEE × WIE SFIT on verbal, non-verbal, and practical communication techniques for technical careers.",
+    image: "https://placehold.co/800x500/7c3aed/ffffff?text=Coming+Soon",
+    speakers: ["Ishita Dcosta"],
+    topics: ["Verbal Communication", "Non-Verbal Communication", "Interview Skills", "Confidence Building"],
+    registrations: 0,
+    satisfaction: null,
+    featured: true,
+    highlights: [],
+    form: ""
+  },
+  {
+    id: 11,
+    title: "Neon Kickoff",
+    date: "2025-10-17",
+    displaydate: "October 17–18, 2025",
+    time: "During Mosaic 2025",
+    location: "SFIT Campus",
+    attendees: 83,
+    category: "Competition",
+    status: "completed",
+    description: "A 3-vs-3 UV LED football tournament with technical QR riddle tosses, Golden Minutes, Mystery Ball scoring, and a Rocket League side game station.",
+    image: "https://i.postimg.cc/5yGw4Rgn/Whats-App-Image-2025-10-15-at-10-12-07-7e32472a.jpg",
+    speakers: ["IEEE SFIT Student Branch Organizers"],
+    topics: ["3v3 Football", "UV Arena", "Technical Toss", "Rocket League"],
+    registrations: 83,
+    satisfaction: 91,
+    featured: false,
+    highlights: [],
+    form: ""
   },
   {
     id: 2,
     title: "Git & Github Workshop",
-    date: "2025-10-15",
-    displaydate: "October 2025",
+    date: "2025-10-08",
+    displaydate: "October 8, 2025",
     time: "Not specified",
     location: "Lab 2",
     attendees: 60,
@@ -163,7 +222,7 @@ const hardcodedEvents = [
     topics: ["Git Basics", "Github Collaboration", "Open Source"],
     registrations: 50,
     satisfaction: 87,
-    featured: true,
+    featured: false,
     highlights: [],
     form: ""
   },
@@ -187,46 +246,6 @@ const hardcodedEvents = [
   //   highlights: [],
   //   form: "" // No form yet
   // },
-  {
-    id: 4,
-    title: "Mosaic (Tech Fest)",
-    date: "2025-09-19",
-    displaydate: "October 19–20, 2025",
-    time: "Full Day",
-    location: "College Campus",
-    attendees: 500,
-    category: "Tech Fest",
-    status: "completed",
-    description: "The annual college Tech Fest featuring workshops, competitions, exhibitions, and guest lectures. A hub of innovation and creativity.",
-    image: "https://i.postimg.cc/5yGw4Rgn/Whats-App-Image-2025-10-15-at-10-12-07-7e32472a.jpg",
-    speakers: ["Industry Experts", "Alumni"],
-    topics: ["Workshops", "Tech Exhibitions", "Competitions"],
-    registrations: 400,
-    satisfaction: 93,
-    featured: false,
-    highlights: [],
-    form: ""
-  },
-  {
-    id: 5,
-    title: "DSA Coding Challenge",
-    date: "2025-08-20",
-    displaydate: "October 20, 2025",
-    time: "Not specified",
-    location: "Not specified",
-    attendees: 75,
-    category: "Workshop/Competition",
-    status: "completed",
-    description: "A competitive coding challenge focused on Data Structures and Algorithms, testing problem-solving skills and time management.",
-    image: "https://i.postimg.cc/X7X20qYR/so-the-image-should-contain-the-words-dsa-challenge.jpg",
-    speakers: ["Judges", "Moderators"],
-    topics: ["DSA Problems", "Problem-Solving", "Algorithms"],
-    registrations: 65,
-    satisfaction: 88,
-    featured: false,
-    highlights: [],
-    form: ""
-  },
   {
     id: 6,
     title: "AIML (Agentic AI)",
@@ -333,110 +352,33 @@ const hardcodedEvents = [
 const EventsPage = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState('all');
-  const [isVisible, setIsVisible] = useState(false);
-  const [imgErrorMap, setImgErrorMap] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
 
   const getSlug = (id: number) => eventsData.find((e) => e.id === id)?.slug ?? null;
-
-  useEffect(() => {
-    setIsVisible(true);
-    setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 1000);
-  }, []);
 
   const allEvents = hardcodedEvents;
   const featuredEvent = allEvents.find(event => event.featured);
 
-  const statsData = [
-    { icon: Award, value: 25, suffix: '+', label: 'Events Organized', color: 'blue' },
-    { icon: Users, value: 1000, suffix: '+', label: 'Total Participants', color: 'purple' },
-    { icon: TrendingUp, value: 94, suffix: '%', label: 'Avg Satisfaction', color: 'green' },
-    { icon: Target, value: 5, suffix: '+', label: 'Completed Events', color: 'pink' }
-  ];
+  const statsData = STATS_DATA;
 
-  // Add 'comingsoon' to the filter options array
-  const filteredEvents = activeFilter === 'all'
-    ? allEvents
-    : activeFilter === 'comingsoon'
-      ? allEvents.filter(event => event.status === 'upcoming' && !event.form)
-      : activeFilter === 'upcoming'
-        ? allEvents.filter(event => event.status === 'upcoming' && event.form)
-        : allEvents.filter(event => event.status === 'completed');
+  const filteredEvents = useMemo(() => {
+    if (activeFilter === 'all') return allEvents;
+    if (activeFilter === 'upcoming') return allEvents.filter(e => e.status === 'upcoming');
+    return allEvents.filter(e => e.status === 'completed');
+  }, [activeFilter]);
 
-  // And update the filter buttons array to:
-  {
-    ['all', 'upcoming', 'comingsoon', 'completed'].map((filter) => (
-      <motion.button
-        key={filter}
-        onClick={() => setActiveFilter(filter)}
-        className={`min-w-max px-4 md:px-6 py-2 md:py-3 rounded-full font-semibold transition-all capitalize whitespace-nowrap relative overflow-hidden text-sm md:text-base ${activeFilter === filter
-          ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg scale-105'
-          : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
-          }`}
-        aria-pressed={activeFilter === filter}
-        aria-label={`Filter events by ${filter}`}
-        whileHover={{
-          scale: activeFilter === filter ? 1.05 : 1.02,
-          y: -2
-        }}
-        whileTap={{ scale: 0.98 }}
-        animate={activeFilter === filter ? {
-          boxShadow: [
-            "0 4px 20px rgba(59, 130, 246, 0.3)",
-            "0 4px 20px rgba(147, 51, 234, 0.3)",
-            "0 4px 20px rgba(59, 130, 246, 0.3)"
-          ]
-        } : {}}
-        transition={{ duration: 2, repeat: Infinity }}
-      >
-        {activeFilter === filter && (
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full"
-            layoutId="activeFilter"
-            transition={{
-              type: "spring",
-              stiffness: 500,
-              damping: 30
-            }}
-          />
-        )}
-        <span className="relative z-10">{filter} Events</span>
-      </motion.button>
-    ))
-  }
+  // Orbs rendered once — stable between re-renders
+  const orbs = useMemo(() => ORB_CONFIG.map((o, i) => (
+    <div
+      key={`orb-${i}`}
+      className={`absolute rounded-full mix-blend-multiply filter blur-xl opacity-20 ${o.color}`}
+      style={{ width: `${o.w}px`, height: `${o.h}px`, top: `${o.top}%`, left: `${o.left}%`, zIndex: 0, pointerEvents: 'none' }}
+    />
+  )), []);
 
-  const orbColors = ['bg-purple-200', 'bg-blue-200', 'bg-pink-200', 'bg-yellow-200', 'bg-green-200', 'bg-indigo-200', 'bg-red-200', 'bg-teal-200', 'bg-orange-200'];
-  const orbSizes = [16, 20, 24, 28, 32, 36, 40, 44, 48];
-
-  const orbs = Array.from({ length: 40 }).map((_, i) => {
-    const width = orbSizes[Math.floor(Math.random() * orbSizes.length)];
-    const height = orbSizes[Math.floor(Math.random() * orbSizes.length)];
-    const colorClass = orbColors[Math.floor(Math.random() * orbColors.length)];
-    const top = Math.floor(Math.random() * 100);
-    const left = Math.floor(Math.random() * 100);
-    return (
-      <div
-        key={`orb-${i}`}
-        className={`absolute rounded-full mix-blend-multiply filter blur-xl opacity-20 ${colorClass}`}
-        style={{
-          width: `${width}px`,
-          height: `${height}px`,
-          top: `${top}%`,
-          left: `${left}%`,
-          zIndex: 0,
-          pointerEvents: 'none'
-        }}
-      />
-    );
-  });
-
-  const handleImgError = (id, e) => {
-    if (!imgErrorMap[id]) {
-      setImgErrorMap(prev => ({ ...prev, [id]: true }));
-      e.currentTarget.src = '/fallback.jpg';
-    }
-  };
+  const handleImgError = useCallback((e: { currentTarget: HTMLImageElement }) => {
+    e.currentTarget.src = '/fallback.jpg';
+    e.currentTarget.onerror = null; // prevent infinite loop if fallback also fails
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden select-none">
@@ -623,71 +565,7 @@ const EventsPage = () => {
                       scale: 1.02
                     }}
                   >
-                    <motion.div
-                      className="absolute inset-0 bg-black/40 transition-opacity duration-500 group-hover:bg-black/30"
-                      animate={{
-                        background: [
-                          "linear-gradient(45deg, rgba(0,0,0,0.4), rgba(0,0,0,0.2))",
-                          "linear-gradient(135deg, rgba(0,0,0,0.2), rgba(0,0,0,0.4))",
-                          "linear-gradient(45deg, rgba(0,0,0,0.4), rgba(0,0,0,0.2))"
-                        ]
-                      }}
-                      transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                    />
-                    <motion.div className="relative z-10 text-center text-white p-8">
-                      <motion.div
-                        animate={{
-                          scale: [1, 1.06, 1],
-                          opacity: [1, 0.7, 1],
-                          y: [0, -5, 0]
-                        }}
-                        transition={{ repeat: Infinity, duration: 2.2 }}
-                        className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6 inline-block select-none"
-                      >
-                        <span className="text-sm font-semibold">FEATURED EVENT</span>
-                      </motion.div>
-                      <motion.h2
-                        className="text-4xl md:text-5xl font-bold mb-4 leading-tight"
-                        initial={{ y: 50, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.5, duration: 0.8 }}
-                      >
-                        {featuredEvent.title}
-                      </motion.h2>
-                      <motion.div
-                        className="flex items-center justify-center text-lg mb-6 gap-2"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ delay: 0.7, type: "spring", stiffness: 200 }}
-                      >
-                        <Calendar className="w-5 h-5 text-white" />
-                        <span>{featuredEvent.displaydate}</span>
-                      </motion.div>
-                      <div className="flex flex-wrap justify-center gap-2">
-                        {(featuredEvent.highlights || []).map((highlight, idx) => (
-                          <motion.span
-                            key={idx}
-                            className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm select-text cursor-pointer"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.9 + idx * 0.1 }}
-                            whileHover={{
-                              scale: 1.1,
-                              backgroundColor: "rgba(255,255,255,0.3)",
-                              transition: { duration: 0.2 }
-                            }}
-                          >
-                            {highlight}
-                          </motion.span>
-                        ))}
-                      </div>
-                    </motion.div>
-                    <motion.div
-                      whileHover={{ scale: 1.1, rotate: 360 }}
-                      transition={{ duration: 0.5 }}
-                      className="absolute bottom-4 right-4"
-                    >
-                    </motion.div>
+
                   </motion.div>
                   <div className="md:w-1/2 p-8 md:p-12 flex flex-col">
                     <div className="flex items-center gap-3 mb-6">
@@ -743,24 +621,22 @@ const EventsPage = () => {
                       }}
                       whileTap={{ scale: 0.98 }}
                       className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 px-8 rounded-2xl font-bold text-lg flex items-center justify-center group select-none relative overflow-hidden"
-                      aria-label="Register for featured event"
-                      onClick={() => window.open(featuredEvent.form, "_blank")}
+                      aria-label="Featured event action"
+                      onClick={() => featuredEvent.status !== 'completed' && featuredEvent.form ? window.open(featuredEvent.form, "_blank") : undefined}
+                      style={{ cursor: featuredEvent.status === 'completed' || !featuredEvent.form ? 'default' : 'pointer' }}
                     >
                       <motion.div
                         className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                        animate={{
-                          x: ["-100%", "100%"]
-                        }}
-                        transition={{
-                          duration: 2,
-                          repeat: Infinity,
-                          repeatDelay: 3,
-                          ease: "easeInOut"
-                        }}
+                        animate={{ x: ["-100%", "100%"] }}
+                        transition={{ duration: 2, repeat: Infinity, repeatDelay: 3, ease: "easeInOut" }}
                       />
-                      <span className="relative z-10">Register Now </span>
-                      ✨<ArrowRight className="ml-2 w-4 h-4" />
-
+                      {featuredEvent.status === 'completed' ? (
+                        <span className="relative z-10">✓ Event Completed</span>
+                      ) : featuredEvent.form ? (
+                        <><span className="relative z-10">Register Now </span>✨<ArrowRight className="ml-2 w-4 h-4" /></>
+                      ) : (
+                        <span className="relative z-10">⏰ Coming Soon</span>
+                      )}
                     </motion.button>
                   </div>
                 </motion.div>
@@ -852,9 +728,10 @@ const EventsPage = () => {
                         alt={event.title}
                         className="w-full h-full object-cover"
                         loading="lazy"
+                        decoding="async"
                         width={400}
                         height={192}
-                        onError={(e) => handleImgError(event.id, e)}
+                        onError={(e) => handleImgError(e)}
                         whileHover={{
                           scale: 1.1,
                           rotate: [0, 1, -1, 0]

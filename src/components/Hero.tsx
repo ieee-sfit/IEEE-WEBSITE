@@ -110,7 +110,7 @@ const Hero = () => {
             </div>
             <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300 hover:scale-105 card-tilt group animation-delay-100">
               <Calendar className="w-8 h-8 text-purple-600 mx-auto mb-3 group-hover:animate-bounce" />
-              <Counter endValue={7} suffix="+" className="text-2xl font-bold text-gray-800 mb-1" />
+              <Counter endValue={10} suffix="+" className="text-2xl font-bold text-gray-800 mb-1" />
               <p className="text-gray-600">Events Organized</p>
             </div>
             <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300 hover:scale-105 card-tilt group animation-delay-200">

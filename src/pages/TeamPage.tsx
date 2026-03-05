@@ -251,10 +251,10 @@ const TeamPage: React.FC = () => {
     // Add this right after the useState declarations in your TeamPage component
     const convenors: TeamMember[] = [
         {
-            id: 0, // Use a unique ID like 0
+            id: 0,
             name: 'Valentina Rani',
             role: 'Convenor',
-            category: 'convenor', // Assign to 'core' to appear in that filter
+            category: 'convenor',
             year: '',
             branch: 'Electronics & Telecommunication',
             image: 'https://res.cloudinary.com/degzo3jzl/image/upload/v1726587187/valentinarani_zbvaxd.jpg', // <-- Replace with actual image URL
@@ -271,10 +271,10 @@ const TeamPage: React.FC = () => {
             committee: 'IEEEXWIE', // Or the relevant committee name
         },
         {
-            id: -1, // Use another unique ID like -1
+            id: 1,
             name: 'Dr. Mrinmoyee Mukherjee',
-            role: 'Co - Convenor',
-            category: 'co - convenor',
+            role: 'Co-Convenor',
+            category: 'convenor',
             year: '',
             branch: 'Information Technology',
             image: 'https://res.cloudinary.com/degzo3jzl/image/upload/v1772716360/e475ae92-1a54-4ba1-96a6-fb8e4d62a06f.png', // <-- Replace with actual image URL
@@ -408,7 +408,7 @@ const TeamPage: React.FC = () => {
                 const sortedData = combinedData.sort((a, b) => {
                     const categoryComparison = a.category.localeCompare(b.category);
                     if (categoryComparison !== 0) return categoryComparison;
-                    if (a.category === 'core') return a.id - b.id;
+                    if (a.category === 'core' || a.category === 'convenor') return a.id - b.id;
                     const priorityA = getRolePriority(a.role, a.committee);
                     const priorityB = getRolePriority(b.role, b.committee);
                     if (priorityA !== priorityB) return priorityA - priorityB;
@@ -476,7 +476,7 @@ const TeamPage: React.FC = () => {
                         {[
                             { icon: Users, value: teamMembers.length, suffix: '', label: 'Active Members', color: 'blue' },
                             { icon: Award, value: executiveCount, suffix: '', label: 'Core Leaders', color: 'purple' },
-                            { icon: Star, value: 10, suffix: '+', label: 'Events Hosted', color: 'pink' },
+                            { icon: Star, value: 4, suffix: '+', label: 'Events Hosted', color: 'pink' },
                             { icon: Users, value: 2, suffix: '', label: 'Convenors', color: 'indigo' }
                         ].map((stat) => (
                             <div key={stat.label} className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 card-tilt text-center">
@@ -550,7 +550,7 @@ const TeamPage: React.FC = () => {
             className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500  overflow-hidden group relative will-change-transform cursor-pointer"
             onClick={() => handleMemberClick(member)}
         >
-                                    {member.featured && member.role !== "Convenor" && (
+                                    {member.featured && member.category === "core" && (
                                         <div className="absolute top-4 right-4 z-10">
                                             <div className="flex items-center px-3 py-1 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-sm font-medium rounded-full">
                                                 <Star className="w-4 h-4 mr-1" /> Core
@@ -558,10 +558,10 @@ const TeamPage: React.FC = () => {
                                         </div>
                                     )}
 
-                                    {member.featured && member.role === "Convenor" && (
+                                    {member.featured && member.category === "convenor" && (
                                         <div className="absolute top-4 right-4 z-10">
                                             <div className="flex items-center px-3 py-1 bg-gradient-to-r from-orange-500 to-yellow-500 text-white text-sm font-medium rounded-full">
-                                                <Star className="w-4 h-4 mr-1" /> Convenor
+                                                <Star className="w-4 h-4 mr-1" /> {member.role}
                                             </div>
                                         </div>
                                     )}
@@ -627,13 +627,13 @@ const TeamPage: React.FC = () => {
                                         <p className="text-blue-600 font-semibold text-sm mb-1">
                                             {member.committee.toLowerCase() == "ieeexwie" ? "IEEE x WIE" : member.committee}
                                             {" - "}
-                                            {member.category == "core"
-                                                ? ""
-                                                : member.category == "pr"
-                                                    ? "PR"
-                                                    : member.category.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ")}
-                                            {" "}
-                                            {member.role == "Convenor" ? "" : member.role}
+                                            {member.category == "convenor"
+                                                ? member.role
+                                                : member.category == "core"
+                                                    ? member.role
+                                                    : member.category == "pr"
+                                                        ? `PR ${member.role}`
+                                                        : `${member.category.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ")} ${member.role}`}
                                         </p>
                                         <p className="text-gray-500 text-sm mb-4">{member.year} • {member.branch}</p>
                                         <p className="text-gray-600 text-sm leading-relaxed mb-4 h-20 overflow-hidden">
