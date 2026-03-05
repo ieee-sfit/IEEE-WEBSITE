@@ -272,18 +272,18 @@ const TeamPage: React.FC = () => {
         },
         {
             id: -1, // Use another unique ID like -1
-            name: 'Dr. Dakshata Panchal',
-            role: 'Convenor',
-            category: 'convenor',
+            name: 'Dr. Mrinmoyee Mukherjee',
+            role: 'Co - Convenor',
+            category: 'co - convenor',
             year: '',
-            branch: 'Computer Engineering',
-            image: 'https://res.cloudinary.com/degzo3jzl/image/upload/v1726587089/drdakshatapanchal_qkcqd2.png', // <-- Replace with actual image URL
-            bio: 'Dedicated to fostering a collaborative and empowering environment for all members.',
+            branch: 'Information Technology',
+            image: 'https://res.cloudinary.com/degzo3jzl/image/upload/v1772716360/e475ae92-1a54-4ba1-96a6-fb8e4d62a06f.png', // <-- Replace with actual image URL
+            bio: 'Fostering the next generation of engineers by bridging the gap between advanced statistical signal processing and real-world IoT solutions.',
             achievements: [],
-            skills: ['Strategy', 'Event Planning', 'Team Building'],
+            skills: ['Strategic Academic Planning', 'Event Planning', 'Interdisciplinary Team Building'],
             social: {
-                linkedin: 'https://www.linkedin.com/in/dr-dakshata-panchal-01b101210/',
-                email: 'dakshatapanchal@sfit.ac.in',
+                linkedin: 'https://www.linkedin.com/in/drmrinmoyeemukherjee/',
+                email: 'mrinmoyeemukherjee@sfit.ac.in',
                 github: '',
                 instagram: ''
             },
