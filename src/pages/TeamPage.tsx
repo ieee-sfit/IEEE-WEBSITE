@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Linkedin, Mail, Github, Award, Users, Star, ChevronDown, Instagram, Frown, X } from 'lucide-react';
-// Make sure your hooks are correctly imported from their location
+import React, { useState, useEffect, useRef } from 'react';
+import { Linkedin, Mail, Github, Award, Users, Star, ChevronDown, Instagram, Frown, X, BookOpen, GraduationCap } from 'lucide-react';
 import { useScrollAnimation, useStaggeredAnimation } from '../hooks/useScrollAnimation';
-import { motion } from "framer-motion";
 
 
 // --- TYPE DEFINITIONS ---
@@ -11,6 +9,7 @@ interface SocialLinks {
     email: string;
     github: string;
     instagram: string;
+    googleScholar?: string;
 }
 
 interface TeamMember {
@@ -27,6 +26,8 @@ interface TeamMember {
     social: SocialLinks;
     featured: boolean;
     committee: string;
+    resume?: string;
+    responsibilities?: string[];
 }
 
 function TeamLoader() {
@@ -50,126 +51,131 @@ function MemberModal({ member, isOpen, onClose }: { member: TeamMember | null; i
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-hidden">
-            {/* Backdrop with blur */}
-            <div 
-                className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-                onClick={onClose}
-            ></div>
-            
-            {/* Modal Content */}
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose}></div>
             <div className="relative bg-white rounded-3xl shadow-2xl max-w-6xl w-full max-h-[95vh] overflow-y-auto overflow-x-hidden">
-                {/* Close Button */}
-                <button
-                    onClick={onClose}
-                    className="absolute top-4 right-4 z-10 w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors shadow-lg"
-                >
+                <button onClick={onClose} className="absolute top-4 right-4 z-10 w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors shadow-lg">
                     <X className="w-6 h-6 text-gray-600" />
                 </button>
-
                 <div className="flex flex-col lg:flex-row">
-                    {/* Left Side - Image */}
+                    {/* Left — Image */}
                     <div className="lg:w-2/5 relative">
-                        <img
-                            src={member.image}
-                            alt={member.name}
-                            className="w-full h-80 lg:h-full object-cover object-center rounded-t-3xl lg:rounded-l-3xl lg:rounded-tr-none"
-                        />
-                        {/* Featured Badge */}
+                        {member.image ? (
+                            <img src={member.image} alt={member.name} className="w-full h-80 lg:h-full object-cover object-center rounded-t-3xl lg:rounded-l-3xl lg:rounded-tr-none" />
+                        ) : (
+                            <div className="w-full h-80 lg:h-full bg-gradient-to-br from-indigo-100 to-purple-100 rounded-t-3xl lg:rounded-l-3xl lg:rounded-tr-none flex items-center justify-center">
+                                <div className="w-32 h-32 rounded-full bg-indigo-200 flex items-center justify-center">
+                                    <Users className="w-16 h-16 text-indigo-500" />
+                                </div>
+                            </div>
+                        )}
                         {member.featured && (
                             <div className="absolute top-6 left-6">
                                 <div className="flex items-center px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-sm font-medium rounded-full shadow-lg">
                                     <Star className="w-4 h-4 mr-2" />
-                                    {member.role === "Convenor" ? "Convenor" : "Core"}
+                                    {member.category === 'convenor' ? member.role : 'Core'}
                                 </div>
                             </div>
                         )}
                     </div>
 
-                    {/* Right Side - Information */}
+                    {/* Right — Info */}
                     <div className="lg:w-3/5 p-6 sm:p-8 lg:p-10">
-                        {/* Header Info */}
-                        <div className="mb-8">
+                        <div className="mb-6">
                             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-3">{member.name}</h2>
                             <p className="text-blue-600 font-semibold text-base sm:text-lg mb-2">
-                                {member.committee.toLowerCase() === "ieeexwie" ? "IEEE x WIE" : member.committee}
-                                {" - "}
-                                {member.category === "core"
-                                    ? ""
-                                    : member.category === "pr"
-                                        ? "PR"
-                                        : member.category.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ")}
-                                {" "}
-                                {member.role === "Convenor" ? "" : member.role}
+                                {member.category === 'faculty'
+                                    ? member.role
+                                    : `${member.committee.toLowerCase() === 'ieeexwie' ? 'IEEE x WIE' : member.committee} — ${
+                                        member.category === 'convenor' ? member.role
+                                        : member.category === 'core' ? member.role
+                                        : member.category === 'pr' ? `PR ${member.role}`
+                                        : `${member.category.charAt(0).toUpperCase() + member.category.slice(1)} ${member.role}`
+                                    }`}
                             </p>
-                            <p className="text-gray-600 text-base sm:text-lg">{member.year} • {member.branch}</p>
+                            {(member.year || member.branch) && (
+                                <p className="text-gray-600 text-base sm:text-lg">{[member.year, member.branch].filter(Boolean).join(' • ')}</p>
+                            )}
                         </div>
 
                         {/* Bio */}
-                        <div className="mb-8">
-                            <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4">About</h3>
+                        <div className="mb-6">
+                            <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-3">About</h3>
                             <p className="text-gray-600 leading-relaxed text-sm sm:text-base">{member.bio}</p>
                         </div>
 
-                        {/* Skills */}
-                        <div className="mb-8">
-                            <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4">Skills</h3>
-                            <div className="flex flex-wrap gap-2 sm:gap-3">
-                                {member.skills.map((skill, index) => (
-                                    <span
-                                        key={index}
-                                        className="px-3 py-2 bg-blue-100 text-blue-700 text-xs sm:text-sm font-medium rounded-full"
-                                    >
-                                        {skill}
-                                    </span>
-                                ))}
+                        {/* Roles & Responsibilities */}
+                        {member.responsibilities && member.responsibilities.length > 0 && (
+                            <div className="mb-6">
+                                <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-3">Roles & Responsibilities</h3>
+                                <ul className="space-y-2">
+                                    {member.responsibilities.map((r, i) => (
+                                        <li key={i} className="flex items-start gap-2 text-sm sm:text-base text-gray-600">
+                                            <span className="mt-1.5 w-2 h-2 rounded-full bg-blue-500 flex-shrink-0"></span>
+                                            {r}
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
-                        </div>
+                        )}
+
+                        {/* Skills */}
+                        {member.skills && member.skills.length > 0 && (
+                            <div className="mb-6">
+                                <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-3">Skills</h3>
+                                <div className="flex flex-wrap gap-2 sm:gap-3">
+                                    {member.skills.map((skill, index) => (
+                                        <span key={index} className="px-3 py-2 bg-blue-100 text-blue-700 text-xs sm:text-sm font-medium rounded-full">{skill}</span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Resume */}
+                        {member.resume && (
+                            <div className="mb-6">
+                                <a href={member.resume} target="_blank" rel="noopener noreferrer"
+                                    className="inline-flex items-center px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md font-medium text-sm sm:text-base">
+                                    <BookOpen className="w-4 h-4 mr-2" />
+                                    View Resume / CV
+                                </a>
+                            </div>
+                        )}
 
                         {/* Social Links */}
                         <div className="mb-6">
-                            <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4">Connect</h3>
+                            <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-3">Connect</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 {member.social.linkedin && member.social.linkedin !== "#" && member.social.linkedin !== "NA" && (
-                                    <a
-                                        href={member.social.linkedin}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors shadow-md"
-                                    >
+                                    <a href={member.social.linkedin} target="_blank" rel="noopener noreferrer"
+                                        className="flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors shadow-md">
                                         <Linkedin className="w-5 h-5 mr-2 flex-shrink-0" />
                                         <span className="text-sm sm:text-base font-medium">LinkedIn</span>
                                     </a>
                                 )}
-                                
+                                {member.social.googleScholar && member.social.googleScholar !== "#" && member.social.googleScholar !== "NA" && (
+                                    <a href={member.social.googleScholar} target="_blank" rel="noopener noreferrer"
+                                        className="flex items-center justify-center px-4 py-3 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-colors shadow-md">
+                                        <GraduationCap className="w-5 h-5 mr-2 flex-shrink-0" />
+                                        <span className="text-sm sm:text-base font-medium">Google Scholar</span>
+                                    </a>
+                                )}
                                 {member.social.github && member.social.github !== "#" && member.social.github !== "NA" && (
-                                    <a
-                                        href={member.social.github}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center justify-center px-4 py-3 bg-gray-800 text-white rounded-xl hover:bg-gray-900 transition-colors shadow-md"
-                                    >
+                                    <a href={member.social.github} target="_blank" rel="noopener noreferrer"
+                                        className="flex items-center justify-center px-4 py-3 bg-gray-800 text-white rounded-xl hover:bg-gray-900 transition-colors shadow-md">
                                         <Github className="w-5 h-5 mr-2 flex-shrink-0" />
                                         <span className="text-sm sm:text-base font-medium">GitHub</span>
                                     </a>
                                 )}
-                                
                                 {member.social.instagram && member.social.instagram !== "#" && member.social.instagram !== "NA" && (
-                                    <a
-                                        href={member.social.instagram}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center justify-center px-4 py-3 bg-pink-600 text-white rounded-xl hover:bg-pink-700 transition-colors shadow-md"
-                                    >
+                                    <a href={member.social.instagram} target="_blank" rel="noopener noreferrer"
+                                        className="flex items-center justify-center px-4 py-3 bg-pink-600 text-white rounded-xl hover:bg-pink-700 transition-colors shadow-md">
                                         <Instagram className="w-5 h-5 mr-2 flex-shrink-0" />
                                         <span className="text-sm sm:text-base font-medium">Instagram</span>
                                     </a>
                                 )}
-                                
                                 {member.social.email && member.social.email !== "#" && member.social.email !== "NA" && (
-                                    <a
-                                        href={member.social.email.startsWith('mailto:') ? member.social.email : `mailto:${member.social.email}`}
-                                        className="flex items-center justify-center px-4 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors shadow-md"
-                                    >
+                                    <a href={member.social.email.startsWith('mailto:') ? member.social.email : `mailto:${member.social.email}`}
+                                        className="flex items-center justify-center px-4 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors shadow-md">
                                         <Mail className="w-5 h-5 mr-2 flex-shrink-0" />
                                         <span className="text-sm sm:text-base font-medium">Email</span>
                                     </a>
@@ -183,12 +189,128 @@ function MemberModal({ member, isOpen, onClose }: { member: TeamMember | null; i
     );
 }
 
+// --- ORG CHART COMPONENT ---
+function OrgChart({
+    convenors,
+    techRep,
+    onMemberClick,
+    onDomainClick,
+}: {
+    convenors: TeamMember[];
+    techRep: TeamMember;
+    onMemberClick: (m: TeamMember) => void;
+    onDomainClick: (category: string) => void;
+}) {
+    const domains = [
+        { key: 'technical', label: 'Technical'   },
+        { key: 'pr',        label: 'PR'           },
+        { key: 'social media', label: 'Social Media' },
+        { key: 'creative',  label: 'Creative'     },
+        { key: 'marketing', label: 'Marketing'    },
+    ];
+
+    const VLine = () => <div className="w-px h-7 bg-gray-300 mx-auto" />;
+
+    return (
+        <div className="max-w-xl mx-auto px-4 py-2">
+            <div className="text-center mb-8">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">Organization</p>
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">Committee <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Structure</span></h2>
+                <p className="text-xs text-gray-400 mt-2">Click a highlighted card to view profile · Click a domain to see members</p>
+            </div>
+
+            <div className="flex flex-col items-center">
+
+                {/* Director — label only */}
+                <div className="w-64 sm:w-72 bg-gray-50 border border-gray-200 rounded-xl px-6 py-4 text-center">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Director</p>
+                    <p className="text-sm font-bold text-gray-700">Bro. Shantilal Kujur</p>
+                    <p className="text-xs text-gray-400 mt-0.5">St. Francis Institute of Technology</p>
+                </div>
+                <VLine />
+
+                {/* Principal — label only */}
+                <div className="w-64 sm:w-72 bg-gray-50 border border-gray-200 rounded-xl px-6 py-4 text-center">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Principal</p>
+                    <p className="text-sm font-bold text-gray-700">Dr. Deepak Jayaswal</p>
+                    <p className="text-xs text-gray-400 mt-0.5">St. Francis Institute of Technology</p>
+                </div>
+                <VLine />
+
+                {/* Tech Rep — clickable */}
+                <button
+                    onClick={() => onMemberClick(techRep)}
+                    className="w-64 sm:w-72 bg-white border border-gray-200 border-l-[3px] border-l-blue-600 rounded-xl px-6 py-4 text-center shadow-sm hover:shadow-md hover:bg-blue-50/50 transition-all group"
+                >
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-blue-600 mb-1">Faculty Technical Representative</p>
+                    <p className="text-sm font-bold text-gray-800 group-hover:text-blue-700">{techRep.name}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">Faculty Technical Representative, SFIT</p>
+                    <p className="text-[10px] text-blue-500 mt-2 font-semibold">View Profile →</p>
+                </button>
+                <VLine />
+
+                {/* Convenors — fork branch */}
+                <div className="w-full max-w-xs sm:max-w-sm">
+                    <div className="flex">
+                        <div className="flex-1 h-6 border-t border-l border-gray-300 rounded-tl-lg" />
+                        <div className="flex-1 h-6 border-t border-r border-gray-300 rounded-tr-lg" />
+                    </div>
+                    <div className="flex items-stretch gap-3">
+                        {convenors.map(c => (
+                            <button
+                                key={c.id}
+                                onClick={() => onMemberClick(c)}
+                                className="flex-1 bg-white border border-gray-200 border-l-[3px] border-l-indigo-600 rounded-xl px-3 py-4 text-center shadow-sm hover:shadow-md hover:bg-indigo-50/50 transition-all group"
+                            >
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-indigo-600 mb-1">{c.role}</p>
+                                <p className="text-xs sm:text-sm font-bold text-gray-800 group-hover:text-indigo-700 leading-tight">{c.name}</p>
+                                <p className="text-[10px] text-gray-400 mt-0.5 leading-tight">{c.branch}</p>
+                                <p className="text-[10px] text-indigo-500 mt-2 font-semibold">View Profile →</p>
+                            </button>
+                        ))}
+                    </div>
+                    <div className="flex">
+                        <div className="flex-1 h-6 border-b border-l border-gray-300 rounded-bl-lg" />
+                        <div className="flex-1 h-6 border-b border-r border-gray-300 rounded-br-lg" />
+                    </div>
+                </div>
+                <VLine />
+
+                {/* Core — clickable */}
+                <button
+                    onClick={() => onDomainClick('core')}
+                    className="w-64 sm:w-72 bg-white border border-gray-200 border-l-[3px] border-l-purple-600 rounded-xl px-6 py-4 text-center shadow-sm hover:shadow-md hover:bg-purple-50/50 transition-all group"
+                >
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-purple-600 mb-1">Core Committee</p>
+                    <p className="text-sm font-bold text-gray-800 group-hover:text-purple-700">Core Members — IEEE & WIE</p>
+                    <p className="text-[10px] text-purple-500 mt-2 font-semibold">View Members ↓</p>
+                </button>
+                <VLine />
+
+                <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">Domain Teams</p>
+                <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
+                    {domains.map(d => (
+                        <button
+                            key={d.key}
+                            onClick={() => onDomainClick(d.key)}
+                            className="bg-white border border-gray-200 rounded-lg px-4 py-3 text-center shadow-sm hover:shadow-md hover:border-gray-400 hover:bg-gray-50 transition-all group"
+                        >
+                            <p className="text-xs sm:text-sm font-bold text-gray-700 group-hover:text-gray-900 whitespace-nowrap">{d.label}</p>
+                            <p className="text-[10px] text-gray-400 mt-0.5">IEEE · WIE</p>
+                        </button>
+                    ))}
+                </div>
+
+            </div>
+        </div>
+    );
+}
+
 // --- HELPER FUNCTIONS ---
 const getDirectImageLink = (googleDriveLink: string | undefined): string => {
     if (!googleDriveLink || typeof googleDriveLink !== 'string') return '';
     const fileIdMatch = googleDriveLink.match(/[-\w]{25,}/);
     if (fileIdMatch && fileIdMatch[0]) {
-        console.log(`https://lh3.googleusercontent.com/d/${fileIdMatch[0]}=w2000`)
         return `https://drive.google.com/uc?id=${fileIdMatch[0]}`;
     }
     return googleDriveLink;
@@ -231,6 +353,80 @@ const getRolePriority = (role: string, committee: string): number => {
     return 99;
 };
 
+// --- LEADERSHIP DATA (module-level, static) ---
+const convenors: TeamMember[] = [
+    {
+        id: 0,
+        name: 'Valentina Rani',
+        role: 'Convenor',
+        category: 'convenor',
+        year: '',
+        branch: 'Electronics & Telecommunication',
+        image: 'https://res.cloudinary.com/degzo3jzl/image/upload/v1726587187/valentinarani_zbvaxd.jpg',
+        bio: 'Leading the IEEE × WIE Student Branch with a vision for innovation, inclusivity, and excellence in technology education.',
+        achievements: [],
+        skills: ['Leadership', 'Strategic Planning', 'Event Management', 'Public Speaking', 'Team Coordination'],
+        social: { linkedin: 'https://www.linkedin.com/in/valentina-rani-39a49bb0/', email: 'valentinabasker@sfit.ac.in', github: '', instagram: '', googleScholar: '' },
+        featured: true,
+        committee: 'IEEEXWIE',
+        responsibilities: [
+            'Leads the overall IEEE × WIE Student Branch committee at SFIT',
+            'Sets the vision and strategic direction for the academic year',
+            'Coordinates with domain heads to ensure smooth execution of events',
+            'Represents the student branch at institutional and IEEE forums',
+            'Manages approvals, external communications, and budgeting',
+            'Fosters a culture of innovation and inclusivity within the committee',
+        ],
+    },
+    {
+        id: 1,
+        name: 'Dr. Mrinmoyee Mukherjee',
+        role: 'Co-Convenor',
+        category: 'convenor',
+        year: '',
+        branch: 'Information Technology',
+        image: 'https://res.cloudinary.com/degzo3jzl/image/upload/v1772716360/e475ae92-1a54-4ba1-96a6-fb8e4d62a06f.png',
+        bio: 'Fostering the next generation of engineers by bridging the gap between advanced statistical signal processing and real-world IoT solutions.',
+        achievements: [],
+        skills: ['Statistical Signal Processing', 'IoT Research', 'Academic Planning', 'Event Planning', 'Team Building'],
+        social: { linkedin: 'https://www.linkedin.com/in/drmrinmoyeemukherjee/', email: 'mrinmoyeemukherjee@sfit.ac.in', github: '', instagram: '', googleScholar: '' },
+        featured: true,
+        committee: 'IEEEXWIE',
+        responsibilities: [
+            'Supports the Convenor in all committee operations and decisions',
+            'Oversees faculty-student coordination and academic alignment',
+            'Guides technical, research-oriented, and WIE-focused activities',
+            'Chairs committee meetings in the Convenor\'s absence',
+            'Mentors core members in their respective domain roles',
+            'Ensures compliance with IEEE and WIE guidelines and standards',
+        ],
+    },
+];
+
+const techRep: TeamMember = {
+    id: -1,
+    name: 'Amrita Mathur',
+    role: 'Faculty Technical Representative',
+    category: 'faculty',
+    year: '',
+    branch: 'St. Francis Institute of Technology',
+    image: 'https://res.cloudinary.com/degzo3jzl/image/upload/v1773105482/7a47b8a2-d55e-43a0-b679-b37cd126ea45.png',
+    bio: 'Faculty Technical Representative at St. Francis Institute of Technology, responsible for overseeing student technical activities, guiding research initiatives, and fostering a culture of innovation and professional development among students.',
+    achievements: [],
+    skills: ['Technical Leadership', 'Research Guidance', 'Academic Mentorship', 'Project Oversight', 'Student Development'],
+    social: { linkedin: '', email: 'amritamathur@sfit.ac.in', github: '', instagram: '', googleScholar: '' },
+    featured: false,
+    committee: 'SFIT',
+    responsibilities: [
+        'Oversees all student technical activities and initiatives at SFIT',
+        'Acts as liaison between the college administration and student technical committees',
+        'Mentors students in technical research, projects, and innovations',
+        'Reviews and approves event proposals and technical workshop plans',
+        'Represents SFIT at inter-collegiate and regional technical forums',
+        'Ensures quality and academic integrity of all technical programs',
+    ],
+    resume: '',
+};
 
 const TeamPage: React.FC = () => {
     const [activeCategory, setActiveCategory] = useState<string>('all');
@@ -242,55 +438,13 @@ const TeamPage: React.FC = () => {
     const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
+    const teamSectionRef = useRef<HTMLDivElement>(null);
+
     const { ref: headerRef } = useScrollAnimation({ threshold: 0.3, triggerOnce: true });
     const { ref: teamRef, visibleItems: teamVisible } = useStaggeredAnimation(teamMembers.length, 150);
     const isLaptop = window.innerWidth > 768;
 
     const [visibleCards, setVisibleCards] = useState<number[]>([]);
-
-    // Add this right after the useState declarations in your TeamPage component
-    const convenors: TeamMember[] = [
-        {
-            id: 0,
-            name: 'Valentina Rani',
-            role: 'Convenor',
-            category: 'convenor',
-            year: '',
-            branch: 'Electronics & Telecommunication',
-            image: 'https://res.cloudinary.com/degzo3jzl/image/upload/v1726587187/valentinarani_zbvaxd.jpg', // <-- Replace with actual image URL
-            bio: 'Leading the team with a vision for innovation and excellence.',
-            achievements: [],
-            skills: ['Leadership', 'Management', 'Public Speaking'],
-            social: {
-                linkedin: 'https://www.linkedin.com/in/valentina-rani-39a49bb0/',
-                email: 'valentinabasker@sfit.ac.in',
-                github: '',
-                instagram: ''
-            },
-            featured: true, // Mark as featured
-            committee: 'IEEEXWIE', // Or the relevant committee name
-        },
-        {
-            id: 1,
-            name: 'Dr. Mrinmoyee Mukherjee',
-            role: 'Co-Convenor',
-            category: 'convenor',
-            year: '',
-            branch: 'Information Technology',
-            image: 'https://res.cloudinary.com/degzo3jzl/image/upload/v1772716360/e475ae92-1a54-4ba1-96a6-fb8e4d62a06f.png', // <-- Replace with actual image URL
-            bio: 'Fostering the next generation of engineers by bridging the gap between advanced statistical signal processing and real-world IoT solutions.',
-            achievements: [],
-            skills: ['Strategic Academic Planning', 'Event Planning', 'Interdisciplinary Team Building'],
-            social: {
-                linkedin: 'https://www.linkedin.com/in/drmrinmoyeemukherjee/',
-                email: 'mrinmoyeemukherjee@sfit.ac.in',
-                github: '',
-                instagram: ''
-            },
-            featured: true,
-            committee: 'IEEEXWIE',
-        }
-    ];
 
     const handleInView = (index: number) => {
         // On mobile, get the next 3 cards (current + next 2)
@@ -322,6 +476,7 @@ const TeamPage: React.FC = () => {
     }, [activeCategory]);
 
     useEffect(() => {
+        let cancelled = false;
         const fetchData = async () => {
             try {
                 const response = await fetch("https://script.google.com/macros/s/AKfycbzGTQv525hbcuS2wHFHlynwo4dcBRztbkK1_hBn3SyP1TykvC-oq1wqQEwSpj9iDnsw/exec");
@@ -374,7 +529,7 @@ const TeamPage: React.FC = () => {
                     };
 
                     return {
-                        id: rowIndex + 1,
+                        id: rowIndex + 100,
                         name: formatName(String(cleanMember['Full Name'] || 'N/A')),
                         role: role
                             .split(' ')
@@ -403,7 +558,44 @@ const TeamPage: React.FC = () => {
                     };
                 });
 
-                const combinedData = [...convenors, ...transformedData]; // <-- ADD THIS LINE
+                // Dedup: match by significant name tokens (handles "Dr. X" vs "X", middle names, typos)
+                // Build convenor dedup identifiers
+                const convenorEmails = convenors
+                    .map(c => c.social.email.replace('mailto:', '').toLowerCase().trim())
+                    .filter(e => e && e !== '#' && e !== 'na');
+
+                const sigTokens = (name: string) =>
+                    name.toLowerCase()
+                        .replace(/\b(dr|prof|mr|mrs|ms)\b\.?\s*/gi, '')
+                        .replace(/[^a-z\s]/g, '')
+                        .trim()
+                        .split(/\s+/)
+                        .filter(t => t.length >= 3);
+
+                // First long distinctive token (≥6 chars) from each convenor name (their given name).
+                // Using only the first such token avoids false-positives from common family names.
+                // e.g. 'Valentina', 'Mrinmoyee' — both extremely rare given names.
+                const convenorDistinctTokens = convenors
+                    .map(c => sigTokens(c.name).find(t => t.length >= 6))
+                    .filter(Boolean) as string[];
+
+                const isConvenorDuplicate = (sheetMember: TeamMember) => {
+                    // 1. Category
+                    if (sheetMember.category === 'convenor') return true;
+                    // 2. Email
+                    const sheetEmail = sheetMember.social.email.replace('mailto:', '').toLowerCase().trim();
+                    if (sheetEmail && convenorEmails.includes(sheetEmail)) return true;
+                    // 3. Substring: does the sheet member's normalised name CONTAIN any distinctive convenor token?
+                    //    e.g. "mrinmoyee" (9 chars) will always be found inside "Mrinmoyee Mukherjee"
+                    const sheetNameNorm = sheetMember.name.toLowerCase().replace(/[^a-z\s]/g, '');
+                    if (convenorDistinctTokens.some(t => sheetNameNorm.includes(t))) return true;
+                    return false;
+                };
+
+                const combinedData = [
+                    ...convenors,
+                    ...transformedData.filter(m => !isConvenorDuplicate(m)),
+                ];
 
                 const sortedData = combinedData.sort((a, b) => {
                     const categoryComparison = a.category.localeCompare(b.category);
@@ -414,17 +606,19 @@ const TeamPage: React.FC = () => {
                     if (priorityA !== priorityB) return priorityA - priorityB;
                     return a.name.localeCompare(b.name);
                 });
+                 (window as any).__teamMembersCache = sortedData;
 
-                setTeamMembers(sortedData);
-            } catch (e: any) {
-                console.error("Failed to fetch team data:", e);
-                setError(e.message || "Could not load team members.");
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchData();
-    }, []);
+                 if (!cancelled) setTeamMembers(sortedData);
+        } catch (e: any) {
+            if (!cancelled) setError(e.message || "Could not load team members.");
+        } finally {
+            if (!cancelled) setIsLoading(false);
+        }
+    };
+
+    fetchData();
+    return () => { cancelled = true; };
+}, []);
 
     // --- DYNAMIC FILTER OPTIONS ---
     const mainCategories = [
@@ -439,10 +633,27 @@ const TeamPage: React.FC = () => {
     const roleOptions = [...new Set(membersInActiveCategory.map(m => m.role))].sort();
     const committeeOptions = [...new Set(membersInActiveCategory.map(m => m.committee))].sort();
 
+    // Hard failsafe: convenors never appear under any category-specific tab except 'all' and 'convenor'.
+    // Use each convenor's first given name as a substring check — this catches any name variant
+    // (e.g. "Mrinmoyee", "Mrinmoyee Mukherjee", "Dr. Mrinmoyee Mukherjee") without fragile exact matching.
+    const convenorFirstNames = convenors.map(c =>
+        c.name.toLowerCase()
+            .replace(/\b(dr|prof|mr|mrs|ms)\b\.?\s*/gi, '') // strip honorifics
+            .trim()
+            .split(/\s+/)[0]                                // take first given name
+    ); // e.g. ['valentina', 'mrinmoyee']
+
     // Final filtering logic for displaying members
     const filteredMembers = membersInActiveCategory
         .filter(member => activeRole === 'all' || member.role === activeRole)
-        .filter(member => activeCommittee === 'all' || member.committee === activeCommittee);
+        .filter(member => activeCommittee === 'all' || member.committee === activeCommittee)
+        .filter(member => {
+            // In 'all' or 'convenor' tab: show everyone
+            if (activeCategory === 'all' || activeCategory === 'convenor') return true;
+            // In ANY other tab: block any member whose name contains a convenor's first name
+            const nameLower = member.name.toLowerCase();
+            return !convenorFirstNames.some(fn => nameLower.includes(fn));
+        });
 
     const executiveCount = teamMembers.filter(m => m.category === 'core').length;
 
@@ -470,6 +681,30 @@ const TeamPage: React.FC = () => {
                     <div ref={headerRef} className="text-center mb-16">
                         <h1 className="text-5xl md:text-6xl font-bold mb-6 opacity-100">Our <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent animate-gradient-shift">Team</span></h1>
                         <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed opacity-100">Meet the passionate individuals who drive our committee forward, dedicated to empowering the next generation of technology leaders.</p>
+                    </div>
+
+                    {/* Org Chart — shown at top before stats */}
+                    <div className="mb-16">
+                        <OrgChart
+                            convenors={convenors}
+                            techRep={techRep}
+                            onMemberClick={handleMemberClick}
+                            onDomainClick={(key) => {
+                                // Resolve the org-chart key against actual loaded categories
+                                // e.g. 'sm' should match 'social media' from the sheet
+                                const allCategories = [...new Set(teamMembers.map(m => m.category))];
+                                const normalise = (s: string) => s.toLowerCase().replace(/[\s_-]/g, '');
+                                const matched = allCategories.find(c =>
+                                    normalise(c) === normalise(key) ||
+                                    normalise(c).includes(normalise(key)) ||
+                                    normalise(key).includes(normalise(c))
+                                ) ?? key;
+                                setActiveCategory(matched);
+                                setTimeout(() => {
+                                    teamSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                }, 100);
+                            }}
+                        />
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16 opacity-100">
@@ -522,7 +757,7 @@ const TeamPage: React.FC = () => {
             </section>
 
             {/* Team Grid */}
-            <section className="pb-20">
+            <section className="pb-20" ref={teamSectionRef}>
                 {/* Animated Background Blobs for Team Grid */}
                 <div className="relative w-full">
                     <div className="pointer-events-none absolute inset-0 z-0">
