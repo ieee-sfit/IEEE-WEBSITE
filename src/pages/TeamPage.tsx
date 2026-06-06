@@ -85,11 +85,10 @@ function MemberModal({ member, isOpen, onClose }: { member: TeamMember | null; i
                             <p className="text-blue-600 font-semibold text-base sm:text-lg mb-2">
                                 {member.category === 'faculty'
                                     ? member.role
-                                    : `${member.committee.toLowerCase() === 'ieeexwie' ? 'IEEE x WIE' : member.committee} — ${
-                                        member.category === 'convenor' ? member.role
+                                    : `${member.committee.toLowerCase() === 'ieeexwie' ? 'IEEE x WIE' : member.committee} — ${member.category === 'convenor' ? member.role
                                         : member.category === 'core' ? member.role
-                                        : member.category === 'pr' ? `PR ${member.role}`
-                                        : `${member.category.charAt(0).toUpperCase() + member.category.slice(1)} ${member.role}`
+                                            : member.category === 'pr' ? `PR ${member.role}`
+                                                : `${member.category.charAt(0).toUpperCase() + member.category.slice(1)} ${member.role}`
                                     }`}
                             </p>
                             {(member.year || member.branch) && (
@@ -202,11 +201,11 @@ function OrgChart({
     onDomainClick: (category: string) => void;
 }) {
     const domains = [
-        { key: 'technical', label: 'Technical'   },
-        { key: 'pr',        label: 'PR'           },
+        { key: 'technical', label: 'Technical' },
+        { key: 'pr', label: 'PR' },
         { key: 'social media', label: 'Social Media' },
-        { key: 'creative',  label: 'Creative'     },
-        { key: 'marketing', label: 'Marketing'    },
+        { key: 'creative', label: 'Creative' },
+        { key: 'marketing', label: 'Marketing' },
     ];
 
     const VLine = () => <div className="w-px h-7 bg-gray-300 mx-auto" />;
@@ -606,19 +605,19 @@ const TeamPage: React.FC = () => {
                     if (priorityA !== priorityB) return priorityA - priorityB;
                     return a.name.localeCompare(b.name);
                 });
-                 (window as any).__teamMembersCache = sortedData;
+                (window as any).__teamMembersCache = sortedData;
 
-                 if (!cancelled) setTeamMembers(sortedData);
-        } catch (e: any) {
-            if (!cancelled) setError(e.message || "Could not load team members.");
-        } finally {
-            if (!cancelled) setIsLoading(false);
-        }
-    };
+                if (!cancelled) setTeamMembers(sortedData);
+            } catch (e: any) {
+                if (!cancelled) setError(e.message || "Could not load team members.");
+            } finally {
+                if (!cancelled) setIsLoading(false);
+            }
+        };
 
-    fetchData();
-    return () => { cancelled = true; };
-}, []);
+        fetchData();
+        return () => { cancelled = true; };
+    }, []);
 
     // --- DYNAMIC FILTER OPTIONS ---
     const mainCategories = [
@@ -722,35 +721,54 @@ const TeamPage: React.FC = () => {
                         ))}
                     </div>
 
-                    <div className="flex flex-col items-center justify-center gap-6 mb-12">
-                        <div className="bg-white rounded-full p-1 shadow-lg border border-gray-200 flex flex-wrap justify-center">
+                    {/* Sleek Minimalist Filters */}
+                    <div className="max-w-6xl mx-auto mb-12 flex flex-col md:flex-row items-center justify-between gap-6 px-4">
+                        {/* Compact Tabs */}
+                        <div className="flex flex-wrap gap-1.5 justify-center md:justify-start">
                             {mainCategories.map((category) => (
                                 <button
                                     key={category.id}
                                     onClick={() => setActiveCategory(category.id)}
-                                    className={`px-4 md:px-6 py-3 rounded-full font-semibold transition-all duration-300 m-1 ${activeCategory === category.id ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg scale-105' : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'}`}
+                                    className={`px-4 py-2 rounded-full font-semibold text-xs tracking-wider transition-all duration-300 ${
+                                        activeCategory === category.id 
+                                            ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md shadow-blue-500/10' 
+                                            : 'bg-white hover:bg-gray-100 text-gray-500 hover:text-gray-800 border border-gray-100'
+                                    }`}
                                 >
-                                    {category.name} ({category.count})
+                                    {category.name} <span className="opacity-60 ml-0.5">({category.count})</span>
                                 </button>
                             ))}
                         </div>
 
-                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                        {/* Minimalist Dropdowns */}
+                        <div className="flex flex-wrap items-center justify-center gap-3">
+                            {/* Role Filter */}
                             <div className="relative">
-                                <select value={activeRole} onChange={(e) => setActiveRole(e.target.value)} className="appearance-none w-full bg-white border border-gray-200 rounded-full pl-4 pr-8 py-2 text-gray-700 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-sm">
+                                <select 
+                                    value={activeRole} 
+                                    onChange={(e) => setActiveRole(e.target.value)} 
+                                    className="appearance-none bg-white border border-gray-200/80 rounded-full pl-4 pr-9 py-2 text-xs font-bold text-gray-600 focus:outline-none focus:border-blue-500 cursor-pointer shadow-sm transition-all"
+                                >
                                     <option value="all">All Roles</option>
                                     {roleOptions.map(role => (<option key={role} value={role}>{role}</option>))}
                                 </select>
-                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700"><ChevronDown className="h-4 w-4" /></div>
+                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400">
+                                    <ChevronDown className="h-3.5 w-3.5" />
+                                </div>
                             </div>
 
-                            <div className="relative">
-                                <select value={activeCommittee} onChange={(e) => setActiveCommittee(e.target.value)} className="appearance-none w-full bg-white border border-gray-200 rounded-full pl-4 pr-8 py-2 text-gray-700 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-sm">
-                                    <option value="all">All Committees</option>
-                                    {committeeOptions.map(com => (<option key={com} value={com}>{com}</option>))}
-                                </select>
-                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700"><ChevronDown className="h-4 w-4" /></div>
-                            </div>
+                            {/* Sleek Reset Button */}
+                            {(activeCategory !== 'all' || activeRole !== 'all') && (
+                                <button
+                                    onClick={() => {
+                                        setActiveCategory('all');
+                                        setActiveRole('all');
+                                    }}
+                                    className="text-xs font-bold text-red-500 hover:text-red-600 hover:underline px-2 py-1 transition-colors"
+                                >
+                                    Clear
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -777,137 +795,188 @@ const TeamPage: React.FC = () => {
                 </div>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-                    <div ref={teamRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                       {filteredMembers.length > 0 ? (
-    filteredMembers.map((member) => (
-        <div
-            key={member.id}
-            className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500  overflow-hidden group relative will-change-transform cursor-pointer"
-            onClick={() => handleMemberClick(member)}
-        >
-                                    {member.featured && member.category === "core" && (
-                                        <div className="absolute top-4 right-4 z-10">
-                                            <div className="flex items-center px-3 py-1 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-sm font-medium rounded-full">
-                                                <Star className="w-4 h-4 mr-1" /> Core
-                                            </div>
-                                        </div>
-                                    )}
+                    <div className="space-y-16">
+                        {(() => {
+                            // Group filtered members by category (domain)
+                            const grouped: { [key: string]: TeamMember[] } = {};
+                            filteredMembers.forEach((member) => {
+                                const cat = member.category || 'general';
+                                if (!grouped[cat]) {
+                                    grouped[cat] = [];
+                                }
+                                grouped[cat].push(member);
+                            });
 
-                                    {member.featured && member.category === "convenor" && (
-                                        <div className="absolute top-4 right-4 z-10">
-                                            <div className="flex items-center px-3 py-1 bg-gradient-to-r from-orange-500 to-yellow-500 text-white text-sm font-medium rounded-full">
-                                                <Star className="w-4 h-4 mr-1" /> {member.role}
-                                            </div>
-                                        </div>
-                                    )}
+                            // Define order of categories to display
+                            const categoryOrder = ['convenor', 'faculty', 'core', 'technical', 'creative', 'pr', 'marketing', 'social media', 'general'];
+                            // Filter and sort the categories that actually have members in the current filter state
+                            const activeGroups = Object.keys(grouped).sort((a, b) => {
+                                const indexA = categoryOrder.indexOf(a);
+                                const indexB = categoryOrder.indexOf(b);
+                                if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+                                if (indexA !== -1) return -1;
+                                if (indexB !== -1) return 1;
+                                return a.localeCompare(b);
+                            });
 
-                                    <div className="relative overflow-hidden">
-                                        <img
-                                            src={member.image}
-                                            alt={member.name}
-                                            className="w-full h-64 brightness-100 object-cover object-center group-hover:scale-110 group-hover:brightness-125 transition duration-700"
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                                        <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-3 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:bottom-6">
-                                            {member.social.linkedin && member.social.linkedin !== "#" && member.social.linkedin !== "NA" && (
-                                                <a
-                                                    href={member.social.linkedin}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
-                                                    onClick={(e) => e.stopPropagation()}
+                            if (activeGroups.length === 0) {
+                                return (
+                                    <div className="col-span-full text-center py-16 flex flex-col items-center justify-center">
+                                        <Frown className="w-16 h-16 text-gray-400 mb-4" />
+                                        <h3 className="text-2xl font-semibold text-gray-600">No Members Found</h3>
+                                        <p className="text-gray-500 mt-2">Try adjusting your filters to find who you're looking for.</p>
+                                    </div>
+                                );
+                            }
+
+                            return activeGroups.map((cat) => {
+                                const members = grouped[cat];
+                                const displayCategoryName = cat === 'pr'
+                                    ? 'PR Team'
+                                    : cat === 'ieeexwie'
+                                        ? 'IEEE x WIE'
+                                        : `${cat.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')} Team`;
+
+                                return (
+                                    <div key={cat} className="space-y-6">
+                                        <div className="flex items-center gap-4 mb-4">
+                                            <h2 className="text-2xl font-bold text-gray-800 tracking-wide border-b-2 border-blue-500 pb-1 inline-block">
+                                                {displayCategoryName}
+                                            </h2>
+                                            <div className="flex-grow h-px bg-gray-200"></div>
+                                            <span className="text-sm font-semibold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                                                {members.length} {members.length === 1 ? 'member' : 'members'}
+                                            </span>
+                                        </div>
+
+                                        <div ref={teamRef} className={cat === 'convenor' ? "flex flex-wrap gap-8 justify-center" : "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 justify-center"}>
+                                            {members.map((member) => (
+                                                <div
+                                                    key={member.id}
+                                                    className={`bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden group relative will-change-transform cursor-pointer w-full ${cat === 'convenor' ? 'sm:w-[280px] md:w-[320px] flex-shrink-0' : ''}`}
+                                                    onClick={() => handleMemberClick(member)}
                                                 >
-                                                    <Linkedin className="w-5 h-5 text-blue-700" />
-                                                </a>
-                                            )}
-                                            
-                                            {member.social.github && member.social.github !== "#" && member.social.github !== "NA" && (
-                                                <a
-                                                    href={member.social.github}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
-                                                    onClick={(e) => e.stopPropagation()}
-                                                >
-                                                    <Github className="w-5 h-5 text-gray-800" />
-                                                </a>
-                                            )}
-                                            
-                                            {member.social.instagram && member.social.instagram !== "#" && member.social.instagram !== "NA" && (
-                                                <a
-                                                    href={member.social.instagram}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
-                                                    onClick={(e) => e.stopPropagation()}
-                                                >
-                                                    <Instagram className="w-5 h-5 text-pink-600" />
-                                                </a>
-                                            )}
-                                            
-                                            {member.social.email && member.social.email !== "#" && member.social.email !== "NA" && (
-                                                <a
-                                                    href={member.social.email.startsWith('mailto:') ? member.social.email : `mailto:${member.social.email}`}
-                                                    className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
-                                                    onClick={(e) => e.stopPropagation()}
-                                                >
-                                                    <Mail className="w-5 h-5 text-green-600" />
-                                                </a>
-                                            )}
+                                                    {member.featured && member.category === "core" && (
+                                                        <div className="absolute top-4 right-4 z-10">
+                                                            <div className="flex items-center px-3 py-1 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-sm font-medium rounded-full">
+                                                                <Star className="w-4 h-4 mr-1" /> Core
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {member.featured && member.category === "convenor" && (
+                                                        <div className="absolute top-4 right-4 z-10">
+                                                            <div className="flex items-center px-3 py-1 bg-gradient-to-r from-orange-500 to-yellow-500 text-white text-sm font-medium rounded-full">
+                                                                <Star className="w-4 h-4 mr-1" /> {member.role}
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    <div className="relative overflow-hidden">
+                                                        <img
+                                                            src={member.image}
+                                                            alt={member.name}
+                                                            className="w-full h-64 brightness-100 object-cover object-center group-hover:scale-110 group-hover:brightness-125 transition duration-700"
+                                                        />
+                                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                                                        <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-3 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:bottom-6">
+                                                            {member.social.linkedin && member.social.linkedin !== "#" && member.social.linkedin !== "NA" && (
+                                                                <a
+                                                                    href={member.social.linkedin}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
+                                                                    onClick={(e) => e.stopPropagation()}
+                                                                >
+                                                                    <Linkedin className="w-5 h-5 text-blue-700" />
+                                                                </a>
+                                                            )}
+
+                                                            {member.social.github && member.social.github !== "#" && member.social.github !== "NA" && (
+                                                                <a
+                                                                    href={member.social.github}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
+                                                                    onClick={(e) => e.stopPropagation()}
+                                                                >
+                                                                    <Github className="w-5 h-5 text-gray-800" />
+                                                                </a>
+                                                            )}
+
+                                                            {member.social.instagram && member.social.instagram !== "#" && member.social.instagram !== "NA" && (
+                                                                <a
+                                                                    href={member.social.instagram}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
+                                                                    onClick={(e) => e.stopPropagation()}
+                                                                >
+                                                                    <Instagram className="w-5 h-5 text-pink-600" />
+                                                                </a>
+                                                            )}
+
+                                                            {member.social.email && member.social.email !== "#" && member.social.email !== "NA" && (
+                                                                <a
+                                                                    href={member.social.email.startsWith('mailto:') ? member.social.email : `mailto:${member.social.email}`}
+                                                                    className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
+                                                                    onClick={(e) => e.stopPropagation()}
+                                                                >
+                                                                    <Mail className="w-5 h-5 text-green-600" />
+                                                                </a>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="p-6">
+                                                        <h3 className="text-xl font-bold text-gray-800 mb-1 group-hover:text-blue-600">{member.name}</h3>
+                                                        <p className="text-blue-600 font-semibold text-sm mb-1">
+                                                            {member.committee.toLowerCase() == "ieeexwie" ? "IEEE x WIE" : member.committee}
+                                                            {" - "}
+                                                            {member.category == "convenor"
+                                                                ? member.role
+                                                                : member.category == "core"
+                                                                    ? member.role
+                                                                    : member.category == "pr"
+                                                                        ? `PR ${member.role}`
+                                                                        : `${member.category.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ")} ${member.role}`}
+                                                        </p>
+                                                        <p className="text-gray-500 text-sm mb-4">{member.year} • {member.branch}</p>
+                                                        <p className="text-gray-600 text-sm leading-relaxed mb-4 h-20 overflow-hidden">
+                                                            {member.bio.length > 100
+                                                                ? (() => {
+                                                                    const truncated = member.bio.slice(0, 100);
+                                                                    const lastSpace = truncated.lastIndexOf(" ");
+                                                                    const safeTruncate = lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated;
+                                                                    return <>{safeTruncate}...</>;
+                                                                })()
+                                                                : member.bio}
+                                                        </p>
+                                                        <div className="mb-4">
+                                                            <h4 className="text-sm font-semibold text-gray-800 mb-2">Skills:</h4>
+                                                            <div className="flex flex-wrap gap-1">
+                                                                {member.skills.slice(0, 5).map((skill, skillIndex) => (
+                                                                    <span key={skillIndex} className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">{skill}</span>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
                                     </div>
-
-                                    <div className="p-6">
-                                        <h3 className="text-xl font-bold text-gray-800 mb-1 group-hover:text-blue-600">{member.name}</h3>
-                                        <p className="text-blue-600 font-semibold text-sm mb-1">
-                                            {member.committee.toLowerCase() == "ieeexwie" ? "IEEE x WIE" : member.committee}
-                                            {" - "}
-                                            {member.category == "convenor"
-                                                ? member.role
-                                                : member.category == "core"
-                                                    ? member.role
-                                                    : member.category == "pr"
-                                                        ? `PR ${member.role}`
-                                                        : `${member.category.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ")} ${member.role}`}
-                                        </p>
-                                        <p className="text-gray-500 text-sm mb-4">{member.year} • {member.branch}</p>
-                                        <p className="text-gray-600 text-sm leading-relaxed mb-4 h-20 overflow-hidden">
-                                            {member.bio.length > 100
-                                                ? (() => {
-                                                    const truncated = member.bio.slice(0, 100);
-                                                    const lastSpace = truncated.lastIndexOf(" ");
-                                                    const safeTruncate = lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated;
-                                                    return <>{safeTruncate}...</>;
-                                                })()
-                                                : member.bio}
-                                        </p>
-                                        <div className="mb-4">
-                                            <h4 className="text-sm font-semibold text-gray-800 mb-2">Skills:</h4>
-                                            <div className="flex flex-wrap gap-1">
-                                                {member.skills.slice(0, 5).map((skill, skillIndex) => (
-                                                    <span key={skillIndex} className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">{skill}</span>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))
-                        ) : (
-                            <div className="col-span-full text-center py-16 flex flex-col items-center justify-center">
-                                <Frown className="w-16 h-16 text-gray-400 mb-4" />
-                                <h3 className="text-2xl font-semibold text-gray-600">No Members Found</h3>
-                                <p className="text-gray-500 mt-2">Try adjusting your filters to find who you're looking for.</p>
-                            </div>
-                        )}
+                                );
+                            });
+                        })()}
                     </div>
                 </div>
             </section>
 
             {/* Modal */}
-            <MemberModal 
-                member={selectedMember} 
-                isOpen={isModalOpen} 
-                onClose={handleCloseModal} 
+            <MemberModal
+                member={selectedMember}
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
             />
         </div>
     );

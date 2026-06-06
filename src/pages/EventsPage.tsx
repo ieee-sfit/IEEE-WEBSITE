@@ -122,42 +122,62 @@ const morphingCard = {
 
 // Static config — defined outside component to avoid re-creation on every render
 const STATS_DATA = [
-  { icon: Award,      value: 10,   suffix: '+',  label: 'Events Organized',  color: 'blue'   },
-  { icon: Users,      value: 1200, suffix: '+',  label: 'Total Participants', color: 'purple' },
-  { icon: TrendingUp, value: 89,   suffix: '%',  label: 'Avg Satisfaction',   color: 'green'  },
-  { icon: Target,     value: 8,    suffix: '',   label: 'Completed Events',   color: 'pink'   },
+  { icon: Award, value: 10, suffix: '+', label: 'Events Organized', color: 'blue' },
+  { icon: Users, value: 1200, suffix: '+', label: 'Total Participants', color: 'purple' },
+  { icon: TrendingUp, value: 89, suffix: '%', label: 'Avg Satisfaction', color: 'green' },
+  { icon: Target, value: 8, suffix: '', label: 'Completed Events', color: 'pink' },
 ];
 
 // Fixed orb positions (deterministic — no Math.random on render)
 const ORB_CONFIG = [
-  { color: 'bg-purple-200', w: 40, h: 40, top: 8,  left: 5  },
-  { color: 'bg-blue-200',   w: 32, h: 32, top: 20, left: 80 },
-  { color: 'bg-pink-200',   w: 48, h: 48, top: 60, left: 15 },
+  { color: 'bg-purple-200', w: 40, h: 40, top: 8, left: 5 },
+  { color: 'bg-blue-200', w: 32, h: 32, top: 20, left: 80 },
+  { color: 'bg-pink-200', w: 48, h: 48, top: 60, left: 15 },
   { color: 'bg-yellow-200', w: 24, h: 24, top: 75, left: 70 },
-  { color: 'bg-green-200',  w: 36, h: 36, top: 40, left: 55 },
+  { color: 'bg-green-200', w: 36, h: 36, top: 40, left: 55 },
   { color: 'bg-indigo-200', w: 28, h: 28, top: 15, left: 40 },
-  { color: 'bg-teal-200',   w: 44, h: 44, top: 85, left: 90 },
+  { color: 'bg-teal-200', w: 44, h: 44, top: 85, left: 90 },
   { color: 'bg-orange-200', w: 20, h: 20, top: 50, left: 30 },
   { color: 'bg-purple-200', w: 32, h: 32, top: 30, left: 92 },
-  { color: 'bg-blue-200',   w: 48, h: 48, top: 70, left: 45 },
-  { color: 'bg-pink-200',   w: 24, h: 24, top: 5,  left: 65 },
-  { color: 'bg-green-200',  w: 36, h: 36, top: 92, left: 25 },
+  { color: 'bg-blue-200', w: 48, h: 48, top: 70, left: 45 },
+  { color: 'bg-pink-200', w: 24, h: 24, top: 5, left: 65 },
+  { color: 'bg-green-200', w: 36, h: 36, top: 92, left: 25 },
 ];
 
 // Hardcoded events array with form link field and sorted with new IDs
 const hardcodedEvents = [
   {
+    id: 14,
+    title: "BLITZ Coding Competition",
+    date: "2026-04-12",
+    displaydate: "April 12–15, 2026",
+    time: "TBD",
+    location: "SFIT Campus",
+    attendees: 120,
+    category: "Competition",
+    status: "completed",
+    description: "A premier coding and prototype development challenge designed to push your technical boundaries and bring your brightest ideas to life. Select your domain, build your solution, push to GitHub, and pitch to win!",
+    image: "https://i.postimg.cc/7Yk3P7F7/Screenshot-2026-06-06-164713.png",
+    speakers: ["Industry Judges & Panels"],
+    topics: ["Coding Competition", "Prototype Development", "GitHub", "Pitching", "Programming"],
+    registrations: 45,
+    satisfaction: null,
+    featured: false,
+    highlights: [],
+    form: ""
+  },
+  {
     id: 13,
-    title: "Inquisite – Women in History",
-    date: "2026-03-13",
-    displaydate: "March 13, 2026",
+    title: "Brainstorm – Women in History",
+    date: "2026-04-08",
+    displaydate: "April 8, 2026",
     time: "1:00 PM – 5:00 PM",
     location: "Room 618, SFIT",
     attendees: 40,
     category: "Quiz Competition",
-    status: "upcoming",
-    description: "A WIE flagship quiz competition celebrating women pioneers in computing, AI, space research, and entrepreneurship across multiple engaging rounds.",
-    image: "https://placehold.co/800x500/9333ea/ffffff?text=Coming+Soon",
+    status: "completed",
+    description: "A WIE flagship women-centric quiz competition themed 'Women in History', focusing on women's contributions in technology. Conducted in an interactive format with rounds including Women in Computing & Innovation, Women in Engineering & Research, Rapid Fire, and Audience Engagement.",
+    image: "https://i.postimg.cc/MK2CWPZh/Screenshot-2026-06-06-165628.png",
     speakers: ["WIE SFIT Organizers"],
     topics: ["Women in Technology", "History of Computing", "AI Pioneers", "Quiz Competition"],
     registrations: 0,
@@ -169,20 +189,20 @@ const hardcodedEvents = [
   {
     id: 12,
     title: "Debugging Your Communication Skills",
-    date: "2026-03-10",
-    displaydate: "March 10, 2026",
+    date: "2026-03-06",
+    displaydate: "March 6, 2026",
     time: "3:00 PM – 5:00 PM",
     location: "Room 618, SFIT",
     attendees: 30,
     category: "Workshop",
-    status: "upcoming",
-    description: "An interactive session by IEEE × WIE SFIT on verbal, non-verbal, and practical communication techniques for technical careers.",
-    image: "https://placehold.co/800x500/7c3aed/ffffff?text=Coming+Soon",
+    status: "completed",
+    description: "A Technical Communication Session by IEEE × WIE SFIT conducted by Ishita Dcosta, helping technical students understand the importance of effective communication and equipping them with practical strategies to enhance verbal and non-verbal skills.",
+    image: "https://i.postimg.cc/KjSQPWRr/Whats-App-Image-2026-06-06-at-15-47-39.jpg",
     speakers: ["Ishita Dcosta"],
     topics: ["Verbal Communication", "Non-Verbal Communication", "Interview Skills", "Confidence Building"],
     registrations: 0,
     satisfaction: null,
-    featured: true,
+    featured: false,
     highlights: [],
     form: ""
   },
@@ -526,14 +546,19 @@ const EventsPage = () => {
             })}
           </motion.div>
 
-          {featuredEvent && (
-            <motion.section
-              variants={slideInRight}
-              initial="hidden"
-              animate="visible"
-              transition={{ delay: 1.2 }}
-              className="pb-12"
-            >
+          <motion.section
+            variants={slideInRight}
+            initial="hidden"
+            animate="visible"
+            transition={{ delay: 1.2 }}
+            className="pb-12"
+          >
+            <div className="flex items-center gap-3 mb-8">
+              <Star className="w-6 h-6 text-yellow-500 fill-current" />
+              <h2 className="text-2xl font-bold text-gray-800">Featured Event</h2>
+            </div>
+
+            {featuredEvent ? (
               <div className="relative group">
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500"
@@ -641,8 +666,103 @@ const EventsPage = () => {
                   </div>
                 </motion.div>
               </div>
-            </motion.section>
-          )}
+            ) : (
+              <div className="relative group">
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-purple-600 via-blue-500 to-pink-600 rounded-3xl blur-xl opacity-15"
+                  animate={{
+                    scale: [1, 1.03, 1],
+                    opacity: [0.15, 0.22, 0.15]
+                  }}
+                  transition={{
+                    duration: 6,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                />
+                <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl overflow-hidden border border-gray-200/60">
+                  <div className="relative px-8 py-16 md:py-20 flex flex-col items-center justify-center text-center overflow-hidden">
+                    {/* Animated shimmer background */}
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-50/60 to-transparent"
+                      animate={{ x: ["-100%", "200%"] }}
+                      transition={{ duration: 4, repeat: Infinity, repeatDelay: 2, ease: "easeInOut" }}
+                      style={{ width: "50%" }}
+                    />
+
+                    {/* Pulsing star cluster */}
+                    <motion.div
+                      className="relative mb-6"
+                      animate={{
+                        scale: [1, 1.15, 1],
+                        rotate: [0, 10, -10, 0]
+                      }}
+                      transition={{
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                    >
+                      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center shadow-lg">
+                        <Star className="w-10 h-10 text-purple-400" />
+                      </div>
+                      <motion.div
+                        className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-yellow-400"
+                        animate={{
+                          scale: [0, 1, 0],
+                          opacity: [0, 1, 0]
+                        }}
+                        transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+                      />
+                      <motion.div
+                        className="absolute -bottom-1 -left-2 w-3 h-3 rounded-full bg-pink-400"
+                        animate={{
+                          scale: [0, 1, 0],
+                          opacity: [0, 1, 0]
+                        }}
+                        transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+                      />
+                      <motion.div
+                        className="absolute top-1 -left-3 w-2 h-2 rounded-full bg-blue-400"
+                        animate={{
+                          scale: [0, 1, 0],
+                          opacity: [0, 1, 0]
+                        }}
+                        transition={{ duration: 2, repeat: Infinity, delay: 1.5 }}
+                      />
+                    </motion.div>
+
+                    <motion.h3
+                      className="text-2xl md:text-3xl font-bold mb-3 bg-gradient-to-r from-purple-600 via-blue-600 to-pink-600 bg-clip-text text-transparent bg-[length:200%_auto]"
+                      animate={{ backgroundPosition: ["0% 0%", "100% 0%"] }}
+                      transition={{ duration: 3, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
+                    >
+                      No Featured Event Right Now
+                    </motion.h3>
+                    <p className="text-gray-500 text-lg max-w-md mb-6 leading-relaxed">
+                      Something amazing is brewing behind the scenes.
+                      <br />
+                      <span className="font-medium text-purple-500">Stay tuned — the next big event is just around the corner! 🚀</span>
+                    </p>
+                    <motion.div
+                      className="flex items-center gap-2 text-sm text-gray-400 bg-gray-50 px-5 py-2.5 rounded-full border border-gray-200"
+                      animate={{
+                        boxShadow: [
+                          "0 0 0px rgba(147, 51, 234, 0)",
+                          "0 0 12px rgba(147, 51, 234, 0.15)",
+                          "0 0 0px rgba(147, 51, 234, 0)"
+                        ]
+                      }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      <CheckCircle className="w-4 h-4 text-green-400" />
+                      <span>Check out our past events below</span>
+                    </motion.div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </motion.section>
 
           <motion.div
             variants={fadeUp}
