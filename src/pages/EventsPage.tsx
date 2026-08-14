@@ -254,7 +254,7 @@ const EventsPage = () => {
               initial="hidden"
               animate="visible"
               transition={{ delay: 0.5 }}
-              className="max-w-3xl mx-auto text-xl text-gray-600 leading-relaxed"
+              className="max-w-3xl mx-auto text-xl text-gray-600 dark:text-gray-400 leading-relaxed"
             >
               Explore our timeline of workshops, seminars, and events designed to empower women engineers.
             </motion.p>
@@ -275,7 +275,7 @@ const EventsPage = () => {
                   whileHover="hover"
                   whileTap={{ scale: 0.95 }}
                   animate={pulseGlow.animate}
-                  className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all text-center cursor-default select-none relative overflow-hidden"
+                  className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all text-center cursor-default select-none relative overflow-hidden"
                   key={stat.label}
                 >
                   <motion.div
@@ -318,7 +318,7 @@ const EventsPage = () => {
                       {stat.value}{stat.suffix}
                     </motion.span>
                   </motion.div>
-                  <div className="text-gray-600 text-sm select-text relative z-10">{stat.label}</div>
+                  <div className="text-gray-600 dark:text-gray-400 text-sm select-text relative z-10">{stat.label}</div>
                 </motion.div>
               );
             })}
@@ -354,7 +354,7 @@ const EventsPage = () => {
                   variants={morphingCard}
                   initial="rest"
                   whileHover="hover"
-                  className="relative bg-white rounded-3xl shadow-2xl overflow-hidden border border-white/50 flex flex-col md:flex-row"
+                  className="relative bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden border border-white/50 flex flex-col md:flex-row"
                   style={{ transformStyle: "preserve-3d" }}
                 >
                   <motion.div
@@ -380,10 +380,10 @@ const EventsPage = () => {
                     <h3 className="text-3xl font-bold text-gray-800 mb-4">
                       {featuredEvent.title}
                     </h3>
-                    <p className="text-gray-600 text-lg mb-6 leading-relaxed">
+                    <p className="text-gray-600 dark:text-gray-400 text-lg mb-6 leading-relaxed">
                       {featuredEvent.description}
                     </p>
-                    <div className="grid grid-cols-2 gap-4 mb-8 text-gray-600">
+                    <div className="grid grid-cols-2 gap-4 mb-8 text-gray-600 dark:text-gray-400">
                       <div className="flex items-center gap-3">
                         <Clock className="w-5 h-5 text-purple-500" />
                         <span className="font-medium">{featuredEvent.time}</span>
@@ -458,7 +458,7 @@ const EventsPage = () => {
                     ease: "easeInOut"
                   }}
                 />
-                <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl overflow-hidden border border-gray-200/60">
+                <div className="relative bg-white dark:bg-slate-900/80 backdrop-blur-sm rounded-3xl shadow-xl overflow-hidden border border-gray-200 dark:border-slate-800/60">
                   <div className="relative px-8 py-16 md:py-20 flex flex-col items-center justify-center text-center overflow-hidden">
                     {/* Animated shimmer background */}
                     <motion.div
@@ -517,13 +517,13 @@ const EventsPage = () => {
                     >
                       No Featured Event Right Now
                     </motion.h3>
-                    <p className="text-gray-500 text-lg max-w-md mb-6 leading-relaxed">
+                    <p className="text-gray-500 dark:text-gray-400 text-lg max-w-md mb-6 leading-relaxed">
                       Something amazing is brewing behind the scenes.
                       <br />
                       <span className="font-medium text-purple-500">Stay tuned — the next big event is just around the corner! 🚀</span>
                     </p>
                     <motion.div
-                      className="flex items-center gap-2 text-sm text-gray-400 bg-gray-50 px-5 py-2.5 rounded-full border border-gray-200"
+                      className="flex items-center gap-2 text-sm text-gray-400 bg-gray-50 dark:bg-slate-950 px-5 py-2.5 rounded-full border border-gray-200 dark:border-slate-800"
                       animate={{
                         boxShadow: [
                           "0 0 0px rgba(147, 51, 234, 0)",
@@ -549,14 +549,14 @@ const EventsPage = () => {
             custom={4}
             className="flex justify-center mb-20"
           >
-            <div className="bg-white rounded-full p-1 shadow-lg border border-gray-200 flex overflow-x-auto flex-nowrap gap-2 md:gap-4 px-2 hide-scrollbar">
+            <div className="bg-white dark:bg-slate-900 rounded-full p-1 shadow-lg border border-gray-200 dark:border-slate-800 flex overflow-x-auto flex-nowrap gap-2 md:gap-4 px-2 hide-scrollbar">
               {['all', 'upcoming', 'completed'].map((filter) => (
                 <motion.button
                   key={filter}
                   onClick={() => setActiveFilter(filter)}
                   className={`min-w-max px-4 md:px-6 py-2 md:py-3 rounded-full font-semibold transition-all capitalize whitespace-nowrap relative overflow-hidden text-sm md:text-base ${activeFilter === filter
                     ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg scale-105'
-                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 hover:bg-gray-50 dark:bg-slate-950'
                     }`}
                   aria-pressed={activeFilter === filter}
                   aria-label={`Filter events by ${filter}`}
@@ -613,7 +613,7 @@ const EventsPage = () => {
                     variants={morphingCard}
                     initial="rest"
                     whileHover="hover"
-                    className="bg-white rounded-2xl shadow-xl hover:shadow-2xl overflow-hidden border border-gray-100 hover:border-gray-200 group h-full flex flex-col select-none relative"
+                    className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl hover:shadow-2xl overflow-hidden border border-gray-100 hover:border-gray-200 dark:border-slate-800 group h-full flex flex-col select-none relative"
                     style={{ transformStyle: "preserve-3d" }}
                   >
                     <motion.div className="relative h-48 w-full overflow-hidden">
@@ -666,37 +666,37 @@ const EventsPage = () => {
                         <h3 className="text-xl font-bold text-gray-800 group-hover:text-blue-600 transition-colors flex-1 pr-4 line-clamp-2" title={event.title}>
                           {event.title}
                         </h3>
-                        <span className="text-sm text-gray-500 font-medium bg-gray-50 px-3 py-1 rounded-full select-text" title={event.displaydate}>
+                        <span className="text-sm text-gray-500 dark:text-gray-400 font-medium bg-gray-50 dark:bg-slate-950 px-3 py-1 rounded-full select-text" title={event.displaydate}>
                           {event.displaydate}
                         </span>
                       </div>
                       <div className="mb-4 h-20">
-                        <p className="text-gray-600 leading-relaxed line-clamp-3 text-sm group-hover:opacity-80" title={event.description}>
+                        <p className="text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-3 text-sm group-hover:opacity-80" title={event.description}>
                           {event.description}
                         </p>
                       </div>
                       <div className="grid grid-cols-2 gap-3 mb-4 text-sm h-24">
-                        <div className="flex items-center text-gray-600 bg-gray-50 p-2 rounded-lg">
+                        <div className="flex items-center text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-slate-950 p-2 rounded-lg">
                           <Clock className="w-4 h-4 mr-2 text-purple-500 flex-shrink-0" />
                           <span className="truncate" title={event.time}>{event.time}</span>
                         </div>
-                        <div className="flex items-center text-gray-600 bg-gray-50 p-2 rounded-lg">
+                        <div className="flex items-center text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-slate-950 p-2 rounded-lg">
                           <MapPin className="w-4 h-4 mr-2 text-pink-500 flex-shrink-0" />
                           <span className="truncate" title={event.location}>{event.location}</span>
                         </div>
-                        <div className="flex items-center text-gray-600 bg-gray-50 p-2 rounded-lg">
+                        <div className="flex items-center text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-slate-950 p-2 rounded-lg">
                           <Users className="w-4 h-4 mr-2 text-green-500 flex-shrink-0" />
                           <span className="truncate" title={`${event.status === 'upcoming' ? `${event.registrations}/${event.attendees}` : event.attendees} attendees`}>
                             {event.status === 'upcoming' ? `${event.registrations}/${event.attendees}` : event.attendees} attendees
                           </span>
                         </div>
                         {event.satisfaction ? (
-                          <div className="flex items-center text-gray-600 bg-gray-50 p-2 rounded-lg">
+                          <div className="flex items-center text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-slate-950 p-2 rounded-lg">
                             <Award className="w-4 h-4 mr-2 text-yellow-500 flex-shrink-0" />
                             <span className="truncate" title={`${event.satisfaction}% satisfaction`}>{event.satisfaction}% satisfaction</span>
                           </div>
                         ) : (
-                          <div className="bg-gray-50 p-2 rounded-lg opacity-50"></div>
+                          <div className="bg-gray-50 dark:bg-slate-950 p-2 rounded-lg opacity-50"></div>
                         )}
                       </div>
                       <div className="mb-4 h-16 overflow-hidden">
@@ -725,7 +725,7 @@ const EventsPage = () => {
                           ))}
                           {event.topics.length > 4 && (
                             <motion.span
-                              className="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full select-text cursor-default"
+                              className="px-2 py-1 bg-gray-100 text-gray-600 dark:text-gray-400 text-xs font-medium rounded-full select-text cursor-default"
                               title={`${event.topics.length - 4} more`}
                               whileHover={{ scale: 1.05 }}
                             >

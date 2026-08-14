@@ -71,6 +71,8 @@ export default function SplashCursor({
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    const abortController = new AbortController();
+    let animationId: number;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -997,7 +999,7 @@ export default function SplashCursor({
       applyInputs();
       step(dt);
       render(null);
-      requestAnimationFrame(updateFrame);
+      animationId = requestAnimationFrame(updateFrame);
     }
 
     function calcDeltaTime() {
@@ -1423,7 +1425,7 @@ export default function SplashCursor({
       const posY = scaleByPixelRatio(e.clientY);
       updatePointerDownData(pointer, -1, posX, posY);
       clickSplat(pointer);
-    });
+    }, { signal: abortController.signal });
 
     function handleFirstMouseMove(e: MouseEvent) {
       const pointer = pointers[0];
@@ -1434,7 +1436,7 @@ export default function SplashCursor({
       updatePointerMoveData(pointer, posX, posY, color);
       document.body.removeEventListener("mousemove", handleFirstMouseMove);
     }
-    document.body.addEventListener("mousemove", handleFirstMouseMove);
+    document.body.addEventListener("mousemove", handleFirstMouseMove, { signal: abortController.signal });
 
     window.addEventListener("mousemove", (e) => {
       const pointer = pointers[0];
@@ -1442,7 +1444,7 @@ export default function SplashCursor({
       const posY = scaleByPixelRatio(e.clientY);
       const color = pointer.color;
       updatePointerMoveData(pointer, posX, posY, color);
-    });
+    }, { signal: abortController.signal });
 
     function handleFirstTouchStart(e: TouchEvent) {
       const touches = e.targetTouches;
@@ -1455,7 +1457,7 @@ export default function SplashCursor({
       }
       document.body.removeEventListener("touchstart", handleFirstTouchStart);
     }
-    document.body.addEventListener("touchstart", handleFirstTouchStart);
+    document.body.addEventListener("touchstart", handleFirstTouchStart, { signal: abortController.signal });
 
     window.addEventListener(
       "touchstart",
@@ -1468,7 +1470,7 @@ export default function SplashCursor({
           updatePointerDownData(pointer, touches[i].identifier, posX, posY);
         }
       },
-      false,
+      { signal: abortController.signal }
     );
 
     window.addEventListener(
@@ -1482,7 +1484,7 @@ export default function SplashCursor({
           updatePointerMoveData(pointer, posX, posY, pointer.color);
         }
       },
-      false,
+      { signal: abortController.signal }
     );
 
     window.addEventListener("touchend", (e) => {
@@ -1491,7 +1493,12 @@ export default function SplashCursor({
       for (let i = 0; i < touches.length; i++) {
         updatePointerUpData(pointer);
       }
-    });
+    }, { signal: abortController.signal });
+
+    return () => {
+      abortController.abort();
+      if (animationId) cancelAnimationFrame(animationId);
+    };
   }, [
     SIM_RESOLUTION,
     DYE_RESOLUTION,

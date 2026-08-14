@@ -15,24 +15,24 @@ const Hero = () => {
     <section
       ref={heroRef}
       id="home"
-      className="min-h-screen relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50 animate-gradient-shift"
+      className="min-h-screen relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 animate-gradient-shift"
     >
       {isLaptop? <SplashCursor SPLAT_RADIUS={0.01}/>: null}
       
       {/* Animated Background Elements */}
       <div className="absolute inset-0">
-          <div className="absolute top-10 left-5 w-40 h-40 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-  <div className="absolute top-20 right-10 w-32 h-32 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-2000"></div>
-  <div className="absolute top-40 left-1/3 w-48 h-48 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-4000"></div>
-  <div className="absolute top-60 right-1/4 w-28 h-28 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-1000"></div>
-  <div className="absolute top-80 left-10 w-36 h-36 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-3000"></div>
+          <div className="absolute top-10 left-5 w-40 h-40 bg-purple-200 dark:bg-purple-900/40 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+  <div className="absolute top-20 right-10 w-32 h-32 bg-blue-200 dark:bg-blue-900/40 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-2000"></div>
+  <div className="absolute top-40 left-1/3 w-48 h-48 bg-pink-200 dark:bg-pink-900/40 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-4000"></div>
+  <div className="absolute top-60 right-1/4 w-28 h-28 bg-yellow-200 dark:bg-yellow-900/40 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-1000"></div>
+  <div className="absolute top-80 left-10 w-36 h-36 bg-green-200 dark:bg-green-900/40 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-3000"></div>
 
   {/* Row 2 */}
-  <div className="absolute top-[30rem] left-1/5 w-44 h-44 bg-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
-  <div className="absolute top-[34rem] right-20 w-52 h-52 bg-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-1500"></div>
-  <div className="absolute top-[38rem] left-1/2 w-24 h-24 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-2500"></div>
-  <div className="absolute top-[42rem] right-1/3 w-60 h-60 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-3500"></div>
-  <div className="absolute top-[46rem] left-16 w-30 h-30 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-500"></div>
+  <div className="absolute top-[30rem] left-1/5 w-44 h-44 bg-indigo-200 dark:bg-indigo-900/40 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
+  <div className="absolute top-[34rem] right-20 w-52 h-52 bg-red-200 dark:bg-red-900/40 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-1500"></div>
+  <div className="absolute top-[38rem] left-1/2 w-24 h-24 bg-blue-300 dark:bg-blue-900/40 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-2500"></div>
+  <div className="absolute top-[42rem] right-1/3 w-60 h-60 bg-purple-300 dark:bg-purple-900/40 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-3500"></div>
+  <div className="absolute top-[46rem] left-16 w-30 h-30 bg-orange-200 dark:bg-orange-900/40 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float animation-delay-500"></div>
 
 
 
@@ -53,11 +53,11 @@ const Hero = () => {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-16">
         <div className="text-center">
           {/* Badge */}
-          <div className={`inline-flex items-center px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border border-gray-200 mb-8 transition-all duration-700 ${
+          <div className={`inline-flex items-center px-4 py-2 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-full border border-gray-200 dark:border-slate-700 mb-8 transition-all duration-700 ${
             heroVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0 translate-y-8'
           }`}>
             <Sparkles className="w-4 h-4 text-purple-600 mr-2 animate-pulse" />
-            <span className="text-sm font-medium text-gray-700">Empowering Women in Engineering</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Empowering Women in Engineering</span>
           </div>
 
           {/* Main Heading */}
@@ -72,7 +72,7 @@ const Hero = () => {
           </h1>
 
           {/* Subtitle */}
-          <p className={`text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed transition-all duration-700 ${
+          <p className={`text-xl md:text-2xl text-gray-600 dark:text-gray-400 mb-8 max-w-3xl mx-auto leading-relaxed transition-all duration-700 ${
             heroVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0 translate-y-8'
           } animation-delay-600`}>
             St. Francis Institute of Technology's IEEE Women in Engineering Committee -
@@ -92,7 +92,7 @@ const Hero = () => {
             </a>
             <a
               href="/team"
-              className="btn-ripple px-8 py-4 bg-white/80 backdrop-blur-sm text-gray-700 rounded-full font-semibold border border-gray-200 hover:bg-white hover:shadow-lg hover:scale-105 transition-all duration-300 relative overflow-hidden"
+              className="btn-ripple px-8 py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-300 rounded-full font-semibold border border-gray-200 dark:border-slate-700 hover:bg-white dark:bg-slate-800 hover:shadow-lg hover:scale-105 transition-all duration-300 relative overflow-hidden"
             >
               <span className="relative z-10">Meet Our Team</span>
             </a>
@@ -102,20 +102,20 @@ const Hero = () => {
           <div className={`grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto transition-all duration-700 ${
             heroVisible ? 'animate-slide-in-up opacity-100' : 'opacity-0 translate-y-12'
           } animation-delay-1000`}>
-            <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300 hover:scale-105 card-tilt group">
-              <Users className="w-8 h-8 text-blue-600 mx-auto mb-3 group-hover:animate-bounce" />
+            <div className="bg-white dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 dark:border-slate-700 hover:shadow-lg transition-all duration-300 hover:scale-105 card-tilt group">
+              <Users className="w-8 h-8 text-blue-600 dark:text-blue-400 mx-auto mb-3 group-hover:animate-bounce" />
               <Counter endValue={50} suffix="+" className="text-2xl font-bold text-gray-800 mb-1" />
-              <p className="text-gray-600">Active Members</p>
+              <p className="text-gray-600 dark:text-gray-400">Active Members</p>
             </div>
-            <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300 hover:scale-105 card-tilt group animation-delay-100">
+            <div className="bg-white dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 dark:border-slate-700 hover:shadow-lg transition-all duration-300 hover:scale-105 card-tilt group animation-delay-100">
               <Calendar className="w-8 h-8 text-purple-600 mx-auto mb-3 group-hover:animate-bounce" />
               <Counter endValue={10} suffix="+" className="text-2xl font-bold text-gray-800 mb-1" />
-              <p className="text-gray-600">Events Organized</p>
+              <p className="text-gray-600 dark:text-gray-400">Events Organized</p>
             </div>
-            <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300 hover:scale-105 card-tilt group animation-delay-200">
+            <div className="bg-white dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 dark:border-slate-700 hover:shadow-lg transition-all duration-300 hover:scale-105 card-tilt group animation-delay-200">
               <Sparkles className="w-8 h-8 text-pink-600 mx-auto mb-3 group-hover:animate-bounce" />
               <Counter endValue={8} suffix="+" className="text-2xl font-bold text-gray-800 mb-1" />
-              <p className="text-gray-600">Years of Excellence</p>
+              <p className="text-gray-600 dark:text-gray-400">Years of Excellence</p>
             </div>
           </div>
         </div>

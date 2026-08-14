@@ -32,7 +32,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer ref={footerRef} className="bg-gray-900 text-white relative overflow-hidden wave-bg">
+    <footer ref={footerRef} className="bg-gray-900 dark:bg-slate-950 text-white relative overflow-hidden wave-bg">
       {/* Animated Wave Background */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute bottom-0 left-0 w-full h-32">
@@ -76,7 +76,7 @@ const Footer = () => {
                 <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent animate-gradient-shift group-hover:scale-105 transition-transform duration-300">
                   IEEE×WIE SFIT
                 </h3>
-                <p className={`text-gray-400 text-sm transition-all duration-1000 ${sloganVisible ? 'animate-fade-in-left opacity-100' : 'opacity-70'
+                <p className={`text-gray-400 dark:text-gray-500 text-sm transition-all duration-1000 ${sloganVisible ? 'animate-fade-in-left opacity-100' : 'opacity-70'
                   }`}>Empowering Women in Engineering</p>
               </div>
             </div>
@@ -187,7 +187,7 @@ const Footer = () => {
         </div>
 
         {/* Contact Info */}
-        <div className={`border-t border-gray-800 mt-12 pt-8 transition-all duration-700 ${footerVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0 translate-y-8'
+        <div className={`border-t border-gray-800 dark:border-slate-800 mt-12 pt-8 transition-all duration-700 ${footerVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0 translate-y-8'
           } animation-delay-1200`}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
@@ -216,12 +216,12 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className={`border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center transition-all duration-700 ${footerVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0 translate-y-4'
+        <div className={`border-t border-gray-800 dark:border-slate-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center transition-all duration-700 ${footerVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0 translate-y-4'
           } animation-delay-1500`}>
-          <p className="text-gray-400 text-sm mb-4 md:mb-0 hover:text-gray-300 transition-colors duration-300">
+          <p className="text-gray-400 dark:text-gray-500 text-sm mb-4 md:mb-0 hover:text-gray-300 transition-colors duration-300">
             © {currentYear} IEEE×WIE SFIT. All rights reserved.
           </p>
-          <div ref={sloganRef} className={`flex items-center space-x-2 text-gray-400 text-sm transition-all duration-1000 ${sloganVisible ? 'animate-pulse opacity-100' : 'opacity-80'
+          <div ref={sloganRef} className={`flex items-center space-x-2 text-gray-400 dark:text-gray-500 text-sm transition-all duration-1000 ${sloganVisible ? 'animate-pulse opacity-100' : 'opacity-80'
             }`}>
             <span className="hover:text-gray-300 transition-colors duration-300">Made with</span>
             <Heart className="w-4 h-4 text-red-500 animate-pulse hover:animate-bounce hover:scale-125 transition-transform duration-300" />

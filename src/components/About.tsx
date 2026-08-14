@@ -38,7 +38,7 @@ const About = () => {
   ];
 
   return (
-    <section id="about" className="py-20 bg-white relative overflow-hidden">
+    <section id="about" className="py-20 bg-white dark:bg-slate-900 relative overflow-hidden">
       {/* Background decorative elements */}
       <div className="absolute top-10 right-10 w-32 h-32 bg-blue-100 rounded-full mix-blend-multiply filter blur-xl opacity-50 animate-float"></div>
       <div className="absolute bottom-20 left-10 w-24 h-24 bg-purple-100 rounded-full mix-blend-multiply filter blur-xl opacity-50 animate-float animation-delay-2000"></div>
@@ -51,7 +51,7 @@ const About = () => {
           }`}>
             About <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent animate-gradient-shift">IEEE×WIE SFIT</span>
           </h2>
-          <p className={`text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed transition-all duration-700 ${
+          <p className={`text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed transition-all duration-700 ${
             headerVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0 translate-y-8'
           } animation-delay-200`}>
             The IEEE Women in Engineering (WIE) Student Branch at St. Francis Institute of Technology
@@ -79,8 +79,8 @@ const About = () => {
                 }`}>
                   <value.icon className="w-8 h-8 text-white group-hover:animate-bounce" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-4 group-hover:text-blue-600 transition-colors duration-300">{value.title}</h3>
-                <p className="text-gray-600 leading-relaxed">{value.description}</p>
+                <h3 className="text-xl font-bold text-gray-800 mb-4 group-hover:text-blue-600 dark:text-blue-400 transition-colors duration-300">{value.title}</h3>
+                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{value.description}</p>
               </div>
 
               {/* Decorative corner element */}
@@ -104,12 +104,12 @@ const About = () => {
               <h3 className="text-3xl font-bold text-gray-800 mb-6 animate-text-reveal">
                 What is IEEE Women in Engineering?
               </h3>
-              <p className="text-gray-600 leading-relaxed mb-6">
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">
                 IEEE Women in Engineering (WIE) is one of the largest international professional organizations
                 dedicated to promoting women engineers and scientists, and inspiring girls around the world
                 to follow their academic interests in a career in engineering and science.
               </p>
-              <p className="text-gray-600 leading-relaxed mb-8">
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-8">
                 Our SFIT chapter focuses on creating opportunities for professional development, networking,
                 and technical advancement while fostering an inclusive environment for all students.
               </p>
@@ -135,15 +135,15 @@ const About = () => {
             } animation-delay-400`}>
               <div className="w-full h-80 bg-gradient-to-br from-blue-200 to-purple-200 rounded-2xl flex items-center justify-center hover:scale-105 transition-transform duration-300 group relative overflow-hidden">
                 {/* Floating background elements */}
-                <div className="absolute top-4 left-4 w-8 h-8 bg-white/30 rounded-full animate-float"></div>
-                <div className="absolute bottom-6 right-6 w-6 h-6 bg-white/20 rounded-full animate-float animation-delay-1000"></div>
+                <div className="absolute top-4 left-4 w-8 h-8 bg-white dark:bg-slate-900/30 rounded-full animate-float"></div>
+                <div className="absolute bottom-6 right-6 w-6 h-6 bg-white dark:bg-slate-900/20 rounded-full animate-float animation-delay-1000"></div>
 
                 <div className="text-center relative z-10">
-                  <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-4 mx-auto shadow-lg group-hover:shadow-xl transition-shadow duration-300 animate-glow">
-                    <Award className="w-12 h-12 text-blue-600 group-hover:animate-spin transition-transform duration-500" />
+                  <div className="w-24 h-24 bg-white dark:bg-slate-900 rounded-full flex items-center justify-center mb-4 mx-auto shadow-lg group-hover:shadow-xl transition-shadow duration-300 animate-glow">
+                    <Award className="w-12 h-12 text-blue-600 dark:text-blue-400 group-hover:animate-spin transition-transform duration-500" />
                   </div>
-                  <h4 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors duration-300">Excellence in Engineering</h4>
-                  <p className="text-gray-600 group-hover:text-gray-700 transition-colors duration-300">Empowering the next generation</p>
+                  <h4 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 dark:text-blue-400 transition-colors duration-300">Excellence in Engineering</h4>
+                  <p className="text-gray-600 dark:text-gray-400 group-hover:text-gray-700 dark:text-gray-300 transition-colors duration-300">Empowering the next generation</p>
                 </div>
               </div>
               <div className="absolute -top-4 -right-4 w-8 h-8 bg-pink-400 rounded-full animate-bounce"></div>

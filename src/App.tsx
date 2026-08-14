@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ErrorBoundary } from './ErrorBoundary';
 import Header from './components/Header';
 import HomePage from './pages/HomePage';
 import EventsPage from './pages/EventsPage';
@@ -8,7 +9,8 @@ import ScrollToTop from './components/ScrollToTop';
 
 function App() {
   return (
-    <Router>
+    <ErrorBoundary>
+      <Router>
       <ScrollToTop />
       <div className="min-h-screen">
         <Header />
@@ -19,7 +21,8 @@ function App() {
           <Route path="/team" element={<TeamPage />} />
         </Routes>
       </div>
-    </Router>
+      </Router>
+    </ErrorBoundary>
   );
 }
 

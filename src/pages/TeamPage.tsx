@@ -52,9 +52,9 @@ function MemberModal({ member, isOpen, onClose }: { member: TeamMember | null; i
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-hidden">
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose}></div>
-            <div className="relative bg-white rounded-3xl shadow-2xl max-w-6xl w-full max-h-[95vh] overflow-y-auto overflow-x-hidden">
+            <div className="relative bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-6xl w-full max-h-[95vh] overflow-y-auto overflow-x-hidden">
                 <button onClick={onClose} className="absolute top-4 right-4 z-10 w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors shadow-lg">
-                    <X className="w-6 h-6 text-gray-600" />
+                    <X className="w-6 h-6 text-gray-600 dark:text-gray-400" />
                 </button>
                 <div className="flex flex-col lg:flex-row">
                     {/* Left — Image */}
@@ -92,14 +92,14 @@ function MemberModal({ member, isOpen, onClose }: { member: TeamMember | null; i
                                     }`}
                             </p>
                             {(member.year || member.branch) && (
-                                <p className="text-gray-600 text-base sm:text-lg">{[member.year, member.branch].filter(Boolean).join(' • ')}</p>
+                                <p className="text-gray-600 dark:text-gray-400 text-base sm:text-lg">{[member.year, member.branch].filter(Boolean).join(' • ')}</p>
                             )}
                         </div>
 
                         {/* Bio */}
                         <div className="mb-6">
                             <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-3">About</h3>
-                            <p className="text-gray-600 leading-relaxed text-sm sm:text-base">{member.bio}</p>
+                            <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-sm sm:text-base">{member.bio}</p>
                         </div>
 
                         {/* Roles & Responsibilities */}
@@ -108,7 +108,7 @@ function MemberModal({ member, isOpen, onClose }: { member: TeamMember | null; i
                                 <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-3">Roles & Responsibilities</h3>
                                 <ul className="space-y-2">
                                     {member.responsibilities.map((r, i) => (
-                                        <li key={i} className="flex items-start gap-2 text-sm sm:text-base text-gray-600">
+                                        <li key={i} className="flex items-start gap-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">
                                             <span className="mt-1.5 w-2 h-2 rounded-full bg-blue-500 flex-shrink-0"></span>
                                             {r}
                                         </li>
@@ -221,17 +221,17 @@ function OrgChart({
             <div className="flex flex-col items-center">
 
                 {/* Director — label only */}
-                <div className="w-64 sm:w-72 bg-gray-50 border border-gray-200 rounded-xl px-6 py-4 text-center">
+                <div className="w-64 sm:w-72 bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl px-6 py-4 text-center">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Director</p>
-                    <p className="text-sm font-bold text-gray-700">Bro. Shantilal Kujur</p>
+                    <p className="text-sm font-bold text-gray-700 dark:text-gray-300">Bro. Shantilal Kujur</p>
                     <p className="text-xs text-gray-400 mt-0.5">St. Francis Institute of Technology</p>
                 </div>
                 <VLine />
 
                 {/* Principal — label only */}
-                <div className="w-64 sm:w-72 bg-gray-50 border border-gray-200 rounded-xl px-6 py-4 text-center">
+                <div className="w-64 sm:w-72 bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl px-6 py-4 text-center">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Principal</p>
-                    <p className="text-sm font-bold text-gray-700">Dr. Deepak Jayaswal</p>
+                    <p className="text-sm font-bold text-gray-700 dark:text-gray-300">Dr. Deepak Jayaswal</p>
                     <p className="text-xs text-gray-400 mt-0.5">St. Francis Institute of Technology</p>
                 </div>
                 <VLine />
@@ -239,7 +239,7 @@ function OrgChart({
                 {/* Tech Rep — clickable */}
                 <button
                     onClick={() => onMemberClick(techRep)}
-                    className="w-64 sm:w-72 bg-white border border-gray-200 border-l-[3px] border-l-blue-600 rounded-xl px-6 py-4 text-center shadow-sm hover:shadow-md hover:bg-blue-50/50 transition-all group"
+                    className="w-64 sm:w-72 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 border-l-[3px] border-l-blue-600 rounded-xl px-6 py-4 text-center shadow-sm hover:shadow-md hover:bg-blue-50/50 transition-all group"
                 >
                     <p className="text-[10px] font-bold uppercase tracking-widest text-blue-600 mb-1">Faculty Technical Representative</p>
                     <p className="text-sm font-bold text-gray-800 group-hover:text-blue-700">{techRep.name}</p>
@@ -259,7 +259,7 @@ function OrgChart({
                             <button
                                 key={c.id}
                                 onClick={() => onMemberClick(c)}
-                                className="flex-1 bg-white border border-gray-200 border-l-[3px] border-l-indigo-600 rounded-xl px-3 py-4 text-center shadow-sm hover:shadow-md hover:bg-indigo-50/50 transition-all group"
+                                className="flex-1 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 border-l-[3px] border-l-indigo-600 rounded-xl px-3 py-4 text-center shadow-sm hover:shadow-md hover:bg-indigo-50/50 transition-all group"
                             >
                                 <p className="text-[10px] font-bold uppercase tracking-widest text-indigo-600 mb-1">{c.role}</p>
                                 <p className="text-xs sm:text-sm font-bold text-gray-800 group-hover:text-indigo-700 leading-tight">{c.name}</p>
@@ -278,7 +278,7 @@ function OrgChart({
                 {/* Core — clickable */}
                 <button
                     onClick={() => onDomainClick('core')}
-                    className="w-64 sm:w-72 bg-white border border-gray-200 border-l-[3px] border-l-purple-600 rounded-xl px-6 py-4 text-center shadow-sm hover:shadow-md hover:bg-purple-50/50 transition-all group"
+                    className="w-64 sm:w-72 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 border-l-[3px] border-l-purple-600 rounded-xl px-6 py-4 text-center shadow-sm hover:shadow-md hover:bg-purple-50/50 transition-all group"
                 >
                     <p className="text-[10px] font-bold uppercase tracking-widest text-purple-600 mb-1">Core Committee</p>
                     <p className="text-sm font-bold text-gray-800 group-hover:text-purple-700">Core Members — IEEE & WIE</p>
@@ -292,9 +292,9 @@ function OrgChart({
                         <button
                             key={d.key}
                             onClick={() => onDomainClick(d.key)}
-                            className="bg-white border border-gray-200 rounded-lg px-4 py-3 text-center shadow-sm hover:shadow-md hover:border-gray-400 hover:bg-gray-50 transition-all group"
+                            className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-lg px-4 py-3 text-center shadow-sm hover:shadow-md hover:border-gray-400 hover:bg-gray-50 dark:bg-slate-950 transition-all group"
                         >
-                            <p className="text-xs sm:text-sm font-bold text-gray-700 group-hover:text-gray-900 whitespace-nowrap">{d.label}</p>
+                            <p className="text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:text-white whitespace-nowrap">{d.label}</p>
                             <p className="text-[10px] text-gray-400 mt-0.5">IEEE · WIE</p>
                         </button>
                     ))}
@@ -659,7 +659,7 @@ const TeamPage: React.FC = () => {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
                     <div ref={headerRef} className="text-center mb-16">
                         <h1 className="text-5xl md:text-6xl font-bold mb-6 opacity-100">Our <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent animate-gradient-shift">Team</span></h1>
-                        <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed opacity-100">Meet the passionate individuals who drive our committee forward, dedicated to empowering the next generation of technology leaders.</p>
+                        <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed opacity-100">Meet the passionate individuals who drive our committee forward, dedicated to empowering the next generation of technology leaders.</p>
                     </div>
 
                     {/* Org Chart — shown at top before stats */}
@@ -693,10 +693,10 @@ const TeamPage: React.FC = () => {
                             { icon: Star, value: 4, suffix: '+', label: 'Events Hosted', color: 'pink' },
                             { icon: Users, value: 2, suffix: '', label: 'Convenors', color: 'indigo' }
                         ].map((stat) => (
-                            <div key={stat.label} className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 card-tilt text-center">
+                            <div key={stat.label} className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 card-tilt text-center">
                                 <stat.icon className={`w-8 h-8 mx-auto mb-3 text-${stat.color}-600`} />
                                 <div className={`text-3xl font-bold text-${stat.color}-600 mb-2`}>{stat.value}{stat.suffix}</div>
-                                <div className="text-gray-600 text-sm">{stat.label}</div>
+                                <div className="text-gray-600 dark:text-gray-400 text-sm">{stat.label}</div>
                             </div>
                         ))}
                     </div>
@@ -712,7 +712,7 @@ const TeamPage: React.FC = () => {
                                     className={`px-4 py-2 rounded-full font-semibold text-xs tracking-wider transition-all duration-300 ${
                                         activeCategory === category.id 
                                             ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md shadow-blue-500/10' 
-                                            : 'bg-white hover:bg-gray-100 text-gray-500 hover:text-gray-800 border border-gray-100'
+                                            : 'bg-white dark:bg-slate-900 hover:bg-gray-100 text-gray-500 dark:text-gray-400 hover:text-gray-800 border border-gray-100'
                                     }`}
                                 >
                                     {category.name} <span className="opacity-60 ml-0.5">({category.count})</span>
@@ -727,7 +727,7 @@ const TeamPage: React.FC = () => {
                                 <select 
                                     value={activeRole} 
                                     onChange={(e) => setActiveRole(e.target.value)} 
-                                    className="appearance-none bg-white border border-gray-200/80 rounded-full pl-4 pr-9 py-2 text-xs font-bold text-gray-600 focus:outline-none focus:border-blue-500 cursor-pointer shadow-sm transition-all"
+                                    className="appearance-none bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800/80 rounded-full pl-4 pr-9 py-2 text-xs font-bold text-gray-600 dark:text-gray-400 focus:outline-none focus:border-blue-500 cursor-pointer shadow-sm transition-all"
                                 >
                                     <option value="all">All Roles</option>
                                     {roleOptions.map(role => (<option key={role} value={role}>{role}</option>))}
@@ -803,8 +803,8 @@ const TeamPage: React.FC = () => {
                                 return (
                                     <div className="col-span-full text-center py-16 flex flex-col items-center justify-center">
                                         <Frown className="w-16 h-16 text-gray-400 mb-4" />
-                                        <h3 className="text-2xl font-semibold text-gray-600">No Members Found</h3>
-                                        <p className="text-gray-500 mt-2">Try adjusting your filters to find who you're looking for.</p>
+                                        <h3 className="text-2xl font-semibold text-gray-600 dark:text-gray-400">No Members Found</h3>
+                                        <p className="text-gray-500 dark:text-gray-400 mt-2">Try adjusting your filters to find who you're looking for.</p>
                                     </div>
                                 );
                             }
@@ -824,7 +824,7 @@ const TeamPage: React.FC = () => {
                                                 {displayCategoryName}
                                             </h2>
                                             <div className="flex-grow h-px bg-gray-200"></div>
-                                            <span className="text-sm font-semibold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                                            <span className="text-sm font-semibold text-gray-500 dark:text-gray-400 bg-gray-100 px-3 py-1 rounded-full">
                                                 {members.length} {members.length === 1 ? 'member' : 'members'}
                                             </span>
                                         </div>
@@ -833,7 +833,7 @@ const TeamPage: React.FC = () => {
                                             {members.map((member) => (
                                                 <div
                                                     key={member.id}
-                                                    className={`bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden group relative will-change-transform cursor-pointer w-full ${cat === 'convenor' ? 'sm:w-[280px] md:w-[320px] flex-shrink-0' : ''}`}
+                                                    className={`bg-white dark:bg-slate-900 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden group relative will-change-transform cursor-pointer w-full ${cat === 'convenor' ? 'sm:w-[280px] md:w-[320px] flex-shrink-0' : ''}`}
                                                     onClick={() => handleMemberClick(member)}
                                                 >
                                                     {member.featured && member.category === "core" && (
@@ -865,7 +865,7 @@ const TeamPage: React.FC = () => {
                                                                     href={member.social.linkedin}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
+                                                                    className="w-10 h-10 bg-white dark:bg-slate-900/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
                                                                     onClick={(e) => e.stopPropagation()}
                                                                 >
                                                                     <Linkedin className="w-5 h-5 text-blue-700" />
@@ -877,7 +877,7 @@ const TeamPage: React.FC = () => {
                                                                     href={member.social.github}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
+                                                                    className="w-10 h-10 bg-white dark:bg-slate-900/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
                                                                     onClick={(e) => e.stopPropagation()}
                                                                 >
                                                                     <Github className="w-5 h-5 text-gray-800" />
@@ -889,7 +889,7 @@ const TeamPage: React.FC = () => {
                                                                     href={member.social.instagram}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
+                                                                    className="w-10 h-10 bg-white dark:bg-slate-900/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
                                                                     onClick={(e) => e.stopPropagation()}
                                                                 >
                                                                     <Instagram className="w-5 h-5 text-pink-600" />
@@ -899,7 +899,7 @@ const TeamPage: React.FC = () => {
                                                             {member.social.email && member.social.email !== "#" && member.social.email !== "NA" && (
                                                                 <a
                                                                     href={member.social.email.startsWith('mailto:') ? member.social.email : `mailto:${member.social.email}`}
-                                                                    className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
+                                                                    className="w-10 h-10 bg-white dark:bg-slate-900/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
                                                                     onClick={(e) => e.stopPropagation()}
                                                                 >
                                                                     <Mail className="w-5 h-5 text-green-600" />
@@ -921,8 +921,8 @@ const TeamPage: React.FC = () => {
                                                                         ? `PR ${member.role}`
                                                                         : `${member.category.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ")} ${member.role}`}
                                                         </p>
-                                                        <p className="text-gray-500 text-sm mb-4">{member.year} • {member.branch}</p>
-                                                        <p className="text-gray-600 text-sm leading-relaxed mb-4 h-20 overflow-hidden">
+                                                        <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">{member.year} • {member.branch}</p>
+                                                        <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-4 h-20 overflow-hidden">
                                                             {member.bio.length > 100
                                                                 ? (() => {
                                                                     const truncated = member.bio.slice(0, 100);
