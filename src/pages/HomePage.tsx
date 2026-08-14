@@ -1,7 +1,5 @@
-import React from 'react';
 import Hero from '../components/Hero';
 import About from '../components/About';
-import EventsPreview from '../components/EventsPreview';
 import Contact from '../components/Contact';
 import Footer from '../components/Footer';
 import Popup from "../components/Popup";

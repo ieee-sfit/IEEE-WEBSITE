@@ -430,7 +430,6 @@ const techRep: TeamMember = {
 const TeamPage: React.FC = () => {
     const [activeCategory, setActiveCategory] = useState<string>('all');
     const [activeRole, setActiveRole] = useState<string>('all');
-    const [activeCommittee, setActiveCommittee] = useState<string>('all');
     const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -439,25 +438,9 @@ const TeamPage: React.FC = () => {
 
     const teamSectionRef = useRef<HTMLDivElement>(null);
 
-    const { ref: headerRef } = useScrollAnimation({ threshold: 0.3, triggerOnce: true });
-    const { ref: teamRef, visibleItems: teamVisible } = useStaggeredAnimation(teamMembers.length, 150);
-    const isLaptop = window.innerWidth > 768;
-
-    const [visibleCards, setVisibleCards] = useState<number[]>([]);
-
-    const handleInView = (index: number) => {
-        // On mobile, get the next 3 cards (current + next 2)
-        const newCards = isLaptop
-            ? [index]
-            : [index, index + 1, index + 2].filter((i) => i < filteredMembers.length);
-
-        // Only add cards that are not already visible
-        const cardsToAdd = newCards.filter((i) => !visibleCards.includes(i));
-        if (cardsToAdd.length === 0) return; // nothing new to add
-
-        setVisibleCards((prev) => [...prev, ...cardsToAdd]);
-    };
-
+    const { ref: headerRef } = useScrollAnimation<HTMLDivElement>({ threshold: 0.3, triggerOnce: true });
+    const { ref: teamRef} = useStaggeredAnimation<HTMLDivElement>(teamMembers.length, 150);
+    
     const handleMemberClick = (member: TeamMember) => {
         setSelectedMember(member);
         setIsModalOpen(true);
@@ -468,10 +451,9 @@ const TeamPage: React.FC = () => {
         setSelectedMember(null);
     };
 
-    // This effect resets the Role and Committee filters when the main Category changes
+    // This effect resets the Role filter when the main Category changes
     useEffect(() => {
         setActiveRole('all');
-        setActiveCommittee('all');
     }, [activeCategory]);
 
     useEffect(() => {
@@ -538,7 +520,7 @@ const TeamPage: React.FC = () => {
                         year: normalizeYear(yearAbbr),
                         branch: normalizeBranch(branchAbbr),
                         image: getDirectImageLink(String(cleanMember['Picture'])),
-                        bio: capitalizeSentences(String(cleanMember['About Bio'] || 'A passionate member of the team.').toLowerCase()),
+                        bio: capitalizeSentences(String(cleanMember['About Bio'] || 'A passionate member of the team.')),
                         achievements: [],
                         skills: skills.map(skill =>
                             skill
@@ -548,7 +530,7 @@ const TeamPage: React.FC = () => {
                         ),
                         social: {
                             linkedin: String(cleanMember['LinkedIn Profile Link'] || '#'),
-                            email: `mailto:${cleanMember['Email Address']}` || '#',
+                            email: cleanMember['Email Address'] ? `mailto:${cleanMember['Email Address']}` : '#',
                             github: String(cleanMember['Github Link'] || '#'),
                             instagram: String(cleanMember['Instagram Link'] || '#')
                         },
@@ -630,7 +612,6 @@ const TeamPage: React.FC = () => {
     // Options for dropdowns are now based on the selected category
     const membersInActiveCategory = teamMembers.filter(member => activeCategory === 'all' || member.category === activeCategory);
     const roleOptions = [...new Set(membersInActiveCategory.map(m => m.role))].sort();
-    const committeeOptions = [...new Set(membersInActiveCategory.map(m => m.committee))].sort();
 
     // Hard failsafe: convenors never appear under any category-specific tab except 'all' and 'convenor'.
     // Use each convenor's first given name as a substring check — this catches any name variant
@@ -645,7 +626,6 @@ const TeamPage: React.FC = () => {
     // Final filtering logic for displaying members
     const filteredMembers = membersInActiveCategory
         .filter(member => activeRole === 'all' || member.role === activeRole)
-        .filter(member => activeCommittee === 'all' || member.committee === activeCommittee)
         .filter(member => {
             // In 'all' or 'convenor' tab: show everyone
             if (activeCategory === 'all' || activeCategory === 'convenor') return true;

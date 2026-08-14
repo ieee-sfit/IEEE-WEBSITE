@@ -122,10 +122,10 @@ const morphingCard = {
 
 // Static config — defined outside component to avoid re-creation on every render
 const STATS_DATA = [
-  { icon: Award, value: 10, suffix: '+', label: 'Events Organized', color: 'blue' },
-  { icon: Users, value: 1200, suffix: '+', label: 'Total Participants', color: 'purple' },
-  { icon: TrendingUp, value: 89, suffix: '%', label: 'Avg Satisfaction', color: 'green' },
-  { icon: Target, value: 8, suffix: '', label: 'Completed Events', color: 'pink' },
+  { icon: Award, value: 10, suffix: '+', label: 'Events Organized', color: 'blue', textClass: 'text-blue-600' },
+  { icon: Users, value: 1200, suffix: '+', label: 'Total Participants', color: 'purple', textClass: 'text-purple-600' },
+  { icon: TrendingUp, value: 89, suffix: '%', label: 'Avg Satisfaction', color: 'green', textClass: 'text-green-600' },
+  { icon: Target, value: 8, suffix: '', label: 'Completed Events', color: 'pink', textClass: 'text-pink-600' },
 ];
 
 // Fixed orb positions (deterministic — no Math.random on render)
@@ -145,229 +145,7 @@ const ORB_CONFIG = [
 ];
 
 // Hardcoded events array with form link field and sorted with new IDs
-const hardcodedEvents = [
-  {
-    id: 14,
-    title: "BLITZ Coding Competition",
-    date: "2026-04-12",
-    displaydate: "April 12–15, 2026",
-    time: "TBD",
-    location: "SFIT Campus",
-    attendees: 120,
-    category: "Competition",
-    status: "completed",
-    description: "A premier coding and prototype development challenge designed to push your technical boundaries and bring your brightest ideas to life. Select your domain, build your solution, push to GitHub, and pitch to win!",
-    image: "https://i.postimg.cc/7Yk3P7F7/Screenshot-2026-06-06-164713.png",
-    speakers: ["Industry Judges & Panels"],
-    topics: ["Coding Competition", "Prototype Development", "GitHub", "Pitching", "Programming"],
-    registrations: 45,
-    satisfaction: null,
-    featured: false,
-    highlights: [],
-    form: ""
-  },
-  {
-    id: 13,
-    title: "Brainstorm – Women in History",
-    date: "2026-04-08",
-    displaydate: "April 8, 2026",
-    time: "1:00 PM – 5:00 PM",
-    location: "Room 618, SFIT",
-    attendees: 40,
-    category: "Quiz Competition",
-    status: "completed",
-    description: "A WIE flagship women-centric quiz competition themed 'Women in History', focusing on women's contributions in technology. Conducted in an interactive format with rounds including Women in Computing & Innovation, Women in Engineering & Research, Rapid Fire, and Audience Engagement.",
-    image: "https://i.postimg.cc/MK2CWPZh/Screenshot-2026-06-06-165628.png",
-    speakers: ["WIE SFIT Organizers"],
-    topics: ["Women in Technology", "History of Computing", "AI Pioneers", "Quiz Competition"],
-    registrations: 0,
-    satisfaction: null,
-    featured: false,
-    highlights: [],
-    form: ""
-  },
-  {
-    id: 12,
-    title: "Debugging Your Communication Skills",
-    date: "2026-03-06",
-    displaydate: "March 6, 2026",
-    time: "3:00 PM – 5:00 PM",
-    location: "Room 618, SFIT",
-    attendees: 30,
-    category: "Workshop",
-    status: "completed",
-    description: "A Technical Communication Session by IEEE × WIE SFIT conducted by Ishita Dcosta, helping technical students understand the importance of effective communication and equipping them with practical strategies to enhance verbal and non-verbal skills.",
-    image: "https://i.postimg.cc/KjSQPWRr/Whats-App-Image-2026-06-06-at-15-47-39.jpg",
-    speakers: ["Ishita Dcosta"],
-    topics: ["Verbal Communication", "Non-Verbal Communication", "Interview Skills", "Confidence Building"],
-    registrations: 0,
-    satisfaction: null,
-    featured: false,
-    highlights: [],
-    form: ""
-  },
-  {
-    id: 11,
-    title: "Neon Kickoff",
-    date: "2025-10-17",
-    displaydate: "October 17–18, 2025",
-    time: "During Mosaic 2025",
-    location: "SFIT Campus",
-    attendees: 83,
-    category: "Competition",
-    status: "completed",
-    description: "A 3-vs-3 UV LED football tournament with technical QR riddle tosses, Golden Minutes, Mystery Ball scoring, and a Rocket League side game station.",
-    image: "https://i.postimg.cc/5yGw4Rgn/Whats-App-Image-2025-10-15-at-10-12-07-7e32472a.jpg",
-    speakers: ["IEEE SFIT Student Branch Organizers"],
-    topics: ["3v3 Football", "UV Arena", "Technical Toss", "Rocket League"],
-    registrations: 83,
-    satisfaction: 91,
-    featured: false,
-    highlights: [],
-    form: ""
-  },
-  {
-    id: 2,
-    title: "Git & Github Workshop",
-    date: "2025-10-08",
-    displaydate: "October 8, 2025",
-    time: "Not specified",
-    location: "Lab 2",
-    attendees: 60,
-    category: "Workshop",
-    status: "completed",
-    description: "A beginner-friendly workshop on Git and Github covering version control, repositories, collaboration workflows, and open-source contributions.",
-    image: "https://i.postimg.cc/7hg0dnBH/create-an-image-for-git-github-workshop.jpg",
-    speakers: ["Technical Trainer"],
-    topics: ["Git Basics", "Github Collaboration", "Open Source"],
-    registrations: 50,
-    satisfaction: 87,
-    featured: false,
-    highlights: [],
-    form: ""
-  },
-  // {
-  //   id: 3,
-  //   title: "Intra-College Hackathon",
-  //   date: "2025-09-22",
-  //   displaydate: "September 22, 2025",
-  //   time: "9:00 AM - 5:00 PM",
-  //   location: "Campus Halls",
-  //   attendees: 120,
-  //   category: "Competition",
-  //   status: "upcoming",
-  //   description: "A day-long hackathon for teams of 2–4 members to develop innovative projects. Includes coding, mentoring, and prize distribution.",
-  //   image: "https://i.postimg.cc/SRpf6kMD/download.jpg",
-  //   speakers: ["Mentors", "Jury"],
-  //   topics: ["Innovation", "Teamwork", "Coding"],
-  //   registrations: 100,
-  //   satisfaction: 89,
-  //   featured: false,
-  //   highlights: [],
-  //   form: "" // No form yet
-  // },
-  {
-    id: 6,
-    title: "AIML (Agentic AI)",
-    date: "2025-08-11",
-    displaydate: "August 11–12, 2025",
-    time: "Not specified",
-    location: "Not specified",
-    attendees: 60,
-    category: "Workshop",
-    status: "completed",
-    description: "Hands-on workshop introducing Agentic AI concepts, tools, and applications, with coding exercises for CS/IT students.",
-    image: "https://i.postimg.cc/hvK3W15g/Agentic-Ai.png",
-    speakers: ["Craig D'Souza"],
-    topics: ["Agentic AI Basics", "Coding with AI", "Real-World Applications"],
-    registrations: 80,
-    satisfaction: 85,
-    featured: false,
-    highlights: [],
-    form: ""
-  },
-  {
-    id: 7,
-    title: "Committee Induction Meet",
-    date: "2025-07-24",
-    displaydate: "July 24, 2025",
-    time: "Not specified",
-    location: "Not specified",
-    attendees: 50,
-    category: "Orientation",
-    status: "completed",
-    description: "An induction meet to introduce committee members, deliver their roles, share the organizational vision, and foster collaboration.",
-    image: "https://i.postimg.cc/Z5KFxJf5/download-1.jpg",
-    speakers: ["Committee Heads"],
-    topics: ["Team Roles", "Vision Sharing", "Collaboration"],
-    registrations: 45,
-    satisfaction: 90,
-    featured: false,
-    highlights: [],
-    form: ""
-  },
-  {
-    id: 8,
-    title: "Techno Art Showdown",
-    date: "2024-08-23",
-    displaydate: "August 23, 2024",
-    time: "1:00 PM – 5:00 PM",
-    location: "Room 602, SFIT",
-    attendees: 100,
-    category: "Competition/Workshop",
-    status: "completed",
-    description: "A groundbreaking fusion of technology and creativity on National Space Day, featuring a digital art contest and virtual treasure hunt.",
-    image: "https://i.postimg.cc/QtHvHCdW/The-IEEE-Student-Branch-WIE-conducted-the-Techno-Art-Showdown-Phase-1-Techno-Art-Showdown-showca.jpg",
-    speakers: ["IEEE SFIT Student Branch", "WIE"],
-    topics: ["Creativity", "Technology", "Innovation"],
-    registrations: 100,
-    satisfaction: 88,
-    featured: false,
-    highlights: [],
-    form: ""
-  },
-  // All completed events without form link
-  {
-    id: 9,
-    title: "Radiant Rumble",
-    date: "2023-09-15",
-    displaydate: "September 15–16, 2023",
-    time: "Not specified",
-    location: "Room 613–614, SFIT",
-    attendees: 80,
-    category: "Competition",
-    status: "completed",
-    description: "A unique competition blending technology and athleticism, played under Radium lights to promote teamwork, innovation, and adaptability.",
-    image: "https://i.postimg.cc/C1sSszVr/Radiant-Rumble.jpg",
-    speakers: ["IEEE SFIT Student Branch Organizers"],
-    topics: ["Teamwork", "Innovation", "Problem-Solving"],
-    registrations: 80,
-    satisfaction: 90,
-    featured: false,
-    highlights: [],
-    form: ""
-  },
-  {
-    id: 10,
-    title: "InQUIZitive",
-    date: "2022-04-09",
-    displaydate: "April 9, 2022",
-    time: "11:00 AM – 5:00 PM",
-    location: "Google Meet, SFIT",
-    attendees: 45,
-    category: "Quiz Competition",
-    status: "completed",
-    description: "Online technical quiz competition by IEEE Techess, with 7 teams of 2, covering technology, GK, and current affairs.",
-    image: "https://i.postimg.cc/BnmFMnJ6/Inquizitive.jpg",
-    speakers: ["IEEE Techess", "Guest Experts"],
-    topics: ["Technology", "GK", "Current Affairs"],
-    registrations: 45,
-    satisfaction: 87,
-    featured: false,
-    highlights: [],
-    form: ""
-  },
-];
+
 
 const EventsPage = () => {
   const navigate = useNavigate();
@@ -375,7 +153,7 @@ const EventsPage = () => {
 
   const getSlug = (id: number) => eventsData.find((e) => e.id === id)?.slug ?? null;
 
-  const allEvents = hardcodedEvents;
+  const allEvents = eventsData;
   const featuredEvent = allEvents.find(event => event.featured);
 
   const statsData = STATS_DATA;
@@ -519,10 +297,10 @@ const EventsPage = () => {
                     }}
                     transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
                   >
-                    <Icon className={`w-8 h-8 mx-auto mb-3 text-${stat.color}-600 relative z-10`} />
+                    <Icon className={`w-8 h-8 mx-auto mb-3 ${stat.textClass} relative z-10`} />
                   </motion.div>
                   <motion.div
-                    className={`text-3xl font-bold text-${stat.color}-600 mb-2 relative z-10`}
+                    className={`text-3xl font-bold ${stat.textClass} mb-2 relative z-10`}
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{
@@ -835,12 +613,8 @@ const EventsPage = () => {
                     variants={morphingCard}
                     initial="rest"
                     whileHover="hover"
-                    className="bg-white rounded-2xl shadow-xl hover:shadow-2xl overflow-hidden border border-gray-100 hover:border-gray-200 group h-full flex flex-col cursor-pointer select-none relative"
+                    className="bg-white rounded-2xl shadow-xl hover:shadow-2xl overflow-hidden border border-gray-100 hover:border-gray-200 group h-full flex flex-col select-none relative"
                     style={{ transformStyle: "preserve-3d" }}
-                    onClick={() => {
-                      const slug = getSlug(event.id);
-                      if (slug) navigate(`/events/${slug}`);
-                    }}
                   >
                     <motion.div className="relative h-48 w-full overflow-hidden">
                       <motion.img
@@ -1011,25 +785,7 @@ const EventsPage = () => {
                             </div>
                           )
                         ) : (
-                          <motion.div
-                            className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 rounded-lg font-semibold flex items-center justify-center select-none"
-                            animate={{
-                              opacity: [0.8, 1, 0.8]
-                            }}
-                            transition={{
-                              duration: 2,
-                              repeat: Infinity,
-                              ease: "easeInOut"
-                            }}
-                          >
-                            <motion.div
-                              animate={{ rotate: 360 }}
-                              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                            >
-                              <CheckCircle className="mr-2 w-4 h-4" />
-                            </motion.div>
-                            Event Completed
-                          </motion.div>
+                          <motion.button onClick={() => { const slug = getSlug(event.id); if (slug) navigate(`/events/${slug}`); }} className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 rounded-lg font-semibold flex items-center justify-center select-none" animate={{ opacity: [0.8, 1, 0.8] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}><CheckCircle className="mr-2 w-5 h-5" />View Event Details</motion.button>
                         )}
                       </div>
                     </div>

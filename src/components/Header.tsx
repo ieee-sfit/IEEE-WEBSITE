@@ -1,17 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Menu, X, Zap } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useScrollAnimation } from '../hooks/useScrollAnimation';
 import logo1 from "./assets/ieee-logo.png";
 import logo2 from "./assets/wie--logo.png";
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const { ref: logoRef, isVisible: logoVisible } = useScrollAnimation({
-    threshold: 0.1,
-    triggerOnce: false
-  });
-
+  
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -30,7 +24,7 @@ const Header = () => {
     { name: 'Contact', href: '#contact', type: 'scroll' },
   ];
 
-  const handleNavClick = (item) => {
+  const handleNavClick = (item: { name: string; href: string; type: string }) => {
     if (item.type === 'scroll') {
       // If we're not on the home page, navigate to home first
       if (location.pathname !== '/') {

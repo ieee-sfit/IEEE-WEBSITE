@@ -1,16 +1,15 @@
-import React from 'react';
 import { Target, Heart, Lightbulb, Award } from 'lucide-react';
 import { useScrollAnimation, useStaggeredAnimation } from '../hooks/useScrollAnimation';
 
 const About = () => {
-  const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation({
+  const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation<HTMLDivElement>({
     threshold: 0.3,
     triggerOnce: true
   });
 
-  const { ref: valuesRef, visibleItems: valuesVisible } = useStaggeredAnimation(4, 150);
+  const { ref: valuesRef, visibleItems: valuesVisible } = useStaggeredAnimation<HTMLDivElement>(4, 150);
 
-  const { ref: descriptionRef, isVisible: descriptionVisible } = useScrollAnimation({
+  const { ref: descriptionRef, isVisible: descriptionVisible } = useScrollAnimation<HTMLDivElement>({
     threshold: 0.2,
     triggerOnce: true
   });

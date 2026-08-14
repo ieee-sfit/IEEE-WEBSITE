@@ -7,14 +7,14 @@ interface UseScrollAnimationOptions {
   delay?: number;
 }
 
-export const useScrollAnimation = ({
+export const useScrollAnimation = <T extends HTMLElement = HTMLElement>({
   threshold = 0.1,
   rootMargin = '0px 0px -50px 0px',
   triggerOnce = true,
   delay = 0
 }: UseScrollAnimationOptions = {}) => {
   const [isVisible, setIsVisible] = useState(false);
-  const ref = useRef<HTMLElement>(null);
+  const ref = useRef<T>(null);
 
   useEffect(() => {
     const element = ref.current;
@@ -53,14 +53,14 @@ export const useScrollAnimation = ({
 };
 
 // Hook for staggered animations
-export const useStaggeredAnimation = (
+export const useStaggeredAnimation = <T extends HTMLElement = HTMLElement>(
   itemCount: number,
   staggerDelay: number = 100
 ) => {
   const [visibleItems, setVisibleItems] = useState<boolean[]>(
     new Array(itemCount).fill(false)
   );
-  const ref = useRef<HTMLElement>(null);
+  const ref = useRef<T>(null);
 
   useEffect(() => {
     const element = ref.current;
@@ -100,14 +100,14 @@ export const useStaggeredAnimation = (
 };
 
 // Hook for counter animations
-export const useCounterAnimation = (
+export const useCounterAnimation = <T extends HTMLElement = HTMLElement>(
   endValue: number,
   duration: number = 2000,
   startValue: number = 0
 ) => {
   const [count, setCount] = useState(startValue);
   const [isAnimating, setIsAnimating] = useState(false);
-  const ref = useRef<HTMLElement>(null);
+  const ref = useRef<T>(null);
 
   const startAnimation = () => {
     if (isAnimating) return;
@@ -158,8 +158,8 @@ export const useCounterAnimation = (
 };
 
 // Hook for scroll-triggered class toggling
-export const useScrollClass = (className: string, options?: UseScrollAnimationOptions) => {
-  const { ref, isVisible } = useScrollAnimation(options);
+export const useScrollClass = <T extends HTMLElement = HTMLElement>(className: string, options?: UseScrollAnimationOptions) => {
+  const { ref, isVisible } = useScrollAnimation<T>(options);
   
   useEffect(() => {
     if (ref.current) {

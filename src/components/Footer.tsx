@@ -1,4 +1,3 @@
-import React from 'react';
 import { Heart, Instagram, Linkedin, Globe, Mail, Phone ,Github, Facebook} from 'lucide-react';
 import { useScrollAnimation, useStaggeredAnimation } from '../hooks/useScrollAnimation';
 import { FaXTwitter } from "react-icons/fa6";
@@ -6,14 +5,14 @@ import { FaXTwitter } from "react-icons/fa6";
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
-  const { ref: footerRef, isVisible: footerVisible } = useScrollAnimation({
+  const { ref: footerRef, isVisible: footerVisible } = useScrollAnimation<HTMLDivElement>({
     threshold: 0.2,
     triggerOnce: true
   });
 
-  const { ref: linksRef, visibleItems: linksVisible } = useStaggeredAnimation(8, 100);
+  const { ref: linksRef, visibleItems: linksVisible } = useStaggeredAnimation<HTMLDivElement>(8, 100);
 
-  const { ref: sloganRef, isVisible: sloganVisible } = useScrollAnimation({
+  const { ref: sloganRef, isVisible: sloganVisible } = useScrollAnimation<HTMLDivElement>({
     threshold: 0.8,
     triggerOnce: false
   });

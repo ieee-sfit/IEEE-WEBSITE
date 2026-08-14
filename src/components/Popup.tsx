@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface NewsItem {
@@ -29,7 +29,7 @@ export default function Popup() {
       if (!mounted) return;
       
       // Hardcoded sample data
-      const newsData = [
+      const newsData: any[] = [
         // {
         //   image: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=250&fit=crop",
         //   headline: "IEEE WIE Workshop on Machine Learning",
@@ -47,7 +47,7 @@ export default function Popup() {
         // }
       ];
       
-      const updatesData = [
+      const updatesData: any[] = [
         // {
         //   headline: "New Scholarship Program Launched",
         //   details: "We're excited to announce a new scholarship program for women pursuing engineering degrees. Applications are now open for the 2024-25 academic year."

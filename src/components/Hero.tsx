@@ -1,4 +1,3 @@
-import React from 'react';
 import { ArrowRight, Sparkles, Users, Calendar } from 'lucide-react';
 import Counter from './Counter';
 

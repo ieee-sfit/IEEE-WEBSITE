@@ -615,12 +615,7 @@
   .particle:nth-child(8) { left: 80%; animation-delay: 1.5s; }
   .particle:nth-child(9) { left: 90%; animation-delay: 2.5s; }
 
-  /* Smooth transitions for all interactive elements */
-  * {
-    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 150ms;
-  }
+
   
   /* Focus styles */
   .focus-visible:focus-visible {

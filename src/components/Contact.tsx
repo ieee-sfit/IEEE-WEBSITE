@@ -1,4 +1,3 @@
-import React from 'react';
 import { Mail, Phone, MapPin, Instagram, Linkedin, Send, Clock, Globe } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from "leaflet";
