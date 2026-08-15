@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Above the Beyond Script';
+  src: url('/fonts/above-the-beyond-script.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-script-logo {
+  font-family: 'Above the Beyond Script', cursive;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
