@@ -41,6 +41,33 @@ export interface EventData {
 
 export const eventsData: EventData[] = [
   {
+    id: 1,
+    slug: 'navkriti-26',
+    title: 'Navkriti \'26 (SIH Qualifier)',
+    date: '2026-08-17',
+    displaydate: 'August 17–28, 2026',
+    time: 'All Day',
+    location: 'SFIT Campus',
+    attendees: 0,
+    registrations: 0,
+    category: 'Hackathon',
+    status: 'upcoming',
+    description: 'The official internal ideathon qualifier for Smart India Hackathon 2026. Top 50 teams will be shortlisted to represent SFIT.',
+    detailedDescription: 'Navkriti 26 is the internal qualifier round for Smart India Hackathon 2026 organized by IEEExWIE, RAW, and IIC at St. Francis Institute of Technology. Teams of 6 (with at least 1 female member) will pitch their ideas using the official SIH template.',
+    image: 'https://www.sih.gov.in/img/logo.png',
+    featured: true,
+    highlights: [
+      'Official SIH Qualifier for SFIT',
+      'Exactly 6 members per team (min 1 female mandatory)',
+      'Idea presentation using SIH template',
+      'Top 50 teams shortlisted for SIH 2026'
+    ],
+    speakers: [],
+    topics: ['Hackathon', 'Ideathon', 'SIH 2026', 'Innovation'],
+    form: '/navkriti',
+    organizer: 'IEEExWIE, RAW & IIC SFIT',
+  },
+  {
     id: 2,
     slug: 'git-github-workshop',
     title: 'Git & Github Workshop',
