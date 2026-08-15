@@ -1,15 +1,23 @@
+import { useState, useEffect, lazy, Suspense } from 'react';
+import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles, Users, Calendar } from 'lucide-react';
 import Counter from './Counter';
 
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
-import SplashCursor from './ui/SplashCursor/SplashCursor';
+const SplashCursor = lazy(() => import('./ui/SplashCursor/SplashCursor'));
 
 const Hero = () => {
   const { ref: heroRef, isVisible: heroVisible } = useScrollAnimation({
     threshold: 0.2,
     triggerOnce: true
   });
-  const isLaptop = window.innerWidth > 768;
+  
+  const [isLaptop, setIsLaptop] = useState(window.innerWidth > 768);
+  useEffect(() => {
+    const handleResize = () => setIsLaptop(window.innerWidth > 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <section
@@ -17,7 +25,11 @@ const Hero = () => {
       id="home"
       className="min-h-screen relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 animate-gradient-shift"
     >
-      {isLaptop? <SplashCursor SPLAT_RADIUS={0.01}/>: null}
+      {isLaptop ? (
+        <Suspense fallback={null}>
+          <SplashCursor SPLAT_RADIUS={0.01} />
+        </Suspense>
+      ) : null}
       
       {/* Animated Background Elements */}
       <div className="absolute inset-0">
@@ -83,19 +95,19 @@ const Hero = () => {
           <div className={`flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 transition-all duration-700 ${
             heroVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0 translate-y-8'
           } animation-delay-800`}>
-            <a
-              href="/events"
+            <Link
+              to="/events"
               className="group btn-ripple btn-glow px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center relative overflow-hidden"
             >
               <span className="relative z-10">Explore Events</span>
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300 relative z-10" />
-            </a>
-            <a
-              href="/team"
+            </Link>
+            <Link
+              to="/team"
               className="btn-ripple px-8 py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-300 rounded-full font-semibold border border-gray-200 dark:border-slate-700 hover:bg-white dark:bg-slate-800 hover:shadow-lg hover:scale-105 transition-all duration-300 relative overflow-hidden"
             >
               <span className="relative z-10">Meet Our Team</span>
-            </a>
+            </Link>
           </div>
 
           {/* Stats */}
@@ -104,17 +116,17 @@ const Hero = () => {
           } animation-delay-1000`}>
             <div className="bg-white dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 dark:border-slate-700 hover:shadow-lg transition-all duration-300 hover:scale-105 card-tilt group">
               <Users className="w-8 h-8 text-blue-600 dark:text-blue-400 mx-auto mb-3 group-hover:animate-bounce" />
-              <Counter endValue={50} suffix="+" className="text-2xl font-bold text-gray-800 mb-1" />
+              <Counter endValue={50} suffix="+" className="text-2xl font-bold text-gray-800 dark:text-white mb-1" />
               <p className="text-gray-600 dark:text-gray-400">Active Members</p>
             </div>
             <div className="bg-white dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 dark:border-slate-700 hover:shadow-lg transition-all duration-300 hover:scale-105 card-tilt group animation-delay-100">
               <Calendar className="w-8 h-8 text-purple-600 mx-auto mb-3 group-hover:animate-bounce" />
-              <Counter endValue={10} suffix="+" className="text-2xl font-bold text-gray-800 mb-1" />
+              <Counter endValue={10} suffix="+" className="text-2xl font-bold text-gray-800 dark:text-white mb-1" />
               <p className="text-gray-600 dark:text-gray-400">Events Organized</p>
             </div>
             <div className="bg-white dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 dark:border-slate-700 hover:shadow-lg transition-all duration-300 hover:scale-105 card-tilt group animation-delay-200">
               <Sparkles className="w-8 h-8 text-pink-600 mx-auto mb-3 group-hover:animate-bounce" />
-              <Counter endValue={8} suffix="+" className="text-2xl font-bold text-gray-800 mb-1" />
+              <Counter endValue={8} suffix="+" className="text-2xl font-bold text-gray-800 dark:text-white mb-1" />
               <p className="text-gray-600 dark:text-gray-400">Years of Excellence</p>
             </div>
           </div>
