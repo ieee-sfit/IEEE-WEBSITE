@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import logo1 from "./assets/ieee-logo.png";
 import logo2 from "./assets/wie--logo.png";
 import ThemeToggle from './ThemeToggle';
 const Header = () => {
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   
@@ -20,6 +21,7 @@ const Header = () => {
   const navItems = [
     { name: 'Home', href: '/', type: 'route' },
     { name: 'About', href: '#about', type: 'scroll' },
+    { name: 'Navkriti \'26', href: '/navkriti', type: 'route' },
     { name: 'Events', href: '/events', type: 'route' },
     { name: 'Our Team', href: '/team', type: 'route' },
     { name: 'Contact', href: '#contact', type: 'scroll' },
@@ -27,11 +29,9 @@ const Header = () => {
 
   const handleNavClick = (item: { name: string; href: string; type: string }) => {
     if (item.type === 'scroll') {
-      // If we're not on the home page, navigate to home first
       if (location.pathname !== '/') {
-        window.location.href = '/' + item.href;
+        navigate(`/${item.href}`);
       } else {
-        // Smooth scroll to section
         const element = document.querySelector(item.href);
         if (element) {
           element.scrollIntoView({ behavior: 'smooth' });
@@ -47,7 +47,7 @@ const Header = () => {
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
-         <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-4 bg-white/90 p-2 rounded-xl backdrop-blur-sm dark:bg-white/95 shadow-sm">
       {/* First Logo */}
       <Link to="/" className="group cursor-pointer">
         <img
