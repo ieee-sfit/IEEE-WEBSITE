@@ -640,7 +640,7 @@ const TeamPage: React.FC = () => {
     if (error) return <div className="flex items-center justify-center min-h-screen text-xl font-semibold text-red-500">{error}</div>;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 dark:from-slate-900 dark:to-slate-950 dark:text-white">
             {/* Header Section */}
             <section className="pt-32 pb-12 relative overflow-hidden ">
                 <div className="absolute top-10 left-5 w-40 h-40 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-float"></div>
