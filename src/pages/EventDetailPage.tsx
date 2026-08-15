@@ -67,7 +67,7 @@ const EventDetailPage: React.FC = () => {
       : 'bg-blue-100 text-blue-700 border border-blue-200';
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-slate-950 dark:text-white">
       {/* Hero Section */}
       <div className="relative w-full h-[55vh] min-h-[400px] overflow-hidden">
         <img
