@@ -40,8 +40,8 @@ const About = () => {
   return (
     <section id="about" className="py-20 bg-white dark:bg-slate-900 relative overflow-hidden">
       {/* Background decorative elements */}
-      <div className="absolute top-10 right-10 w-32 h-32 bg-blue-100 rounded-full mix-blend-multiply filter blur-xl opacity-50 animate-float"></div>
-      <div className="absolute bottom-20 left-10 w-24 h-24 bg-purple-100 rounded-full mix-blend-multiply filter blur-xl opacity-50 animate-float animation-delay-2000"></div>
+      <div className="absolute top-10 right-10 w-32 h-32 bg-blue-100 dark:bg-blue-900 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-xl opacity-50 animate-float"></div>
+      <div className="absolute bottom-20 left-10 w-24 h-24 bg-purple-100 dark:bg-purple-900 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-xl opacity-50 animate-float animation-delay-2000"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         {/* Section Header */}
@@ -65,13 +65,13 @@ const About = () => {
           {values.map((value, index) => (
             <div
               key={value.title}
-              className={`group bg-gradient-to-br from-gray-50 to-white p-8 rounded-2xl border border-gray-200 hover:shadow-xl transition-all duration-500 card-tilt relative overflow-hidden ${
+              className={`group bg-gradient-to-br from-gray-50 to-white dark:from-slate-800 dark:to-slate-900 p-8 rounded-2xl border border-gray-200 dark:border-slate-700 hover:shadow-xl transition-all duration-500 card-tilt relative overflow-hidden ${
                 valuesVisible[index] ? 'animate-slide-in-up opacity-100' : 'opacity-0 translate-y-12'
               }`}
               style={{ transitionDelay: `${index * 150}ms` }}
             >
               {/* Hover effect overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
 
               <div className="relative z-10">
                 <div className={`w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 ${
@@ -79,7 +79,7 @@ const About = () => {
                 }`}>
                   <value.icon className="w-8 h-8 text-white group-hover:animate-bounce" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-4 group-hover:text-blue-600 dark:text-blue-400 transition-colors duration-300">{value.title}</h3>
+                <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4 group-hover:text-blue-600 dark:text-blue-400 transition-colors duration-300">{value.title}</h3>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{value.description}</p>
               </div>
 
@@ -91,17 +91,17 @@ const About = () => {
         </div>
 
         {/* IEEE WIE Description */}
-        <div ref={descriptionRef} className={`bg-gradient-to-r from-blue-50 to-purple-50 rounded-3xl p-8 md:p-12 relative overflow-hidden transition-all duration-700 ${
+        <div ref={descriptionRef} className={`bg-gradient-to-r from-blue-50 to-purple-50 dark:from-slate-800 dark:to-slate-900 rounded-3xl p-8 md:p-12 relative overflow-hidden transition-all duration-700 border border-transparent dark:border-slate-800 ${
           descriptionVisible ? 'animate-scale-in opacity-100' : 'opacity-0 scale-95'
         }`}>
           {/* Background decorative pattern */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-200 to-purple-200 rounded-full mix-blend-multiply opacity-30 animate-pulse"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-200 to-purple-200 dark:from-blue-900/30 dark:to-purple-900/30 rounded-full mix-blend-multiply dark:mix-blend-screen opacity-30 animate-pulse"></div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
             <div className={`transition-all duration-700 ${
               descriptionVisible ? 'animate-fade-in-left opacity-100' : 'opacity-0 -translate-x-8'
             } animation-delay-200`}>
-              <h3 className="text-3xl font-bold text-gray-800 mb-6 animate-text-reveal">
+              <h3 className="text-3xl font-bold text-gray-800 dark:text-white mb-6 animate-text-reveal">
                 What is IEEE Women in Engineering?
               </h3>
               <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">
@@ -115,14 +115,14 @@ const About = () => {
               </p>
               <div className="flex flex-wrap gap-4">
                 {[
-                  { text: 'Professional Development', color: 'blue' },
-                  { text: 'Technical Workshops', color: 'purple' },
-                  { text: 'Networking Events', color: 'pink' },
-                  { text: 'Mentorship Programs', color: 'indigo' }
+                  { text: 'Professional Development', bgClass: 'bg-blue-100 dark:bg-blue-900/50', textClass: 'text-blue-800 dark:text-blue-300' },
+                  { text: 'Technical Workshops', bgClass: 'bg-purple-100 dark:bg-purple-900/50', textClass: 'text-purple-800 dark:text-purple-300' },
+                  { text: 'Networking Events', bgClass: 'bg-pink-100 dark:bg-pink-900/50', textClass: 'text-pink-800 dark:text-pink-300' },
+                  { text: 'Mentorship Programs', bgClass: 'bg-indigo-100 dark:bg-indigo-900/50', textClass: 'text-indigo-800 dark:text-indigo-300' }
                 ].map((tag, index) => (
                   <span
                     key={tag.text}
-                    className={`px-4 py-2 bg-${tag.color}-100 text-${tag.color}-800 rounded-full text-sm font-medium hover:scale-105 transition-transform duration-300 cursor-pointer`}
+                    className={`px-4 py-2 ${tag.bgClass} ${tag.textClass} rounded-full text-sm font-medium hover:scale-105 transition-transform duration-300 cursor-pointer`}
                     style={{ animationDelay: `${600 + index * 100}ms` }}
                   >
                     {tag.text}
@@ -133,16 +133,16 @@ const About = () => {
             <div className={`relative transition-all duration-700 ${
               descriptionVisible ? 'animate-fade-in-right opacity-100' : 'opacity-0 translate-x-8'
             } animation-delay-400`}>
-              <div className="w-full h-80 bg-gradient-to-br from-blue-200 to-purple-200 rounded-2xl flex items-center justify-center hover:scale-105 transition-transform duration-300 group relative overflow-hidden">
+              <div className="w-full h-80 bg-gradient-to-br from-blue-200 to-purple-200 dark:from-blue-900/30 dark:to-purple-900/30 rounded-2xl flex items-center justify-center hover:scale-105 transition-transform duration-300 group relative overflow-hidden border border-transparent dark:border-slate-800">
                 {/* Floating background elements */}
-                <div className="absolute top-4 left-4 w-8 h-8 bg-white dark:bg-slate-900/30 rounded-full animate-float"></div>
-                <div className="absolute bottom-6 right-6 w-6 h-6 bg-white dark:bg-slate-900/20 rounded-full animate-float animation-delay-1000"></div>
+                <div className="absolute top-4 left-4 w-8 h-8 bg-white/50 dark:bg-slate-900/30 rounded-full animate-float"></div>
+                <div className="absolute bottom-6 right-6 w-6 h-6 bg-white/50 dark:bg-slate-900/20 rounded-full animate-float animation-delay-1000"></div>
 
                 <div className="text-center relative z-10">
-                  <div className="w-24 h-24 bg-white dark:bg-slate-900 rounded-full flex items-center justify-center mb-4 mx-auto shadow-lg group-hover:shadow-xl transition-shadow duration-300 animate-glow">
+                  <div className="w-24 h-24 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center mb-4 mx-auto shadow-lg group-hover:shadow-xl transition-shadow duration-300 animate-glow">
                     <Award className="w-12 h-12 text-blue-600 dark:text-blue-400 group-hover:animate-spin transition-transform duration-500" />
                   </div>
-                  <h4 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 dark:text-blue-400 transition-colors duration-300">Excellence in Engineering</h4>
+                  <h4 className="text-xl font-bold text-gray-800 dark:text-white mb-2 group-hover:text-blue-600 dark:text-blue-400 transition-colors duration-300">Excellence in Engineering</h4>
                   <p className="text-gray-600 dark:text-gray-400 group-hover:text-gray-700 dark:text-gray-300 transition-colors duration-300">Empowering the next generation</p>
                 </div>
               </div>

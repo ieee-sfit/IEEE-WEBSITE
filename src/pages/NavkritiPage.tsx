@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import NavkritiRegistration from '../components/NavkritiRegistration';
 import Footer from '../components/Footer';
+import { navkritiConfig } from '../config/navkritiConfig';
 
 const NavkritiPage = () => {
   const [activeTab, setActiveTab] = useState<'info' | 'register'>('info');
@@ -120,7 +121,7 @@ const NavkritiPage = () => {
                     All participants must join the WhatsApp group for important announcements, status updates, queries, etc.
                   </p>
                   <a
-                    href="https://chat.whatsapp.com/placeholder-link"
+                    href={navkritiConfig.contact.whatsappGroupLink}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center justify-center w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg transition-colors"
@@ -137,10 +138,10 @@ const NavkritiPage = () => {
                 </h2>
                 <div className="space-y-5 relative before:absolute before:inset-0 before:ml-2 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent">
                   {[
-                    { date: 'Aug 17 – 23', label: 'Registration Window', active: true },
-                    { date: 'Aug 24', label: 'Problem Statement Release', active: false },
-                    { date: 'Aug 28', label: 'Idea PPT Submission Deadline', active: false },
-                    { date: 'Aug 29', label: 'Idea Pitch / Presentation Day', active: false },
+                    { date: navkritiConfig.registration.displayDates, label: 'Registration Window', active: true },
+                    { date: navkritiConfig.problemStatements.displayDate, label: 'Problem Statement Release', active: false },
+                    { date: navkritiConfig.submission.displayDeadline, label: 'Idea PPT Submission Deadline', active: false },
+                    { date: navkritiConfig.pitch.displayDate, label: 'Idea Pitch / Presentation Day', active: false },
                   ].map((item, idx) => (
                     <div key={idx} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
                       <div className={`flex items-center justify-center w-5 h-5 rounded-full border-4 border-white dark:border-slate-900 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow ${item.active ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-700'}`}></div>
@@ -161,10 +162,10 @@ const NavkritiPage = () => {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
-                  { step: '01', title: 'Register', desc: 'Fill the team registration form on the RAW or IEEExWIE SFIT website. Pay the ₹300 team fee to confirm your slot.' },
-                  { step: '02', title: 'Choose a Problem', desc: "On Aug 24, problem statements are released across a few domains. Pick a domain that fits your team's strengths." },
-                  { step: '03', title: 'Submit Your Idea PPT', desc: 'Use the official SIH Idea Presentation Template — no edits to the format. Submit your deck on or before Aug 28.' },
-                  { step: '04', title: 'Pitch to Judges', desc: 'Present live on Aug 29. Top qualifying teams will represent SFIT at Smart India Hackathon 2026.' },
+                  { step: '01', title: 'Register', desc: `Fill the team registration form on the RAW or IEEExWIE SFIT website. Pay the ₹${navkritiConfig.rules.fee} team fee to confirm your slot.` },
+                  { step: '02', title: 'Choose a Problem', desc: `On ${navkritiConfig.problemStatements.displayDate}, problem statements are released across a few domains. Pick a domain that fits your team's strengths.` },
+                  { step: '03', title: 'Submit Your Idea PPT', desc: `Use the official SIH Idea Presentation Template — no edits to the format. Submit your deck on or before ${navkritiConfig.submission.displayDeadline}.` },
+                  { step: '04', title: 'Pitch to Judges', desc: `Present live on ${navkritiConfig.pitch.displayDate}. Top qualifying teams will represent SFIT at Smart India Hackathon ${navkritiConfig.edition}.` },
                 ].map((s) => (
                   <div key={s.step} className="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-100 dark:border-slate-700">
                     <div className="text-3xl font-black text-blue-100 dark:text-blue-900 mb-2">{s.step}</div>
@@ -181,7 +182,7 @@ const NavkritiPage = () => {
               {/* Prize Pool */}
               <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 shadow-sm">
                 <h2 className="text-2xl font-bold mb-6 flex items-center gap-3 text-slate-900 dark:text-white">
-                  <Trophy className="w-6 h-6 text-yellow-500" /> Prize Pool: ₹9,000
+                  <Trophy className="w-6 h-6 text-yellow-500" /> Prize Pool: ₹{navkritiConfig.rules.prizePool.toLocaleString()}
                 </h2>
                 <div className="grid grid-cols-3 gap-4">
                   {[
@@ -197,7 +198,7 @@ const NavkritiPage = () => {
                   ))}
                 </div>
                 <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 space-y-2 text-sm text-slate-600 dark:text-slate-400">
-                  <div className="flex justify-between"><span>Registration Fee:</span><strong className="text-slate-900 dark:text-white">₹300 per team</strong></div>
+                  <div className="flex justify-between"><span>Registration Fee:</span><strong className="text-slate-900 dark:text-white">₹{navkritiConfig.rules.fee} per team</strong></div>
                   <div className="flex justify-between"><span>Register via:</span><strong className="text-slate-900 dark:text-white">RAW & IEEE SFIT Websites</strong></div>
                 </div>
               </div>
@@ -211,10 +212,10 @@ const NavkritiPage = () => {
                   Registration is a two-step process — fill the online form and pay the fee. Incomplete registrations will not be considered. One team leader submits on behalf of all members.
                 </p>
                 <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
-                  <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" /><span>Registrations will remain open from <strong className="text-slate-900 dark:text-white">Aug 17 – 23</strong> only</span></li>
+                  <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" /><span>Registrations will remain open from <strong className="text-slate-900 dark:text-white">{navkritiConfig.registration.displayDates}</strong> only</span></li>
                   <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" /><span>The team leader registers the entire team in one go</span></li>
                   <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" /><span>Payment confirmation (screenshot or UPI transaction ID) is required to finalize your registration</span></li>
-                  <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" /><span>Problem statements released only to registered teams on Aug 24</span></li>
+                  <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" /><span>Problem statements released only to registered teams on {navkritiConfig.problemStatements.displayDate}</span></li>
                 </ul>
               </div>
             </div>
@@ -232,7 +233,7 @@ const NavkritiPage = () => {
                 <li><strong>Minimum 1 female</strong> participant per team is a mandatory SIH requirement.</li>
                 <li>All participants must be active enrolled students of SFIT.</li>
                 <li>The official SIH Idea Presentation Template is mandatory — any modification leads to disqualification.</li>
-                <li>Submissions will close after the Aug 28 deadline and will not be accepted under any circumstances.</li>
+                <li>Submissions will close after the {navkritiConfig.submission.displayDeadline} deadline and will not be accepted under any circumstances.</li>
               </ul>
             </div>
 
@@ -246,7 +247,7 @@ const NavkritiPage = () => {
                   { mistake: 'Forming a team with fewer or more than 6 members', fix: 'Exactly 6 — always, no exceptions.' },
                   { mistake: 'No female team member in the group', fix: 'Minimum 1 female is a hard SIH rule.' },
                   { mistake: 'Modifying the official SIH PPT template', fix: 'Use as-is — no font, layout, or design changes.' },
-                  { mistake: 'Submitting the PPT after Aug 28', fix: 'Make sure to keep an eye on the deadlines!' },
+                  { mistake: `Submitting the PPT after ${navkritiConfig.submission.displayDeadline}`, fix: 'Make sure to keep an eye on the deadlines!' },
                   { mistake: 'Registering without paying the fee', fix: 'Fee payment is required to confirm your team.' },
                   { mistake: 'Picking a domain outside the team\'s expertise', fix: 'Choose what you genuinely understand and can solve.' },
                   { mistake: 'Getting carried by one or two team members.', fix: 'Everyone in the team should be equally involved in the event.' },
@@ -272,12 +273,7 @@ const NavkritiPage = () => {
                 Reach out to any of our coordinators directly for questions about registration, team composition, problem statements, or event logistics.
               </p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                {[
-                  { name: 'Pal Rajak', phone: '7208697241' },
-                  { name: 'Jhoshua Coutinho', phone: '8976357005' },
-                  { name: 'Zion Naranje', phone: '8356818735' },
-                  { name: 'Rich Rebello', phone: '8828242446' },
-                ].map((contact) => (
+                {navkritiConfig.contact.coordinators.map((contact) => (
                   <div key={contact.name} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 text-center">
                     <div className="font-semibold text-slate-900 dark:text-white text-sm mb-1">{contact.name}</div>
                     <a href={`tel:${contact.phone}`} className="text-blue-600 dark:text-blue-400 text-sm hover:underline">{contact.phone}</a>

@@ -85,55 +85,28 @@ export default function NavkritiRegistration() {
 
     setIsSubmitting(true);
     try {
-      // 1. Upload Payment Receipt
-      const fileExt = paymentFile.name.split('.').pop();
-      const fileName = `${Date.now()}_${teamName.replace(/\s+/g, '_')}.${fileExt}`;
-      const { error: uploadError } = await supabase.storage
-        .from('payment_receipts')
-        .upload(`receipts/${fileName}`, paymentFile);
+      // 1. Prepare FormData for Edge Function
+      const formData = new FormData();
+      formData.append('registration_request_id', crypto.randomUUID());
+      formData.append('team_name', teamName);
+      formData.append('payment_receipt', paymentFile);
+      formData.append('participants', JSON.stringify(members));
 
-      if (uploadError) throw new Error('Failed to upload payment receipt: ' + uploadError.message);
+      // 2. Invoke Edge Function
+      const { data: functionData, error: functionError } = await supabase.functions.invoke('register-team', {
+        body: formData,
+      });
 
-      // 2. Generate Secret and Team ID
-      const secret = Math.random().toString(36).substring(2, 8).toUpperCase();
-      const teamId = `NAV-${Math.floor(1000 + Math.random() * 9000)}`;
-
-      // 3. Insert Team
-      const { data: teamData, error: teamError } = await supabase
-        .from('teams')
-        .insert({
-          team_id: teamId,
-          team_name: teamName,
-          submission_secret_hash: secret, // Storing raw for now until auth Edge Functions are set up
-          payment_receipt_path: `receipts/${fileName}`,
-        })
-        .select('id')
-        .single();
-
-      if (teamError) throw new Error('Failed to register team: ' + teamError.message);
-
-      // 4. Insert Participants
-      const participantsData = members.map((m, index) => ({
-        team_id: teamData.id,
-        is_leader: index === 0,
-        pid: m.pid,
-        email: m.email,
-        name: m.name,
-        phone: m.phone,
-        gender: m.gender,
-      }));
-
-      const { error: partError } = await supabase
-        .from('participants')
-        .insert(participantsData);
-
-      if (partError) {
-        // We should ideally rollback here, but for frontend it's hard. 
-        throw new Error('Failed to add team members: ' + partError.message);
+      if (functionError) {
+        throw new Error('Failed to complete registration: ' + functionError.message);
+      }
+      
+      if (functionData?.error) {
+        throw new Error(functionData.error);
       }
       
       // Success
-      setSuccessData({ teamId, secret });
+      setSuccessData({ teamId: functionData.team_id, secret: functionData.secret });
       
     } catch (err: any) {
       setError(err.message || 'An unexpected error occurred during registration.');
@@ -195,8 +168,9 @@ export default function NavkritiRegistration() {
             <Users className="w-5 h-5 text-blue-500" /> Team Details
           </h3>
           <div>
-            <label className="block text-sm font-semibold mb-2">Team Name</label>
+            <label htmlFor="team-name" className="block text-sm font-semibold mb-2">Team Name</label>
             <input
+              id="team-name"
               type="text"
               required
               value={teamName}
@@ -217,8 +191,9 @@ export default function NavkritiRegistration() {
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
                 <div>
-                  <label className="block text-sm font-semibold mb-2">Full Name</label>
+                  <label htmlFor={`name-${index}`} className="block text-sm font-semibold mb-2">Full Name</label>
                   <input
+                    id={`name-${index}`}
                     type="text"
                     required
                     value={member.name}
@@ -228,8 +203,9 @@ export default function NavkritiRegistration() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-2">Email Address</label>
+                  <label htmlFor={`email-${index}`} className="block text-sm font-semibold mb-2">Email Address</label>
                   <input
+                    id={`email-${index}`}
                     type="email"
                     required
                     value={member.email}
@@ -239,8 +215,9 @@ export default function NavkritiRegistration() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-2">PID (College ID)</label>
+                  <label htmlFor={`pid-${index}`} className="block text-sm font-semibold mb-2">PID (College ID)</label>
                   <input
+                    id={`pid-${index}`}
                     type="text"
                     required
                     value={member.pid}
@@ -250,8 +227,9 @@ export default function NavkritiRegistration() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-2">Phone Number</label>
+                  <label htmlFor={`phone-${index}`} className="block text-sm font-semibold mb-2">Phone Number</label>
                   <input
+                    id={`phone-${index}`}
                     type="tel"
                     required
                     value={member.phone}
@@ -261,8 +239,9 @@ export default function NavkritiRegistration() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-2">Gender</label>
+                  <label htmlFor={`gender-${index}`} className="block text-sm font-semibold mb-2">Gender</label>
                   <select
+                    id={`gender-${index}`}
                     required
                     value={member.gender}
                     onChange={(e) => updateMember(index, 'gender', e.target.value)}
@@ -276,8 +255,9 @@ export default function NavkritiRegistration() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold mb-2">Branch</label>
+                    <label htmlFor={`branch-${index}`} className="block text-sm font-semibold mb-2">Branch</label>
                     <select
+                      id={`branch-${index}`}
                       required
                       value={member.branch}
                       onChange={(e) => updateMember(index, 'branch', e.target.value)}
@@ -292,8 +272,9 @@ export default function NavkritiRegistration() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold mb-2">Year</label>
+                    <label htmlFor={`year-${index}`} className="block text-sm font-semibold mb-2">Year</label>
                     <select
+                      id={`year-${index}`}
                       required
                       value={member.year}
                       onChange={(e) => updateMember(index, 'year', e.target.value)}
@@ -355,8 +336,9 @@ export default function NavkritiRegistration() {
 
         {/* Agreement */}
         <section className="bg-red-50 dark:bg-red-900/10 p-6 rounded-xl border border-red-200 dark:border-red-900/50">
-          <label className="flex items-start gap-3 cursor-pointer">
+          <label htmlFor="sih-agreement" className="flex items-start gap-3 cursor-pointer">
             <input 
+              id="sih-agreement"
               type="checkbox" 
               required
               checked={agreedToRules}
@@ -368,6 +350,11 @@ export default function NavkritiRegistration() {
             </span>
           </label>
         </section>
+
+        {/* Privacy Notice */}
+        <p className="text-xs text-slate-500 dark:text-slate-400 text-center max-w-2xl mx-auto">
+          By submitting this form, you consent to the collection and processing of your team's details for the purpose of the Smart India Hackathon. Your data will be stored securely and will not be shared with third parties.
+        </p>
 
         {/* Submit Button */}
         <button
