@@ -80,7 +80,7 @@ const Hero = () => {
               IEEE×WIE
             </span>
             <br />
-            <span className="text-gray-800 text-4xl md:text-5xl animate-fade-in-up animation-delay-400">SFIT</span>
+            <span className="text-gray-800 dark:text-gray-200 text-4xl md:text-5xl animate-fade-in-up animation-delay-400">SFIT</span>
           </h1>
 
           {/* Subtitle */}

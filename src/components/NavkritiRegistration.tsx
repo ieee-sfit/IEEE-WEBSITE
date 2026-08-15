@@ -269,6 +269,8 @@ export default function NavkritiRegistration() {
                       <option value="EXTC">EXTC</option>
                       <option value="ELEC">ELEC</option>
                       <option value="MECH">MECH</option>
+                      <option value="ECS">ECS</option>
+                      <option value="AIML">AIML</option>
                     </select>
                   </div>
                   <div>

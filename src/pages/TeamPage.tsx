@@ -81,7 +81,7 @@ function MemberModal({ member, isOpen, onClose }: { member: TeamMember | null; i
                     {/* Right — Info */}
                     <div className="lg:w-3/5 p-6 sm:p-8 lg:p-10">
                         <div className="mb-6">
-                            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-3">{member.name}</h2>
+                            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 dark:text-gray-200 mb-3">{member.name}</h2>
                             <p className="text-blue-600 font-semibold text-base sm:text-lg mb-2">
                                 {member.category === 'faculty'
                                     ? member.role
@@ -98,14 +98,14 @@ function MemberModal({ member, isOpen, onClose }: { member: TeamMember | null; i
 
                         {/* Bio */}
                         <div className="mb-6">
-                            <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-3">About</h3>
+                            <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-3">About</h3>
                             <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-sm sm:text-base">{member.bio}</p>
                         </div>
 
                         {/* Roles & Responsibilities */}
                         {member.responsibilities && member.responsibilities.length > 0 && (
                             <div className="mb-6">
-                                <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-3">Roles & Responsibilities</h3>
+                                <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-3">Roles & Responsibilities</h3>
                                 <ul className="space-y-2">
                                     {member.responsibilities.map((r, i) => (
                                         <li key={i} className="flex items-start gap-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">
@@ -120,7 +120,7 @@ function MemberModal({ member, isOpen, onClose }: { member: TeamMember | null; i
                         {/* Skills */}
                         {member.skills && member.skills.length > 0 && (
                             <div className="mb-6">
-                                <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-3">Skills</h3>
+                                <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-3">Skills</h3>
                                 <div className="flex flex-wrap gap-2 sm:gap-3">
                                     {member.skills.map((skill, index) => (
                                         <span key={index} className="px-3 py-2 bg-blue-100 text-blue-700 text-xs sm:text-sm font-medium rounded-full">{skill}</span>
@@ -142,7 +142,7 @@ function MemberModal({ member, isOpen, onClose }: { member: TeamMember | null; i
 
                         {/* Social Links */}
                         <div className="mb-6">
-                            <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-3">Connect</h3>
+                            <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-3">Connect</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 {member.social.linkedin && member.social.linkedin !== "#" && member.social.linkedin !== "NA" && (
                                     <a href={member.social.linkedin} target="_blank" rel="noopener noreferrer"
@@ -214,7 +214,7 @@ function OrgChart({
         <div className="max-w-xl mx-auto px-4 py-2">
             <div className="text-center mb-8">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">Organization</p>
-                <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">Committee <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Structure</span></h2>
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-200">Committee <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Structure</span></h2>
                 <p className="text-xs text-gray-400 mt-2">Click a highlighted card to view profile · Click a domain to see members</p>
             </div>
 
@@ -242,7 +242,7 @@ function OrgChart({
                     className="w-64 sm:w-72 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 border-l-[3px] border-l-blue-600 rounded-xl px-6 py-4 text-center shadow-sm hover:shadow-md hover:bg-blue-50/50 transition-all group"
                 >
                     <p className="text-[10px] font-bold uppercase tracking-widest text-blue-600 mb-1">Faculty Technical Representative</p>
-                    <p className="text-sm font-bold text-gray-800 group-hover:text-blue-700">{techRep.name}</p>
+                    <p className="text-sm font-bold text-gray-800 dark:text-gray-200 group-hover:text-blue-700">{techRep.name}</p>
                     <p className="text-xs text-gray-400 mt-0.5">Faculty Technical Representative, SFIT</p>
                     <p className="text-[10px] text-blue-500 mt-2 font-semibold">View Profile →</p>
                 </button>
@@ -262,7 +262,7 @@ function OrgChart({
                                 className="flex-1 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 border-l-[3px] border-l-indigo-600 rounded-xl px-3 py-4 text-center shadow-sm hover:shadow-md hover:bg-indigo-50/50 transition-all group"
                             >
                                 <p className="text-[10px] font-bold uppercase tracking-widest text-indigo-600 mb-1">{c.role}</p>
-                                <p className="text-xs sm:text-sm font-bold text-gray-800 group-hover:text-indigo-700 leading-tight">{c.name}</p>
+                                <p className="text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 group-hover:text-indigo-700 leading-tight">{c.name}</p>
                                 <p className="text-[10px] text-gray-400 mt-0.5 leading-tight">{c.branch}</p>
                                 <p className="text-[10px] text-indigo-500 mt-2 font-semibold">View Profile →</p>
                             </button>
@@ -281,7 +281,7 @@ function OrgChart({
                     className="w-64 sm:w-72 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 border-l-[3px] border-l-purple-600 rounded-xl px-6 py-4 text-center shadow-sm hover:shadow-md hover:bg-purple-50/50 transition-all group"
                 >
                     <p className="text-[10px] font-bold uppercase tracking-widest text-purple-600 mb-1">Core Committee</p>
-                    <p className="text-sm font-bold text-gray-800 group-hover:text-purple-700">Core Members — IEEE & WIE</p>
+                    <p className="text-sm font-bold text-gray-800 dark:text-gray-200 group-hover:text-purple-700">Core Members — IEEE & WIE</p>
                     <p className="text-[10px] text-purple-500 mt-2 font-semibold">View Members ↓</p>
                 </button>
                 <VLine />
@@ -712,7 +712,7 @@ const TeamPage: React.FC = () => {
                                     className={`px-4 py-2 rounded-full font-semibold text-xs tracking-wider transition-all duration-300 ${
                                         activeCategory === category.id 
                                             ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md shadow-blue-500/10' 
-                                            : 'bg-white dark:bg-slate-900 hover:bg-gray-100 text-gray-500 dark:text-gray-400 hover:text-gray-800 border border-gray-100'
+                                            : 'bg-white dark:bg-slate-900 hover:bg-gray-100 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:text-gray-200 border border-gray-100'
                                     }`}
                                 >
                                     {category.name} <span className="opacity-60 ml-0.5">({category.count})</span>
@@ -820,7 +820,7 @@ const TeamPage: React.FC = () => {
                                 return (
                                     <div key={cat} className="space-y-6">
                                         <div className="flex items-center gap-4 mb-4">
-                                            <h2 className="text-2xl font-bold text-gray-800 tracking-wide border-b-2 border-blue-500 pb-1 inline-block">
+                                            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 tracking-wide border-b-2 border-blue-500 pb-1 inline-block">
                                                 {displayCategoryName}
                                             </h2>
                                             <div className="flex-grow h-px bg-gray-200"></div>
@@ -880,7 +880,7 @@ const TeamPage: React.FC = () => {
                                                                     className="w-10 h-10 bg-white dark:bg-slate-900/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:scale-110"
                                                                     onClick={(e) => e.stopPropagation()}
                                                                 >
-                                                                    <Github className="w-5 h-5 text-gray-800" />
+                                                                    <Github className="w-5 h-5 text-gray-800 dark:text-gray-200" />
                                                                 </a>
                                                             )}
 
@@ -909,7 +909,7 @@ const TeamPage: React.FC = () => {
                                                     </div>
 
                                                     <div className="p-6">
-                                                        <h3 className="text-xl font-bold text-gray-800 mb-1 group-hover:text-blue-600">{member.name}</h3>
+                                                        <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-1 group-hover:text-blue-600">{member.name}</h3>
                                                         <p className="text-blue-600 font-semibold text-sm mb-1">
                                                             {member.committee.toLowerCase() == "ieeexwie" ? "IEEE x WIE" : member.committee}
                                                             {" - "}
@@ -933,7 +933,7 @@ const TeamPage: React.FC = () => {
                                                                 : member.bio}
                                                         </p>
                                                         <div className="mb-4">
-                                                            <h4 className="text-sm font-semibold text-gray-800 mb-2">Skills:</h4>
+                                                            <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">Skills:</h4>
                                                             <div className="flex flex-wrap gap-1">
                                                                 {member.skills.slice(0, 5).map((skill, skillIndex) => (
                                                                     <span key={skillIndex} className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">{skill}</span>
