@@ -264,7 +264,29 @@ const EventsPage = () => {
                       backgroundPosition: 'center'
                     }}
                     whileHover={{ scale: 1.02 }}
-                  />
+                  >
+                    {featuredEvent.slug === 'navkriti-26' && (
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10 bg-black/40 backdrop-blur-[2px]">
+                        <div className="text-5xl md:text-6xl font-extrabold tracking-tight leading-none text-white drop-shadow-[0_0_15px_rgba(0,0,0,0.8)]">
+                          <span>NAV</span>
+                          <span
+                            className="text-blue-400 font-script-logo drop-shadow-[0_0_10px_rgba(59,130,246,0.8)]"
+                            style={{
+                              fontSize: '1.4em',
+                              display: 'inline-block',
+                              transform: 'rotate(-4deg) translateY(0.05em)',
+                              margin: '0 -0.04em 0 -0.02em',
+                              lineHeight: 1,
+                            }}
+                          >
+                            K
+                          </span>
+                          <span>RITI</span>
+                          <span className="text-blue-400 ml-1 drop-shadow-[0_0_10px_rgba(59,130,246,0.8)]">'26</span>
+                        </div>
+                      </div>
+                    )}
+                  </motion.div>
                   <div className="md:w-1/2 p-8 md:p-12 flex flex-col">
                     <div className="flex items-center gap-3 mb-6">
                       <span className="bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 px-4 py-2 rounded-full text-sm font-semibold select-none">
@@ -463,6 +485,29 @@ const EventsPage = () => {
                         whileHover={{ scale: 1.1, rotate: [0, 1, -1, 0] }}
                         transition={{ scale: { duration: 0.6 }, rotate: { duration: 0.8, ease: 'easeInOut' } }}
                       />
+                      
+                      {event.slug === 'navkriti-26' && (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10 bg-black/30 backdrop-blur-[1px]">
+                          <div className="text-3xl font-extrabold tracking-tight leading-none text-white drop-shadow-[0_0_10px_rgba(0,0,0,0.8)]">
+                            <span>NAV</span>
+                            <span
+                              className="text-blue-400 font-script-logo drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]"
+                              style={{
+                                fontSize: '1.4em',
+                                display: 'inline-block',
+                                transform: 'rotate(-4deg) translateY(0.05em)',
+                                margin: '0 -0.04em 0 -0.02em',
+                                lineHeight: 1,
+                              }}
+                            >
+                              K
+                            </span>
+                            <span>RITI</span>
+                            <span className="text-blue-400 ml-1 drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]">'26</span>
+                          </div>
+                        </div>
+                      )}
+
                       <motion.div
                         className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100"
                         transition={{ duration: 0.3 }}
