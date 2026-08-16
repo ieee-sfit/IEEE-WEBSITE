@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Upload, CheckCircle, AlertCircle, Loader2, Users } from 'lucide-react';
-import { supabase } from '../lib/supabaseClient';
+
 
 type MemberData = {
   name: string;
@@ -93,12 +93,26 @@ export default function NavkritiRegistration() {
       formData.append('participants', JSON.stringify(members));
 
       // 2. Invoke Edge Function
-      const { data: functionData, error: functionError } = await supabase.functions.invoke('register-team', {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+      
+      const response = await fetch(`${supabaseUrl}/functions/v1/register-team`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${anonKey}`,
+        },
         body: formData,
       });
 
-      if (functionError) {
-        throw new Error('Failed to complete registration: ' + functionError.message);
+      let functionData;
+      try {
+        functionData = await response.json();
+      } catch (parseError) {
+        throw new Error(`Server Error (${response.status}): Failed to parse response`);
+      }
+
+      if (!response.ok) {
+        throw new Error(functionData?.error || `Registration failed with status ${response.status}`);
       }
       
       if (functionData?.error) {

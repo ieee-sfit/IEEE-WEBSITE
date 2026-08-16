@@ -24,7 +24,7 @@ async function generateTeamSecret(teamUuid: string): Promise<string> {
   
   const hashArray = Array.from(new Uint8Array(signature));
   const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  return hashHex.substring(0, 16).toUpperCase();
+  return hashHex.substring(0, 8).toUpperCase();
 }
 
 async function createSessionToken(teamUuid: string): Promise<string> {

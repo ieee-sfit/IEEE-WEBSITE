@@ -23,8 +23,8 @@ async function generateTeamSecret(teamUuid: string): Promise<string> {
   const hashArray = Array.from(new Uint8Array(signature));
   const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   
-  // Return a 16-character string (64 bits of entropy from the hash)
-  return hashHex.substring(0, 16).toUpperCase();
+  // Return an 8-character string (32 bits of entropy from the hash)
+  return hashHex.substring(0, 8).toUpperCase();
 }
 
 function normalizeString(str: any): string {

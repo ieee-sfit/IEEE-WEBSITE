@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Upload, LogOut, CheckCircle, AlertCircle, FileText, Lock, Layout } from 'lucide-react';
 
 import { supabase } from '../lib/supabaseClient';
-
+import UpdateTeamForm from '../components/UpdateTeamForm';
 export default function NavkritiPortal() {
   const [session, setSession] = useState<{ teamId: string, token: string } | null>(null);
   const [teamIdInput, setTeamIdInput] = useState('');
@@ -177,6 +177,8 @@ export default function NavkritiPortal() {
             <LogOut className="w-4 h-4" /> Logout
           </button>
         </div>
+
+        <UpdateTeamForm token={session.token} />
 
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-sm">
           <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
