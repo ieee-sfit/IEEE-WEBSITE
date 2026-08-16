@@ -152,6 +152,7 @@ serve(async (req) => {
     if (!data.is_duplicate) {
       const mailDispatcherUrl = Deno.env.get('MAIL_DISPATCHER_URL');
       const mailDispatcherKey = Deno.env.get('MAIL_DISPATCHER_KEY');
+      
       if (mailDispatcherUrl && mailDispatcherKey) {
           const dispatchEmail = async () => {
             try {
@@ -165,7 +166,7 @@ serve(async (req) => {
                     teamId: actual_team_id,
                     teamName: team_name,
                     secret: secret,
-                    participants: participantsData
+                    leader: participantsData[0]
                 })
               });
               if (!response.ok) {
@@ -182,7 +183,7 @@ serve(async (req) => {
             EdgeRuntime.waitUntil(dispatchEmail());
           } else {
             // Fallback for local testing or non-Edge environments
-            dispatchEmail();
+            await dispatchEmail();
           }
       }
     }
