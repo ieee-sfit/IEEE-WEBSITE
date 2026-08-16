@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Upload, CheckCircle, AlertCircle, Loader2, Users, Copy } from 'lucide-react';
-
+import { supabase } from '../lib/supabaseClient';
 
 type MemberData = {
   name: string;
@@ -32,7 +32,7 @@ export default function NavkritiRegistration() {
   const [successData, setSuccessData] = useState<{ teamId: string, secret: string, message: string } | null>(null);
   const [copiedId, setCopiedId] = useState(false);
   const [copiedSecret, setCopiedSecret] = useState(false);
-  
+
   // Generate request ID once when form mounts for idempotency across retries
   const [registrationRequestId] = useState(() => crypto.randomUUID());
 
@@ -109,39 +109,25 @@ export default function NavkritiRegistration() {
       formData.append('participants', JSON.stringify(members));
 
       // 2. Invoke Edge Function
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-      
-      const response = await fetch(`${supabaseUrl}/functions/v1/register-team`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${anonKey}`,
-        },
+      const { data: functionData, error: functionError } = await supabase.functions.invoke('register-team', {
         body: formData,
       });
 
-      let functionData;
-      try {
-        functionData = await response.json();
-      } catch (parseError) {
-        throw new Error(`Server Error (${response.status}): Failed to parse response`);
+      if (functionError) {
+        throw new Error('Failed to complete registration: ' + functionError.message);
       }
 
-      if (!response.ok) {
-        throw new Error(functionData?.error || `Registration failed with status ${response.status}`);
-      }
-      
       if (functionData?.error) {
         throw new Error(functionData.error);
       }
-      
+
       // Success
-      setSuccessData({ 
-        teamId: functionData.team_id, 
-        secret: functionData.secret, 
+      setSuccessData({
+        teamId: functionData.team_id,
+        secret: functionData.secret,
         message: functionData.message || 'Registration Successful!'
       });
-      
+
     } catch (err: any) {
       setError(err.message || 'An unexpected error occurred during registration.');
     } finally {
@@ -163,7 +149,7 @@ export default function NavkritiRegistration() {
           <div className="bg-white dark:bg-slate-900 border border-green-100 dark:border-green-800/50 p-6 rounded-xl shadow-sm relative group">
             <p className="text-sm text-slate-500 mb-1">Your Official Team ID</p>
             <p className="text-4xl font-extrabold tracking-wider text-slate-900 dark:text-white">{successData.teamId}</p>
-            <button 
+            <button
               onClick={() => handleCopy(successData.teamId, true)}
               className="absolute top-2 right-2 p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               title="Copy Team ID"
@@ -174,7 +160,7 @@ export default function NavkritiRegistration() {
           <div className="bg-white dark:bg-slate-900 border border-blue-100 dark:border-blue-800/50 p-6 rounded-xl shadow-sm relative group">
             <p className="text-sm text-slate-500 mb-1">Submission Secret</p>
             <p className="text-4xl font-extrabold tracking-wider text-blue-600 dark:text-blue-400">{successData.secret}</p>
-            <button 
+            <button
               onClick={() => handleCopy(successData.secret, false)}
               className="absolute top-2 right-2 p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               title="Copy Secret"
@@ -185,7 +171,7 @@ export default function NavkritiRegistration() {
         </div>
         <div className="max-w-md mx-auto bg-blue-50 dark:bg-blue-900/10 p-4 rounded-lg mt-6 text-sm text-blue-800 dark:text-blue-300">
           <p>
-            <strong className="text-red-600 dark:text-red-400">IMPORTANT:</strong> Please save this <strong>Submission Secret</strong> securely! 
+            <strong className="text-red-600 dark:text-red-400">IMPORTANT:</strong> Please save this <strong>Submission Secret</strong> securely!
             You will need both your Team ID and Secret to upload your PPT on August 25th. Do not share it outside your team.
           </p>
         </div>
@@ -196,7 +182,7 @@ export default function NavkritiRegistration() {
   return (
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-10 shadow-xl relative overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-600 to-purple-600"></div>
-      
+
       <div className="mb-10 text-center">
         <h2 className="text-3xl font-bold mb-4">Team Registration</h2>
         <p className="text-slate-600 dark:text-slate-400">Fill out the details for all 6 team members. All fields are mandatory.</p>
@@ -236,7 +222,7 @@ export default function NavkritiRegistration() {
               <div className="absolute -top-3 left-6 px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 text-xs font-bold uppercase rounded-full tracking-wider border border-blue-200 dark:border-blue-800">
                 {index === 0 ? 'Team Leader' : `Member ${index + 1}`}
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
                 <div>
                   <label htmlFor={`name-${index}`} className="block text-sm font-semibold mb-2">Full Name</label>
@@ -356,7 +342,7 @@ export default function NavkritiRegistration() {
               </div>
               <p className="text-sm font-medium">Scan to pay ₹300</p>
             </div>
-            
+
             <div className="w-full md:w-2/3">
               <label className="block text-sm font-semibold mb-2">Upload Payment Screenshot</label>
               <div className="mt-2 flex justify-center rounded-lg border border-dashed border-slate-300 dark:border-slate-700 px-6 py-10 bg-white dark:bg-slate-900">
@@ -387,13 +373,13 @@ export default function NavkritiRegistration() {
         {/* Agreement */}
         <section className="bg-red-50 dark:bg-red-900/10 p-6 rounded-xl border border-red-200 dark:border-red-900/50">
           <label htmlFor="sih-agreement" className="flex items-start gap-3 cursor-pointer">
-            <input 
+            <input
               id="sih-agreement"
-              type="checkbox" 
+              type="checkbox"
               required
               checked={agreedToRules}
               onChange={(e) => setAgreedToRules(e.target.checked)}
-              className="mt-1 w-5 h-5 rounded border-red-300 text-red-600 focus:ring-red-500" 
+              className="mt-1 w-5 h-5 rounded border-red-300 text-red-600 focus:ring-red-500"
             />
             <span className="text-sm text-red-900 dark:text-red-300 font-medium">
               I confirm that our team will strictly use the official SIH prescribed PPT template. I understand that modifying the template structure or rules will lead to immediate disqualification.
@@ -417,9 +403,8 @@ export default function NavkritiRegistration() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className={`w-full py-4 rounded-xl text-white font-bold text-lg transition-all duration-300 flex items-center justify-center gap-2 ${
-            isSubmitting ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 shadow-lg hover:shadow-xl hover:-translate-y-1'
-          }`}
+          className={`w-full py-4 rounded-xl text-white font-bold text-lg transition-all duration-300 flex items-center justify-center gap-2 ${isSubmitting ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 shadow-lg hover:shadow-xl hover:-translate-y-1'
+            }`}
         >
           {isSubmitting ? (
             <>
