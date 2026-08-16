@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Upload, CheckCircle, AlertCircle, Loader2, Users } from 'lucide-react';
+import { Upload, CheckCircle, AlertCircle, Loader2, Users, Copy } from 'lucide-react';
 
 
 type MemberData = {
@@ -30,6 +30,19 @@ export default function NavkritiRegistration() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successData, setSuccessData] = useState<{ teamId: string, secret: string, message: string } | null>(null);
+  const [copiedId, setCopiedId] = useState(false);
+  const [copiedSecret, setCopiedSecret] = useState(false);
+
+  const handleCopy = (text: string, isId: boolean) => {
+    navigator.clipboard.writeText(text);
+    if (isId) {
+      setCopiedId(true);
+      setTimeout(() => setCopiedId(false), 2000);
+    } else {
+      setCopiedSecret(true);
+      setTimeout(() => setCopiedSecret(false), 2000);
+    }
+  };
 
   const updateMember = (index: number, field: keyof MemberData, value: string) => {
     const newMembers = [...members];
@@ -144,13 +157,27 @@ export default function NavkritiRegistration() {
           Your team <strong>{teamName}</strong> has been registered.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4 mt-4">
-          <div className="bg-white dark:bg-slate-900 border border-green-100 dark:border-green-800/50 p-6 rounded-xl shadow-sm">
+          <div className="bg-white dark:bg-slate-900 border border-green-100 dark:border-green-800/50 p-6 rounded-xl shadow-sm relative group">
             <p className="text-sm text-slate-500 mb-1">Your Official Team ID</p>
             <p className="text-4xl font-extrabold tracking-wider text-slate-900 dark:text-white">{successData.teamId}</p>
+            <button 
+              onClick={() => handleCopy(successData.teamId, true)}
+              className="absolute top-2 right-2 p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              title="Copy Team ID"
+            >
+              {copiedId ? <CheckCircle className="w-5 h-5 text-green-500" /> : <Copy className="w-5 h-5" />}
+            </button>
           </div>
-          <div className="bg-white dark:bg-slate-900 border border-blue-100 dark:border-blue-800/50 p-6 rounded-xl shadow-sm">
+          <div className="bg-white dark:bg-slate-900 border border-blue-100 dark:border-blue-800/50 p-6 rounded-xl shadow-sm relative group">
             <p className="text-sm text-slate-500 mb-1">Submission Secret</p>
             <p className="text-4xl font-extrabold tracking-wider text-blue-600 dark:text-blue-400">{successData.secret}</p>
+            <button 
+              onClick={() => handleCopy(successData.secret, false)}
+              className="absolute top-2 right-2 p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              title="Copy Secret"
+            >
+              {copiedSecret ? <CheckCircle className="w-5 h-5 text-green-500" /> : <Copy className="w-5 h-5" />}
+            </button>
           </div>
         </div>
         <div className="max-w-md mx-auto bg-blue-50 dark:bg-blue-900/10 p-4 rounded-lg mt-6 text-sm text-blue-800 dark:text-blue-300">

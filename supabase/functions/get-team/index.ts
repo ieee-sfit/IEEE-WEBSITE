@@ -31,7 +31,11 @@ async function verifyToken(token: string): Promise<string> {
     throw new Error('Invalid signature');
   }
 
-  const payloadStr = atob(payloadB64.replace(/-/g, '+').replace(/_/g, '/'));
+  let b64 = payloadB64.replace(/-/g, '+').replace(/_/g, '/');
+  while (b64.length % 4 !== 0) {
+    b64 += '=';
+  }
+  const payloadStr = atob(b64);
   const payload = JSON.parse(payloadStr);
 
   if (Date.now() > payload.exp) {

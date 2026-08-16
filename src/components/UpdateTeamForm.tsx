@@ -84,6 +84,18 @@ export default function UpdateTeamForm({ token }: { token: string }) {
     );
   }
 
+  if (members.length !== 6 && !isLoading) {
+    return (
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-sm mb-8 text-center">
+        <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+        <h2 className="text-xl font-bold mb-2">Error Loading Team Details</h2>
+        <p className="text-slate-600 dark:text-slate-400">
+          {error || "We couldn't retrieve your team members. Please try logging in again."}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-sm mb-8">
       <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
