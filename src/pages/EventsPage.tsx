@@ -516,7 +516,7 @@ const EventsPage = () => {
                         <motion.span
                           animate={{ opacity: [0.6, 1, 0.6], scale: [1, 1.05, 1], rotate: [0, 5, -5, 0] }}
                           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                          className="absolute top-2 left-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg select-none"
+                          className="absolute top-2 left-2 z-20 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg select-none"
                         >
                           ✨ Featured
                         </motion.span>
