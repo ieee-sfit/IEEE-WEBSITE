@@ -131,3 +131,70 @@ EXCEPTION WHEN OTHERS THEN
     RAISE;
 END;
 $$;
+
+-- 8. Create RPC for atomic team updates
+CREATE OR REPLACE FUNCTION update_team(
+    p_team_uuid UUID,
+    p_participants JSONB -- Array of participant objects
+) RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+    v_participant JSONB;
+    v_female_count INTEGER := 0;
+    v_participant_count INTEGER := 0;
+BEGIN
+    -- Validate participants count
+    v_participant_count := jsonb_array_length(p_participants);
+    IF v_participant_count != 6 THEN
+        RAISE EXCEPTION 'Team must have exactly 6 participants.';
+    END IF;
+
+    -- Validate female count
+    FOR v_participant IN SELECT * FROM jsonb_array_elements(p_participants)
+    LOOP
+        IF (v_participant->>'gender') = 'Female' THEN
+            v_female_count := v_female_count + 1;
+        END IF;
+    END LOOP;
+
+    IF v_female_count < 1 THEN
+        RAISE EXCEPTION 'Team must have at least one female participant according to SIH rules.';
+    END IF;
+
+    -- Delete old participants (cascade guarantees clean slate for this team)
+    DELETE FROM public.participants WHERE team_id = p_team_uuid;
+
+    -- Insert new participants
+    FOR v_participant IN SELECT * FROM jsonb_array_elements(p_participants)
+    LOOP
+        INSERT INTO public.participants (
+            team_id,
+            is_leader,
+            pid,
+            email,
+            name,
+            phone,
+            gender,
+            branch,
+            year
+        ) VALUES (
+            p_team_uuid,
+            (v_participant->>'is_leader')::BOOLEAN,
+            v_participant->>'pid',
+            v_participant->>'email',
+            v_participant->>'name',
+            v_participant->>'phone',
+            v_participant->>'gender',
+            v_participant->>'branch',
+            v_participant->>'year'
+        );
+    END LOOP;
+
+    RETURN jsonb_build_object('success', true);
+EXCEPTION WHEN OTHERS THEN
+    -- Transaction rolls back on any error (including UNIQUE constraint violations)
+    RAISE;
+END;
+$$;

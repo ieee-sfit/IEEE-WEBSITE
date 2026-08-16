@@ -410,5 +410,22 @@ s3_secret_key = "env(S3_SECRET_KEY)"
 enabled = true
 # Directory under `supabase/` where declarative files are written.
 # declarative_schema_path = "./database"
-# JSON string passed through to pg-delta SQL formatting.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":80,\"commaStyle\":\"trailing\"}"
+
+# These functions use the Navkriti custom HMAC authentication scheme.
+# Supabase JWT verification must remain disabled because the Authorization
+# header contains our custom session token, not a Supabase Auth JWT.
+[functions.login-team]
+verify_jwt = false
+
+[functions.register-team]
+verify_jwt = false
+
+[functions.get-team]
+verify_jwt = false
+
+[functions.update-team]
+verify_jwt = false
+
+[functions.submit-ppt]
+verify_jwt = false

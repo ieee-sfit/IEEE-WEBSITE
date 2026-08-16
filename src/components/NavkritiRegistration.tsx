@@ -32,6 +32,9 @@ export default function NavkritiRegistration() {
   const [successData, setSuccessData] = useState<{ teamId: string, secret: string, message: string } | null>(null);
   const [copiedId, setCopiedId] = useState(false);
   const [copiedSecret, setCopiedSecret] = useState(false);
+  
+  // Generate request ID once when form mounts for idempotency across retries
+  const [registrationRequestId] = useState(() => crypto.randomUUID());
 
   const handleCopy = (text: string, isId: boolean) => {
     navigator.clipboard.writeText(text);
@@ -100,7 +103,7 @@ export default function NavkritiRegistration() {
     try {
       // 1. Prepare FormData for Edge Function
       const formData = new FormData();
-      formData.append('registration_request_id', crypto.randomUUID());
+      formData.append('registration_request_id', registrationRequestId);
       formData.append('team_name', teamName);
       formData.append('payment_receipt', paymentFile);
       formData.append('participants', JSON.stringify(members));

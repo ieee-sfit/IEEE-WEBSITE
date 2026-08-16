@@ -148,14 +148,14 @@ serve(async (req) => {
     // 4. Generate Deterministic Secret
     const secret = await generateTeamSecret(actual_team_uuid);
 
-    // 5. Fire Mail Dispatcher asynchronously (Don't await it, or await it but catch errors)
+    // 5. Fire Mail Dispatcher asynchronously using EdgeRuntime.waitUntil
     if (!data.is_duplicate) {
-      try {
-        const mailDispatcherUrl = Deno.env.get('MAIL_DISPATCHER_URL');
-        const mailDispatcherKey = Deno.env.get('MAIL_DISPATCHER_KEY');
-        if (mailDispatcherUrl && mailDispatcherKey) {
-            // Non-blocking fetch so user doesn't wait
-            fetch(mailDispatcherUrl, {
+      const mailDispatcherUrl = Deno.env.get('MAIL_DISPATCHER_URL');
+      const mailDispatcherKey = Deno.env.get('MAIL_DISPATCHER_KEY');
+      if (mailDispatcherUrl && mailDispatcherKey) {
+          const dispatchEmail = async () => {
+            try {
+              const response = await fetch(mailDispatcherUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -165,12 +165,25 @@ serve(async (req) => {
                     teamId: actual_team_id,
                     teamName: team_name,
                     secret: secret,
-                    leader: participantsData[0]
+                    participants: participantsData
                 })
-            }).catch(e => console.error('Mail dispatcher fetch error:', e));
-        }
-      } catch (err) {
-        console.error('Error triggering mail dispatcher', err);
+              });
+              if (!response.ok) {
+                console.error('Mail dispatcher returned:', response.status);
+              }
+            } catch (error) {
+              console.error('Mail dispatcher failed:', error);
+            }
+          };
+          
+          // @ts-ignore
+          if (typeof EdgeRuntime !== 'undefined' && EdgeRuntime.waitUntil) {
+            // @ts-ignore
+            EdgeRuntime.waitUntil(dispatchEmail());
+          } else {
+            // Fallback for local testing or non-Edge environments
+            dispatchEmail();
+          }
       }
     }
 

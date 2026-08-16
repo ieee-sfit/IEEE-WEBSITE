@@ -104,27 +104,24 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Delete existing participants
-    const { error: deleteError } = await supabaseClient
-      .from('participants')
-      .delete()
-      .eq('team_id', teamUuid);
+    // Use the transactional RPC to safely update participants
+    const { data: rpcData, error: rpcError } = await supabaseClient.rpc('update_team', {
+      p_team_uuid: teamUuid,
+      p_participants: participants
+    });
 
-    if (deleteError) {
-      throw new Error('Failed to update participants: ' + deleteError.message);
+    if (rpcError) {
+      console.error('RPC Error:', rpcError);
+      return new Response(JSON.stringify({ error: rpcError.message || 'Failed to update team participants' }), {
+        status: 400,
+        headers,
+      });
     }
 
-    // Insert new participants
-    const { error: insertError } = await supabaseClient
-      .from('participants')
-      .insert(participants);
-
-    if (insertError) {
-      throw new Error('Failed to insert updated participants: ' + insertError.message);
-    }
-
-    headers.set('Content-Type', 'application/json');
-    return new Response(JSON.stringify({ success: true, message: 'Team details updated successfully' }), { headers, status: 200 });
+    return new Response(JSON.stringify({ message: 'Team details updated successfully' }), {
+      headers,
+      status: 200,
+    });
   } catch (error: any) {
     const origin = req.headers.get('Origin');
     const errHeaders = new Headers(corsHeaders);
