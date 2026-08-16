@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Upload, CheckCircle, AlertCircle, Loader2, Users, Copy } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
+import { navkritiConfig } from '../config/navkritiConfig';
 
 type MemberData = {
   name: string;
@@ -175,6 +176,34 @@ export default function NavkritiRegistration() {
             You will need both your Team ID and Secret to upload your PPT on August 25th. Do not share it outside your team.
           </p>
         </div>
+      </div>
+    );
+  }
+
+  const now = Date.now();
+  const isBeforeOpen = now < new Date(navkritiConfig.registration.opens).getTime();
+  const isAfterClose = now > new Date(navkritiConfig.registration.closes).getTime();
+
+  if (isBeforeOpen) {
+    return (
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-10 text-center shadow-xl relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-600 to-purple-600"></div>
+        <h2 className="text-3xl font-bold mb-4 mt-4">Registrations Not Yet Open</h2>
+        <p className="text-slate-600 dark:text-slate-400">
+          Registrations for Navkriti {navkritiConfig.edition} will open on {new Date(navkritiConfig.registration.opens).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}.
+        </p>
+      </div>
+    );
+  }
+
+  if (isAfterClose) {
+    return (
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-10 text-center shadow-xl relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-600 to-purple-600"></div>
+        <h2 className="text-3xl font-bold mb-4 mt-4">Registrations Closed</h2>
+        <p className="text-slate-600 dark:text-slate-400">
+          Registrations for Navkriti {navkritiConfig.edition} have officially closed. Thank you for your interest!
+        </p>
       </div>
     );
   }

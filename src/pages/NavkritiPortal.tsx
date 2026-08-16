@@ -3,6 +3,8 @@ import { Upload, LogOut, CheckCircle, AlertCircle, FileText, Lock, Layout } from
 
 import { supabase } from '../lib/supabaseClient';
 import UpdateTeamForm from '../components/UpdateTeamForm';
+import { navkritiConfig } from '../config/navkritiConfig';
+
 export default function NavkritiPortal() {
   const [session, setSession] = useState<{ teamId: string, token: string } | null>(null);
   const [teamIdInput, setTeamIdInput] = useState('');
@@ -20,6 +22,10 @@ export default function NavkritiPortal() {
   const [solutionTitle, setSolutionTitle] = useState('');
   const [summary, setSummary] = useState('');
   const [pptFile, setPptFile] = useState<File | null>(null);
+
+  const now = Date.now();
+  const isSubmissionBeforeOpen = now < new Date(navkritiConfig.submission.opens).getTime();
+  const isSubmissionAfterClose = now > new Date(navkritiConfig.submission.closes).getTime();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -180,19 +186,35 @@ export default function NavkritiPortal() {
 
         <UpdateTeamForm token={session.token} />
 
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-sm">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-sm mt-8">
           <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
             <Layout className="w-6 h-6 text-blue-500" /> Project Submission
           </h2>
           
-          <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/50 rounded-xl p-6 mb-8 text-sm text-blue-800 dark:text-blue-300">
-            <ul className="list-disc pl-5 space-y-1">
-              <li>Upload only the <strong>official SIH PPT template</strong> in <strong>.pptx</strong> or <strong>.pdf</strong> format (Max 10MB).</li>
-              <li>You can re-upload to overwrite your previous submission until the deadline.</li>
-            </ul>
-          </div>
+          {isSubmissionBeforeOpen ? (
+            <div className="text-center py-10 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
+              <h3 className="text-xl font-bold mb-2">Submissions Not Yet Open</h3>
+              <p className="text-slate-600 dark:text-slate-400">
+                The submission portal will open on {new Date(navkritiConfig.submission.opens).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}.
+              </p>
+            </div>
+          ) : isSubmissionAfterClose ? (
+            <div className="text-center py-10 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
+              <h3 className="text-xl font-bold mb-2">Submissions Closed</h3>
+              <p className="text-slate-600 dark:text-slate-400">
+                The deadline for project submissions has passed.
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/50 rounded-xl p-6 mb-8 text-sm text-blue-800 dark:text-blue-300">
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Upload only the <strong>official SIH PPT template</strong> in <strong>.pptx</strong> or <strong>.pdf</strong> format (Max 10MB).</li>
+                  <li>You can re-upload to overwrite your previous submission until the deadline.</li>
+                </ul>
+              </div>
 
-          {error && (
+              {error && (
             <div className="mb-6 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded-r flex items-start gap-3 text-sm">
               <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 shrink-0" />
               <span className="text-red-800 dark:text-red-300">{error}</span>
@@ -309,6 +331,8 @@ export default function NavkritiPortal() {
               {isUploading ? 'Submitting...' : 'Submit Project'}
             </button>
           </form>
+          </>
+          )}
         </div>
       </div>
     </div>
