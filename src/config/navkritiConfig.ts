@@ -32,7 +32,7 @@ export const navkritiConfig = {
       { name: 'Zion Naranje', phone: '8356818735' },
       { name: 'Rich Rebello', phone: '8828242446' },
     ],
-    email: 'ieeesfit@sfit.ac.in', // Placeholder
-    whatsappGroupLink: 'https://chat.whatsapp.com/placeholder-link'
+    email: '', // TODO: Add official email
+    whatsappGroupLink: '' // TODO: Add official WhatsApp group link
   }
 };

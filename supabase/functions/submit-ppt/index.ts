@@ -61,7 +61,15 @@ serve(async (req) => {
   }
 
   try {
-    // 1. Enforce Submission Deadline
+    // 1. Enforce Submission Timeline
+    const openDateStr = Deno.env.get('NAVKRITI_SUBMISSION_OPEN');
+    if (openDateStr) {
+        const openDate = new Date(openDateStr).getTime();
+        if (Date.now() < openDate) {
+            throw new Error('Submissions are not open yet.');
+        }
+    }
+
     const closeDateStr = Deno.env.get('NAVKRITI_SUBMISSION_CLOSE');
     if (closeDateStr) {
         const closeDate = new Date(closeDateStr).getTime();
