@@ -29,7 +29,7 @@ export default function NavkritiRegistration() {
   const [agreedToRules, setAgreedToRules] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [successData, setSuccessData] = useState<{ teamId: string, secret: string } | null>(null);
+  const [successData, setSuccessData] = useState<{ teamId: string, secret: string, message: string } | null>(null);
 
   const updateMember = (index: number, field: keyof MemberData, value: string) => {
     const newMembers = [...members];
@@ -106,7 +106,11 @@ export default function NavkritiRegistration() {
       }
       
       // Success
-      setSuccessData({ teamId: functionData.team_id, secret: functionData.secret });
+      setSuccessData({ 
+        teamId: functionData.team_id, 
+        secret: functionData.secret, 
+        message: functionData.message || 'Registration Successful!'
+      });
       
     } catch (err: any) {
       setError(err.message || 'An unexpected error occurred during registration.');
@@ -121,7 +125,7 @@ export default function NavkritiRegistration() {
         <div className="w-20 h-20 bg-green-100 dark:bg-green-800 rounded-full flex items-center justify-center mx-auto">
           <CheckCircle className="w-10 h-10 text-green-600 dark:text-green-400" />
         </div>
-        <h2 className="text-3xl font-bold text-green-800 dark:text-green-400">Registration Successful!</h2>
+        <h2 className="text-3xl font-bold text-green-800 dark:text-green-400">{successData.message}</h2>
         <p className="text-lg text-green-700 dark:text-green-300">
           Your team <strong>{teamName}</strong> has been registered.
         </p>

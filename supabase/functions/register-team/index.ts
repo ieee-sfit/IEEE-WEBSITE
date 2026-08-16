@@ -7,13 +7,45 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+async function generateTeamSecret(teamUuid: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const keyString = Deno.env.get('NAVKRITI_HMAC_SECRET');
+  if (!keyString) throw new Error('NAVKRITI_HMAC_SECRET not set');
+  
+  const keyData = encoder.encode(keyString);
+  const cryptoKey = await crypto.subtle.importKey(
+      'raw', keyData, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+  );
+  
+  const data = encoder.encode(teamUuid);
+  const signature = await crypto.subtle.sign('HMAC', cryptoKey, data);
+  
+  const hashArray = Array.from(new Uint8Array(signature));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  
+  // Return a 16-character string (64 bits of entropy from the hash)
+  return hashHex.substring(0, 16).toUpperCase();
+}
+
+function normalizeString(str: any): string {
+    return typeof str === 'string' ? str.trim() : '';
+}
+
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
+    // Enforce Registration Deadline
+    const closeDateStr = Deno.env.get('NAVKRITI_REGISTRATION_CLOSE');
+    if (closeDateStr) {
+        const closeDate = new Date(closeDateStr).getTime();
+        if (Date.now() > closeDate) {
+            throw new Error('Registration is officially closed.');
+        }
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -21,42 +53,68 @@ serve(async (req) => {
 
     const formData = await req.formData();
     const registration_request_id = formData.get('registration_request_id');
-    const team_name = formData.get('team_name');
+    const raw_team_name = formData.get('team_name');
     const payment_receipt = formData.get('payment_receipt');
     const participantsDataRaw = formData.get('participants');
 
-    if (!registration_request_id || !team_name || !payment_receipt || !participantsDataRaw) {
+    if (!registration_request_id || !raw_team_name || !payment_receipt || !participantsDataRaw) {
       throw new Error('Missing required fields');
     }
 
-    const participantsData = JSON.parse(participantsDataRaw.toString());
+    const team_name = normalizeString(raw_team_name);
+    let participantsData = JSON.parse(participantsDataRaw.toString());
     
-    // Server-side validation
     if (participantsData.length !== 6) {
       throw new Error('Team must have exactly 6 members');
     }
+
+    // Normalize participant data
+    participantsData = participantsData.map((m: any, idx: number) => {
+        const email = normalizeString(m.email).toLowerCase();
+        // Basic validations
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error(`Invalid email for participant ${idx + 1}`);
+        if (!/^\d{10}$/.test(normalizeString(m.phone))) throw new Error(`Phone number must be exactly 10 digits for participant ${idx + 1}`);
+
+        return {
+            is_leader: idx === 0,
+            pid: normalizeString(m.pid),
+            email: email,
+            name: normalizeString(m.name),
+            phone: normalizeString(m.phone),
+            gender: normalizeString(m.gender),
+            branch: normalizeString(m.branch),
+            year: normalizeString(m.year)
+        };
+    });
 
     const femaleCount = participantsData.filter((m: any) => m.gender === 'Female').length;
     if (femaleCount < 1) {
       throw new Error('Team must have at least one female participant according to SIH rules.');
     }
 
-    // Process file
     if (!(payment_receipt instanceof File)) {
       throw new Error('payment_receipt must be a file');
     }
     
+    // Strict MIME type checking
+    const validTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+    if (!validTypes.includes(payment_receipt.type)) {
+      throw new Error('Invalid payment receipt format. Please upload a JPG, PNG, or PDF.');
+    }
+
     if (payment_receipt.size > 5 * 1024 * 1024) {
       throw new Error('File size exceeds 5MB limit');
     }
 
-    // 1. Generate Secret and Team ID server-side
-    const secret = Math.random().toString(36).substring(2, 8).toUpperCase();
-    const team_id = `NAV-${Math.floor(1000 + Math.random() * 9000)}`;
+    // 1. Generate secure random Team ID
+    const randomBytes = new Uint8Array(3); // 6 hex chars
+    crypto.getRandomValues(randomBytes);
+    const teamIdHex = Array.from(randomBytes).map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+    const p_team_id = `NAV-${teamIdHex}`;
 
     // 2. Upload file to Supabase Storage
     const fileExt = payment_receipt.name.split('.').pop();
-    const fileName = `${Date.now()}_${team_name.toString().replace(/\s+/g, '_')}.${fileExt}`;
+    const fileName = `${Date.now()}_${team_name.replace(/[^a-zA-Z0-9]/g, '_')}.${fileExt}`;
     
     const { error: uploadError } = await supabaseClient.storage
       .from('payment_receipts')
@@ -71,43 +129,58 @@ serve(async (req) => {
     // 3. Call the RPC function using the Service Role key
     const { data, error } = await supabaseClient.rpc('register_team', {
       p_registration_request_id: registration_request_id,
-      p_team_id: team_id,
+      p_team_id: p_team_id,
       p_team_name: team_name,
-      p_submission_secret_hash: secret, // Store raw for now
       p_payment_receipt_path: payment_receipt_path,
-      p_participants: participantsData.map((m: any, idx: number) => ({
-        is_leader: idx === 0,
-        pid: m.pid,
-        email: m.email,
-        name: m.name,
-        phone: m.phone,
-        gender: m.gender,
-        branch: m.branch,
-        year: m.year
-      })),
+      p_participants: participantsData,
     });
 
     if (error) {
       console.error('RPC Error:', error);
-      // Clean up the uploaded file if DB insert fails
       await supabaseClient.storage.from('payment_receipts').remove([payment_receipt_path]);
-
-      if (error.code === '23505') { // Postgres unique_violation
-          if (error.message.includes('teams_registration_request_id_key')) {
-              return new Response(
-                JSON.stringify({ success: true, message: 'Already registered (Idempotent success)', team_id, secret }),
-                { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
-              );
-          }
-      }
-      throw error;
+      throw new Error(error.message);
     }
 
-    // 4. Dispatch Email (Placeholder)
-    // await fetch('https://api.resend.com/emails', ...)
+    // data contains { success: true, team_uuid, team_id, is_duplicate }
+    const actual_team_uuid = data.team_uuid;
+    const actual_team_id = data.team_id;
+
+    // 4. Generate Deterministic Secret
+    const secret = await generateTeamSecret(actual_team_uuid);
+
+    // 5. Fire Mail Dispatcher asynchronously (Don't await it, or await it but catch errors)
+    if (!data.is_duplicate) {
+      try {
+        const mailDispatcherUrl = Deno.env.get('MAIL_DISPATCHER_URL');
+        const mailDispatcherKey = Deno.env.get('MAIL_DISPATCHER_KEY');
+        if (mailDispatcherUrl && mailDispatcherKey) {
+            // Non-blocking fetch so user doesn't wait
+            fetch(mailDispatcherUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    dispatcherSecret: mailDispatcherKey,
+                    teamId: actual_team_id,
+                    teamName: team_name,
+                    secret: secret,
+                    leader: participantsData[0]
+                })
+            }).catch(e => console.error('Mail dispatcher fetch error:', e));
+        }
+      } catch (err) {
+        console.error('Error triggering mail dispatcher', err);
+      }
+    }
 
     return new Response(
-      JSON.stringify({ success: true, team_id, secret }),
+      JSON.stringify({ 
+        success: true, 
+        team_id: actual_team_id, 
+        secret: secret,
+        message: data.is_duplicate ? 'Already registered (Idempotent success)' : 'Registration successful'
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     );
   } catch (error: any) {

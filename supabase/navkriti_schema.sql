@@ -6,7 +6,7 @@ CREATE TABLE public.teams (
     registration_request_id UUID UNIQUE NOT NULL, -- Idempotency key from Edge Function
     team_id VARCHAR NOT NULL UNIQUE,
     team_name VARCHAR NOT NULL UNIQUE,
-    submission_secret_hash VARCHAR NOT NULL,
+    event_id VARCHAR DEFAULT 'NAVKRITI_26',
     payment_receipt_path VARCHAR NOT NULL,
     status VARCHAR DEFAULT 'REGISTERED',
     submission_file_path VARCHAR,
@@ -33,18 +33,21 @@ CREATE TABLE public.participants (
 CREATE TABLE public.submissions (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     team_id UUID NOT NULL UNIQUE REFERENCES public.teams(id) ON DELETE CASCADE,
+    problem_statement VARCHAR,
+    domain VARCHAR,
+    solution_title VARCHAR,
+    summary TEXT,
     ppt_file_path VARCHAR NOT NULL,
     status VARCHAR DEFAULT 'SUBMITTED',
     submitted_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 4. Create Storage Buckets
--- Note: You should do this via the Supabase Dashboard UI -> Storage -> New Bucket
--- Name 1: 'payment_receipts' (Public)
--- Name 2: 'sih_presentations' (Private)
+-- 4. Create Storage Buckets (if running locally or as a migration)
+INSERT INTO storage.buckets (id, name, public) VALUES ('payment_receipts', 'payment_receipts', false) ON CONFLICT (id) DO UPDATE SET public = false;
+INSERT INTO storage.buckets (id, name, public) VALUES ('sih_presentations', 'sih_presentations', false) ON CONFLICT (id) DO UPDATE SET public = false;
 
--- 4. Set up Row Level Security (RLS) for the database tables
+-- 5. Set up Row Level Security (RLS) for the database tables
 -- We deny all access to `anon` by default. 
 -- Only the `service_role` (used by Edge Functions) will have access, which bypasses RLS.
 ALTER TABLE public.teams ENABLE ROW LEVEL SECURITY;
@@ -62,7 +65,6 @@ CREATE OR REPLACE FUNCTION register_team(
     p_registration_request_id UUID,
     p_team_id VARCHAR,
     p_team_name VARCHAR,
-    p_submission_secret_hash VARCHAR,
     p_payment_receipt_path VARCHAR,
     p_participants JSONB -- Array of participant objects
 ) RETURNS JSONB
@@ -71,20 +73,29 @@ SECURITY DEFINER
 AS $$
 DECLARE
     v_team_uuid UUID;
+    v_existing_team_id VARCHAR;
     v_participant JSONB;
 BEGIN
+    -- Idempotency check: see if registration_request_id already exists
+    SELECT id, team_id INTO v_team_uuid, v_existing_team_id
+    FROM public.teams
+    WHERE registration_request_id = p_registration_request_id;
+    
+    IF v_team_uuid IS NOT NULL THEN
+        -- Already registered, return success with existing IDs
+        RETURN jsonb_build_object('success', true, 'team_uuid', v_team_uuid, 'team_id', v_existing_team_id, 'is_duplicate', true);
+    END IF;
+
     -- Insert Team
     INSERT INTO public.teams (
         registration_request_id,
         team_id,
         team_name,
-        submission_secret_hash,
         payment_receipt_path
     ) VALUES (
         p_registration_request_id,
         p_team_id,
         p_team_name,
-        p_submission_secret_hash,
         p_payment_receipt_path
     ) RETURNING id INTO v_team_uuid;
 
@@ -114,10 +125,9 @@ BEGIN
         );
     END LOOP;
 
-    RETURN jsonb_build_object('success', true, 'team_uuid', v_team_uuid);
+    RETURN jsonb_build_object('success', true, 'team_uuid', v_team_uuid, 'team_id', p_team_id, 'is_duplicate', false);
 EXCEPTION WHEN OTHERS THEN
     -- If any error occurs, the transaction will automatically be rolled back
-    -- We raise the error to be caught by the Edge Function
     RAISE;
 END;
 $$;

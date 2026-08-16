@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Upload, LogOut, CheckCircle, AlertCircle, FileText, Lock } from 'lucide-react';
+import { Upload, LogOut, CheckCircle, AlertCircle, FileText, Lock, Layout } from 'lucide-react';
+
 import { supabase } from '../lib/supabaseClient';
 
 export default function NavkritiPortal() {
-  // Runtime memory only authentication
-  const [session, setSession] = useState<{ teamId: string, secret: string } | null>(null);
+  const [session, setSession] = useState<{ teamId: string, token: string } | null>(null);
   const [teamIdInput, setTeamIdInput] = useState('');
   const [secretInput, setSecretInput] = useState('');
   
@@ -12,8 +12,14 @@ export default function NavkritiPortal() {
   const [error, setError] = useState<string | null>(null);
   
   const [isUploading, setIsUploading] = useState(false);
-  const [pptFile, setPptFile] = useState<File | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  
+  // New Submission Fields
+  const [domain, setDomain] = useState('');
+  const [problemStatement, setProblemStatement] = useState('');
+  const [solutionTitle, setSolutionTitle] = useState('');
+  const [summary, setSummary] = useState('');
+  const [pptFile, setPptFile] = useState<File | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,20 +27,15 @@ export default function NavkritiPortal() {
     setIsLoggingIn(true);
     
     try {
-      // In a real secure app, this goes to an Edge Function /login
-      // which checks against bcrypt hash and issues HttpOnly cookie.
-      // Since we don't have custom auth fully wired, we'll verify via a direct edge function call.
-      
-      const { data, error } = await supabase.functions.invoke('login-team', {
+      const { data, error: functionError } = await supabase.functions.invoke('login-team', {
         body: { team_id: teamIdInput, secret: secretInput }
       });
       
-      if (error) throw new Error(error.message);
+      if (functionError) throw new Error(functionError.message);
       if (data?.error) throw new Error(data.error);
       
-      // Store credentials strictly in runtime memory React State
-      setSession({ teamId: teamIdInput, secret: secretInput });
-      
+      // Store session state with secure token
+      setSession({ teamId: teamIdInput, token: data.token });
     } catch (err: any) {
       setError(err.message || 'Invalid Team ID or Secret');
     } finally {
@@ -46,18 +47,24 @@ export default function NavkritiPortal() {
     setSession(null);
     setTeamIdInput('');
     setSecretInput('');
+    setUploadSuccess(false);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      if (!file.name.endsWith('.pptx')) {
-        setError('Only .pptx files are allowed.');
+      const validTypes = [
+          'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+          'application/vnd.ms-powerpoint',
+          'application/pdf'
+      ];
+      if (!validTypes.includes(file.type) && !file.name.match(/\.(ppt|pptx|pdf)$/)) {
+        setError('Only .ppt, .pptx, or .pdf files are allowed.');
         setPptFile(null);
         return;
       }
-      if (file.size > 15 * 1024 * 1024) {
-        setError('File size must be less than 15MB');
+      if (file.size > 10 * 1024 * 1024) {
+        setError('File size must be less than 10MB');
         setPptFile(null);
         return;
       }
@@ -67,22 +74,28 @@ export default function NavkritiPortal() {
     }
   };
 
-  const handleUpload = async () => {
+  const handleUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!pptFile || !session) return;
     setError(null);
     setIsUploading(true);
 
     try {
       const formData = new FormData();
-      formData.append('team_id', session.teamId);
-      formData.append('secret', session.secret);
+      formData.append('domain', domain);
+      formData.append('problem_statement', problemStatement);
+      formData.append('solution_title', solutionTitle);
+      formData.append('summary', summary);
       formData.append('ppt_file', pptFile);
       
-      const { data, error } = await supabase.functions.invoke('submit-ppt', {
+      const { data, error: functionError } = await supabase.functions.invoke('submit-ppt', {
         body: formData,
+        headers: {
+            Authorization: `Bearer ${session.token}`
+        }
       });
 
-      if (error) throw new Error(error.message);
+      if (functionError) throw new Error(functionError.message);
       if (data?.error) throw new Error(data.error);
 
       setUploadSuccess(true);
@@ -121,7 +134,7 @@ export default function NavkritiPortal() {
                 required
                 value={teamIdInput}
                 onChange={(e) => setTeamIdInput(e.target.value)}
-                placeholder="e.g. NAV-1234"
+                placeholder="e.g. NAV-123456"
                 className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none uppercase"
               />
             </div>
@@ -132,7 +145,7 @@ export default function NavkritiPortal() {
                 required
                 value={secretInput}
                 onChange={(e) => setSecretInput(e.target.value)}
-                placeholder="Enter your 6-character secret"
+                placeholder="Enter your secret"
                 className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
               />
             </div>
@@ -167,13 +180,12 @@ export default function NavkritiPortal() {
 
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-sm">
           <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-            <FileText className="w-6 h-6 text-blue-500" /> Idea PPT Submission
+            <Layout className="w-6 h-6 text-blue-500" /> Project Submission
           </h2>
           
           <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/50 rounded-xl p-6 mb-8 text-sm text-blue-800 dark:text-blue-300">
             <ul className="list-disc pl-5 space-y-1">
-              <li>Upload only the <strong>official SIH PPT template</strong> in <strong>.pptx</strong> format.</li>
-              <li>Maximum file size is <strong>15MB</strong>.</li>
+              <li>Upload only the <strong>official SIH PPT template</strong> in <strong>.pptx</strong> or <strong>.pdf</strong> format (Max 10MB).</li>
               <li>You can re-upload to overwrite your previous submission until the deadline.</li>
             </ul>
           </div>
@@ -188,44 +200,113 @@ export default function NavkritiPortal() {
           {uploadSuccess && (
             <div className="mb-6 bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 p-4 rounded-r flex items-start gap-3 text-sm">
               <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
-              <span className="text-green-800 dark:text-green-300">PPT uploaded successfully! Your submission is recorded.</span>
+              <span className="text-green-800 dark:text-green-300">Project details and presentation uploaded successfully!</span>
             </div>
           )}
 
-          <div className="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-10 text-center hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-            <Upload className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Upload Presentation</h3>
-            <p className="text-sm text-slate-500 mb-6">Drag and drop your .pptx file here, or click to browse</p>
-            
-            <input 
-              type="file" 
-              id="ppt-upload" 
-              className="hidden" 
-              accept=".pptx" 
-              onChange={handleFileChange}
-            />
-            <label 
-              htmlFor="ppt-upload"
-              className="cursor-pointer inline-flex items-center justify-center px-6 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-semibold hover:scale-105 transition-transform"
-            >
-              Select File
-            </label>
-
-            {pptFile && (
-              <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700 flex flex-col items-center">
-                <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
-                  <FileText className="w-4 h-4" /> {pptFile.name} ({(pptFile.size / 1024 / 1024).toFixed(2)} MB)
-                </p>
-                <button
-                  onClick={handleUpload}
-                  disabled={isUploading}
-                  className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all disabled:opacity-50"
+          <form onSubmit={handleUpload} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-semibold mb-2">Project Domain</label>
+                <select
+                  required
+                  value={domain}
+                  onChange={(e) => setDomain(e.target.value)}
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none"
                 >
-                  {isUploading ? 'Uploading...' : 'Submit Presentation'}
-                </button>
+                  <option value="">Select Domain</option>
+                  <option value="Smart Automation">Smart Automation</option>
+                  <option value="Fitness & Sports">Fitness & Sports</option>
+                  <option value="Heritage & Culture">Heritage & Culture</option>
+                  <option value="MedTech / BioTech / HealthTech">MedTech / BioTech / HealthTech</option>
+                  <option value="Agriculture, FoodTech & Rural Development">Agriculture, FoodTech & Rural Development</option>
+                  <option value="Smart Vehicles">Smart Vehicles</option>
+                  <option value="Transportation & Logistics">Transportation & Logistics</option>
+                  <option value="Robotics and Drones">Robotics and Drones</option>
+                  <option value="Clean & Green Technology">Clean & Green Technology</option>
+                  <option value="Tourism">Tourism</option>
+                  <option value="Renewable / Sustainable Energy">Renewable / Sustainable Energy</option>
+                  <option value="Blockchain & Cybersecurity">Blockchain & Cybersecurity</option>
+                  <option value="Smart Education">Smart Education</option>
+                  <option value="Disaster Management">Disaster Management</option>
+                  <option value="Toys and Games">Toys and Games</option>
+                  <option value="Space Technology">Space Technology</option>
+                  <option value="Miscellaneous">Miscellaneous</option>
+                </select>
               </div>
-            )}
-          </div>
+              <div>
+                <label className="block text-sm font-semibold mb-2">Problem Statement</label>
+                <input
+                  type="text"
+                  required
+                  value={problemStatement}
+                  onChange={(e) => setProblemStatement(e.target.value)}
+                  placeholder="e.g., SIH1234 or Custom Problem"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold mb-2">Solution Title</label>
+              <input
+                type="text"
+                required
+                value={solutionTitle}
+                onChange={(e) => setSolutionTitle(e.target.value)}
+                placeholder="Enter a descriptive title for your solution"
+                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold mb-2">Executive Summary</label>
+              <textarea
+                required
+                rows={4}
+                value={summary}
+                onChange={(e) => setSummary(e.target.value)}
+                placeholder="Briefly describe your solution approach..."
+                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none resize-none"
+              />
+            </div>
+
+            <div className="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-10 text-center hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+              <Upload className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Upload Presentation</h3>
+              <p className="text-sm text-slate-500 mb-6">Drag and drop your file here, or click to browse</p>
+              
+              <input 
+                type="file" 
+                id="ppt-upload" 
+                className="hidden" 
+                accept=".ppt,.pptx,.pdf" 
+                onChange={handleFileChange}
+              />
+              <label 
+                htmlFor="ppt-upload"
+                className="cursor-pointer inline-flex items-center justify-center px-6 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-semibold hover:scale-105 transition-transform"
+              >
+                {pptFile ? 'Change File' : 'Select File'}
+              </label>
+
+              {pptFile && (
+                <div className="mt-4 flex flex-col items-center">
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                    <FileText className="w-4 h-4" /> {pptFile.name} ({(pptFile.size / 1024 / 1024).toFixed(2)} MB)
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={isUploading || !pptFile}
+              className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all disabled:opacity-50"
+            >
+              {isUploading ? 'Submitting...' : 'Submit Project'}
+            </button>
+          </form>
         </div>
       </div>
     </div>
