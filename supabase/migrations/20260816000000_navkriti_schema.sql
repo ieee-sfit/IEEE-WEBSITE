@@ -51,13 +51,7 @@ ALTER TABLE public.teams ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.participants ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.submissions ENABLE ROW LEVEL SECURITY;
 
--- 6. Grant Permissions to Service Role
--- This ensures the Edge Functions (using service_role key) can read/write data
-GRANT ALL ON TABLE public.teams TO service_role;
-GRANT ALL ON TABLE public.participants TO service_role;
-GRANT ALL ON TABLE public.submissions TO service_role;
-
--- 7. Create RPC for atomic team registration
+-- 6. Create RPC for atomic team registration
 CREATE OR REPLACE FUNCTION register_team(
     p_registration_request_id UUID,
     p_team_id VARCHAR,

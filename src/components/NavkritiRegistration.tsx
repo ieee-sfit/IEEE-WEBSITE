@@ -358,6 +358,13 @@ export default function NavkritiRegistration() {
           By submitting this form, you consent to the collection and processing of your team's details for the purpose of the Smart India Hackathon. Your data will be stored securely and will not be shared with third parties.
         </p>
 
+        {error && (
+          <div className="bg-red-50 dark:bg-red-900/10 border-l-4 border-red-500 p-4 rounded-r-lg flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+            <p className="text-red-800 dark:text-red-300 font-medium">{error}</p>
+          </div>
+        )}
+
         {/* Submit Button */}
         <button
           type="submit"

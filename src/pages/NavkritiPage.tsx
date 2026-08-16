@@ -3,6 +3,7 @@ import {
   Calendar, Users, Trophy, ChevronRight, FileText,
   Info, AlertCircle, Lightbulb, Phone, CheckCircle2, XCircle, MessageCircle
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import NavkritiRegistration from '../components/NavkritiRegistration';
 import Footer from '../components/Footer';
 import { navkritiConfig } from '../config/navkritiConfig';
@@ -62,6 +63,12 @@ const NavkritiPage = () => {
             >
               Event Details
             </button>
+            <Link
+              to="/navkriti/portal"
+              className="px-8 py-4 rounded-xl font-bold transition-all duration-300 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-purple-400 hover:text-purple-600 flex items-center gap-2"
+            >
+              Portal Login
+            </Link>
           </div>
         </div>
 
