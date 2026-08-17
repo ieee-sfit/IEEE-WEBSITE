@@ -111,7 +111,7 @@ const NavkritiPage = () => {
                 </p>
                 <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
                   <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" /><span>Exactly <strong className="text-slate-900 dark:text-white">6 members</strong> per team — no more, no less</span></li>
-                  <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" /><span>At least <strong className="text-slate-900 dark:text-white">1 female member</strong> is compulsory (SIH rule)</span></li>
+                  <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" /><span>At least <strong className="text-slate-900 dark:text-white">1 female member</strong> is compulsory (SIH 2026 rule)</span></li>
                   <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" /><span>All members must be active enrolled students of SFIT</span></li>
                   <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" /><span>Cross-branch and cross-year teams are permitted</span></li>
                 </ul>
@@ -195,7 +195,7 @@ const NavkritiPage = () => {
                 {[
                   { step: '01', title: 'Register', desc: `Fill the team registration form on the RAW or IEEExWIE SFIT website. Pay the ₹${navkritiConfig.rules.fee} team fee to confirm your slot.` },
                   { step: '02', title: 'Choose a Problem', desc: `On ${navkritiConfig.problemStatements.displayDate}, problem statements are released across a few domains. Pick a domain that fits your team's strengths.` },
-                  { step: '03', title: 'Submit Your Idea PPT', desc: `Use the official SIH Idea Presentation Template — no edits to the format. Submit your deck on or before ${navkritiConfig.submission.displayDeadline}.` },
+                  { step: '03', title: 'Submit Your Idea PPT', desc: `Use the official SIH 2026 Idea Presentation Template — no edits to the format. Submit your deck on or before ${navkritiConfig.submission.displayDeadline}.` },
                   { step: '04', title: 'Pitch to Judges', desc: `Present live on ${navkritiConfig.pitch.displayDate}. Top qualifying teams will represent SFIT at Smart India Hackathon ${navkritiConfig.edition}.` },
                 ].map((s) => (
                   <div key={s.step} className="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-100 dark:border-slate-700">
@@ -251,19 +251,19 @@ const NavkritiPage = () => {
               </div>
             </div>
 
-            {/* === Strict SIH Guidelines === */}
+            {/* === Strict SIH 2026 Guidelines === */}
             <div className="bg-red-50 dark:bg-red-900/10 border-l-4 border-red-500 p-6 rounded-r-xl">
               <h2 className="text-lg font-bold text-red-800 dark:text-red-400 flex items-center gap-2 mb-3">
-                <AlertCircle className="w-5 h-5" /> Strict SIH Guidelines
+                <AlertCircle className="w-5 h-5" /> Strict SIH 2026 Guidelines
               </h2>
               <p className="text-red-700 dark:text-red-300 text-sm mb-3 leading-relaxed">
                 NAVKRITI '26 strictly follows SIH 2026 guidelines. Violations result in immediate disqualification with no exceptions:
               </p>
               <ul className="list-disc list-inside text-red-700 dark:text-red-300 space-y-2 text-sm">
                 <li><strong>Exactly 6 members</strong> per team — partial teams will not be accepted.</li>
-                <li><strong>Minimum 1 female</strong> participant per team is a mandatory SIH requirement.</li>
+                <li><strong>Minimum 1 female</strong> participant per team is a mandatory SIH 2026 requirement.</li>
                 <li>All participants must be active enrolled students of SFIT.</li>
-                <li>The official SIH Idea Presentation Template is mandatory — any modification leads to disqualification.</li>
+                <li>The official SIH 2026 Idea Presentation Template is mandatory — any modification leads to disqualification.</li>
                 <li>Submissions will close after the {navkritiConfig.submission.displayDeadline} deadline and will not be accepted under any circumstances.</li>
               </ul>
               
@@ -296,8 +296,8 @@ const NavkritiPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {[
                   { mistake: 'Forming a team with fewer or more than 6 members', fix: 'Exactly 6 — always, no exceptions.' },
-                  { mistake: 'No female team member in the group', fix: 'Minimum 1 female is a hard SIH rule.' },
-                  { mistake: 'Modifying the official SIH PPT template', fix: 'Use as-is — no font, layout, or design changes.' },
+                  { mistake: 'No female team member in the group', fix: 'Minimum 1 female is a hard SIH 2026 rule.' },
+                  { mistake: 'Modifying the official SIH 2026 PPT template', fix: 'Use as-is — no font, layout, or design changes.' },
                   { mistake: `Submitting the PPT after ${navkritiConfig.submission.displayDeadline}`, fix: 'Make sure to keep an eye on the deadlines!' },
                   { mistake: 'Registering without paying the fee', fix: 'Fee payment is required to confirm your team.' },
                   { mistake: 'Picking a domain outside the team\'s expertise', fix: 'Choose what you genuinely understand and can solve.' },

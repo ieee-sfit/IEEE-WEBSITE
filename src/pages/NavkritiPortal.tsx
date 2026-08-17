@@ -215,7 +215,7 @@ export default function NavkritiPortal() {
             <>
               <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/50 rounded-xl p-6 mb-8 text-sm text-blue-800 dark:text-blue-300">
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>Upload only the <strong>official SIH PPT template</strong> in <strong>.pptx</strong> or <strong>.pdf</strong> format (Max 10MB).</li>
+                  <li>Upload only the <strong>official SIH 2026 PPT template</strong> in <strong>.pptx</strong> or <strong>.pdf</strong> format (Max 10MB).</li>
                   <li>You can re-upload to overwrite your previous submission until the deadline.</li>
                 </ul>
               </div>

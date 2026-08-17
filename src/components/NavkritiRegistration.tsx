@@ -73,7 +73,7 @@ export default function NavkritiRegistration() {
 
     // Validations
     if (!agreedToRules) {
-      setError('You must agree to the SIH prescribed PPT template rule.');
+      setError('You must agree to the SIH 2026 prescribed PPT template rule.');
       return;
     }
 
@@ -84,7 +84,7 @@ export default function NavkritiRegistration() {
 
     const femaleCount = members.filter(m => m.gender === 'Female').length;
     if (femaleCount < 1) {
-      setError('Team must have at least one female participant according to SIH rules.');
+      setError('Team must have at least one female participant according to SIH 2026 rules.');
       return;
     }
 
@@ -411,7 +411,7 @@ export default function NavkritiRegistration() {
               className="mt-1 w-5 h-5 rounded border-red-300 text-red-600 focus:ring-red-500"
             />
             <span className="text-sm text-red-900 dark:text-red-300 font-medium">
-              I confirm that our team will strictly use the official SIH prescribed PPT template. I understand that modifying the template structure or rules will lead to immediate disqualification.
+              I confirm that our team will strictly use the official SIH 2026 prescribed PPT template. I understand that modifying the template structure or rules will lead to immediate disqualification.
             </span>
           </label>
         </section>

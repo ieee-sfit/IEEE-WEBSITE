@@ -57,7 +57,7 @@ export default function UpdateTeamForm({ token }: { token: string }) {
     try {
       const femaleCount = members.filter(m => m.gender === 'Female').length;
       if (femaleCount < 1) {
-        throw new Error('Team must have at least one female participant according to SIH rules.');
+        throw new Error('Team must have at least one female participant according to SIH 2026 rules.');
       }
 
       const { data, error: functionError } = await supabase.functions.invoke('update-team', {
