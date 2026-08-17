@@ -400,6 +400,7 @@ export default function NavkritiRegistration() {
                   )}
                 </div>
               </div>
+              </div>
               
               <div>
                 <label htmlFor="payeeUpiId" className="block text-sm font-semibold mb-2">Payee UPI ID</label>
