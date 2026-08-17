@@ -4,7 +4,6 @@ import L from "leaflet";
 import 'leaflet/dist/leaflet.css';
 import { FaXTwitter } from "react-icons/fa6";
 import { useState } from 'react';
-import { supabase } from '../lib/supabaseClient';
 
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -32,14 +31,38 @@ const Contact = () => {
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
+    // Basic honeypot check on frontend too
+    if (formData.honeypot) {
+      setSubmitStatus('success');
+      setIsSubmitting(false);
+      setFormData({ name: '', email: '', subject: '', message: '', honeypot: '' });
+      return;
+    }
+
     try {
-      const { error } = await supabase.functions.invoke('contact-form', {
-        body: formData,
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          access_key: import.meta.env.VITE_WEB3FORMS_KEY || 'YOUR_ACCESS_KEY_HERE',
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+          from_name: 'IEEE SFIT Website',
+        }),
       });
 
-      if (error) throw error;
-      setSubmitStatus('success');
-      setFormData({ name: '', email: '', subject: '', message: '', honeypot: '' });
+      const result = await response.json();
+      if (result.success) {
+        setSubmitStatus('success');
+        setFormData({ name: '', email: '', subject: '', message: '', honeypot: '' });
+      } else {
+        throw new Error(result.message);
+      }
     } catch (error) {
       console.error('Failed to send message:', error);
       setSubmitStatus('error');
