@@ -3,6 +3,8 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from "leaflet";
 import 'leaflet/dist/leaflet.css';
 import { FaXTwitter } from "react-icons/fa6";
+import { useState } from 'react';
+import { supabase } from '../lib/supabaseClient';
 
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -15,6 +17,42 @@ L.Icon.Default.mergeOptions({
 
 
 const Contact = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
+    honeypot: '',
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+
+    try {
+      const { error } = await supabase.functions.invoke('contact-form', {
+        body: formData,
+      });
+
+      if (error) throw error;
+      setSubmitStatus('success');
+      setFormData({ name: '', email: '', subject: '', message: '', honeypot: '' });
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
   return (
     <section id="contact" className="py-20 bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -117,20 +155,84 @@ const Contact = () => {
 
           {/* Contact CTA */}
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 flex flex-col items-center justify-center text-center">
-            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mb-6">
-              <Mail className="w-8 h-8 text-white" />
-            </div>
             <h3 className="text-2xl font-bold mb-4">Send us a Message</h3>
             <p className="text-gray-300 mb-8 max-w-md">
-              Have a specific inquiry? Drop us an email and our team will get back to you as soon as possible.
+              Have a specific inquiry? Drop us a message and our team will get back to you as soon as possible.
             </p>
-            <a
-              href="mailto:ieeesfitsb@gmail.com"
-              className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center"
-            >
-              Email Us
-              <Send className="ml-2 w-5 h-5" />
-            </a>
+            
+            <form onSubmit={handleSubmit} className="w-full space-y-4">
+              {/* Honeypot field - invisible to users, traps bots */}
+              <input
+                type="text"
+                name="honeypot"
+                value={formData.honeypot}
+                onChange={handleInputChange}
+                className="hidden"
+                autoComplete="off"
+                tabIndex={-1}
+              />
+              
+              <div>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Your Name"
+                  required
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Your Email"
+                  required
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <input
+                  type="text"
+                  name="subject"
+                  placeholder="Subject"
+                  required
+                  value={formData.subject}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <textarea
+                  name="message"
+                  placeholder="Your Message"
+                  required
+                  rows={4}
+                  value={formData.message}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:border-blue-500 resize-none"
+                ></textarea>
+              </div>
+              
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? 'Sending...' : 'Send Message'}
+                <Send className="ml-2 w-5 h-5" />
+              </button>
+
+              {submitStatus === 'success' && (
+                <p className="text-green-400 mt-4">Message sent successfully!</p>
+              )}
+              {submitStatus === 'error' && (
+                <p className="text-red-400 mt-4">Failed to send message. Please try again later.</p>
+              )}
+            </form>
           </div>
         </div>
 
