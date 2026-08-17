@@ -18,7 +18,7 @@ const NavkritiPage = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center space-y-4 mb-16">
           <div className="inline-block px-4 py-1.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-semibold text-sm mb-4 border border-blue-200 dark:border-blue-800">
-            Internal Ideathon for Smart India Hackathon 2026
+            Internal Hackathon for Smart India Hackathon 2026
           </div>
 
           {/* Title: NAV + stylised script K + RITI '26 — matching brochure */}
@@ -82,7 +82,7 @@ const NavkritiPage = () => {
                 <Info className="w-6 h-6 text-blue-500" /> What is NAVKRITI '26?
               </h2>
               <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
-                <strong className="text-slate-900 dark:text-white">NAVKRITI '26</strong> is SFIT's college-level internal ideathon and the internal selection round for SFIT's SIH 2026 participation. It gives students a structured platform to tackle real-world challenges, demonstrate engineering ingenuity, and pitch their ideas to industry evaluators — all before competing at the national stage.
+                <strong className="text-slate-900 dark:text-white">NAVKRITI '26</strong> is SFIT's college-level internal hackathon and the internal selection round for SFIT's SIH 2026 participation. It gives students a structured platform to tackle real-world challenges, demonstrate engineering ingenuity, and pitch their ideas to industry evaluators — all before competing at the national stage.
               </p>
               <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-5 mb-4">
                 <h4 className="font-bold text-blue-900 dark:text-blue-300 mb-1">Inculcating Innovation</h4>
@@ -92,7 +92,7 @@ const NavkritiPage = () => {
               </div>
               <ul className="space-y-2 text-slate-600 dark:text-slate-400 text-sm">
                 <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" /><span><strong className="text-slate-800 dark:text-slate-200">Edition:</strong> NAVKRITI '26 — qualifier for SIH 2026</span></li>
-                <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" /><span><strong className="text-slate-800 dark:text-slate-200">Format:</strong> Internal ideathon with screening and evaluation by industry experts</span></li>
+                <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" /><span><strong className="text-slate-800 dark:text-slate-200">Format:</strong> Internal hackathon with screening and evaluation by industry experts</span></li>
                 <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" /><span><strong className="text-slate-800 dark:text-slate-200">Venue:</strong> St. Francis Institute of Technology (SFIT), Borivali West, Mumbai</span></li>
                 <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" /><span><strong className="text-slate-800 dark:text-slate-200">Organizers:</strong> TEAM RAW SFIT · IEEExWIE SFIT · IIC SFIT</span></li>
               </ul>

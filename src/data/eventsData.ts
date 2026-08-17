@@ -63,7 +63,7 @@ export const eventsData: EventData[] = [
       'Top 50 teams shortlisted for SIH 2026'
     ],
     speakers: [],
-    topics: ['Hackathon', 'Ideathon', 'SIH 2026', 'Innovation'],
+    topics: ['Hackathon', 'SIH 2026', 'Innovation'],
     form: '/navkriti',
     organizer: 'IEEExWIE, RAW & IIC SFIT',
   },
