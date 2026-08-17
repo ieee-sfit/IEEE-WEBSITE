@@ -67,9 +67,11 @@ test.describe('Navkriti Registration Fuzzer', () => {
     const fileUpload = page.locator('input#file-upload');
     await fileUpload.setInputFiles('./tests/fixtures/test-receipt.png');
 
-    // 6. Tick Checkboxes
+    // 6. Tick Checkboxes & Fill Additional Info
     // SIH agreement checkbox
     await page.check('input#sih-agreement');
+    // Payee UPI ID
+    await page.fill('input#payeeUpiId', `autotest${testRunId}@ybl`);
 
     // 7. Submit Form
     await page.click('button[type="submit"]');

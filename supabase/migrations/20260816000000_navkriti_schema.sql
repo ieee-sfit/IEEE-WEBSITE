@@ -8,6 +8,7 @@ CREATE TABLE public.teams (
     team_name VARCHAR NOT NULL UNIQUE,
     event_id VARCHAR DEFAULT 'NAVKRITI_26',
     payment_receipt_path VARCHAR NOT NULL,
+    payee_upi_id VARCHAR,
     status VARCHAR DEFAULT 'REGISTERED',
     submission_file_path VARCHAR,
     submitted_at TIMESTAMP WITH TIME ZONE,
@@ -66,6 +67,7 @@ CREATE OR REPLACE FUNCTION public.register_team(
     p_team_id VARCHAR,
     p_team_name VARCHAR,
     p_payment_receipt_path VARCHAR,
+    p_payee_upi_id VARCHAR,
     p_participants JSONB -- Array of participant objects
 ) RETURNS JSONB
 LANGUAGE plpgsql
@@ -87,17 +89,18 @@ BEGIN
         RETURN pg_catalog.jsonb_build_object('success', true, 'team_uuid', v_team_uuid, 'team_id', v_existing_team_id, 'is_duplicate', true);
     END IF;
 
-    -- Insert Team
     INSERT INTO public.teams (
         registration_request_id,
         team_id,
         team_name,
-        payment_receipt_path
+        payment_receipt_path,
+        payee_upi_id
     ) VALUES (
         p_registration_request_id,
         p_team_id,
         p_team_name,
-        p_payment_receipt_path
+        p_payment_receipt_path,
+        p_payee_upi_id
     ) RETURNING id INTO v_team_uuid;
 
     -- Insert Participants
@@ -193,9 +196,9 @@ $$;
 
 
 -- 9. Revoke EXECUTE from default roles to secure the RPCs
-REVOKE EXECUTE ON FUNCTION public.register_team(UUID, VARCHAR, VARCHAR, VARCHAR, JSONB) FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.register_team(UUID, VARCHAR, VARCHAR, VARCHAR, VARCHAR, JSONB) FROM PUBLIC, anon, authenticated;
 REVOKE EXECUTE ON FUNCTION public.update_team(UUID, JSONB) FROM PUBLIC, anon, authenticated;
 
 -- 10. Grant EXECUTE to service_role ONLY (Edge Functions)
-GRANT EXECUTE ON FUNCTION public.register_team(UUID, VARCHAR, VARCHAR, VARCHAR, JSONB) TO service_role;
+GRANT EXECUTE ON FUNCTION public.register_team(UUID, VARCHAR, VARCHAR, VARCHAR, VARCHAR, JSONB) TO service_role;
 GRANT EXECUTE ON FUNCTION public.update_team(UUID, JSONB) TO service_role;

@@ -27,6 +27,7 @@ export default function NavkritiRegistration() {
   const [teamName, setTeamName] = useState('');
   const [members, setMembers] = useState<MemberData[]>(Array(6).fill({ ...INITIAL_MEMBER }));
   const [paymentFile, setPaymentFile] = useState<File | null>(null);
+  const [payeeUpiId, setPayeeUpiId] = useState('');
   const [agreedToRules, setAgreedToRules] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -82,6 +83,11 @@ export default function NavkritiRegistration() {
       return;
     }
 
+    if (!payeeUpiId || !payeeUpiId.includes('@')) {
+      setError('Please provide a valid Payee UPI ID (must contain @).');
+      return;
+    }
+
     const femaleCount = members.filter(m => m.gender === 'Female').length;
     if (femaleCount < 1) {
       setError('Team must have at least one female participant according to SIH 2026 rules.');
@@ -107,6 +113,7 @@ export default function NavkritiRegistration() {
       formData.append('registration_request_id', registrationRequestId);
       formData.append('team_name', teamName);
       formData.append('payment_receipt', paymentFile);
+      formData.append('payee_upi_id', payeeUpiId);
       formData.append('participants', JSON.stringify(members));
 
       // 2. Invoke Edge Function
@@ -369,8 +376,9 @@ export default function NavkritiRegistration() {
               <p className="text-sm font-medium">Scan to pay ₹300</p>
             </div>
 
-            <div className="w-full md:w-2/3">
-              <label className="block text-sm font-semibold mb-2">Upload Payment Screenshot</label>
+            <div className="w-full md:w-2/3 flex flex-col gap-6">
+              <div>
+                <label className="block text-sm font-semibold mb-2">Upload Payment Screenshot</label>
               <div className="mt-2 flex justify-center rounded-lg border border-dashed border-slate-300 dark:border-slate-700 px-6 py-10 bg-white dark:bg-slate-900">
                 <div className="text-center">
                   <Upload className="mx-auto h-12 w-12 text-slate-300" aria-hidden="true" />
@@ -391,6 +399,20 @@ export default function NavkritiRegistration() {
                     </p>
                   )}
                 </div>
+              </div>
+              
+              <div>
+                <label htmlFor="payeeUpiId" className="block text-sm font-semibold mb-2">Payee UPI ID</label>
+                <input
+                  id="payeeUpiId"
+                  type="text"
+                  required
+                  value={payeeUpiId}
+                  onChange={(e) => setPayeeUpiId(e.target.value)}
+                  placeholder="e.g. 9876543210@ybl"
+                  className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                />
+                <p className="text-xs text-slate-500 mt-1">Please provide the exact UPI ID from which the payment was made so we can verify it manually.</p>
               </div>
             </div>
           </div>

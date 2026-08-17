@@ -55,13 +55,20 @@ serve(async (req) => {
     const registration_request_id = formData.get('registration_request_id');
     const raw_team_name = formData.get('team_name');
     const payment_receipt = formData.get('payment_receipt');
+    const payee_upi_id = formData.get('payee_upi_id');
     const participantsDataRaw = formData.get('participants');
 
-    if (!registration_request_id || !raw_team_name || !payment_receipt || !participantsDataRaw) {
+    if (!registration_request_id || !raw_team_name || !payment_receipt || !payee_upi_id || !participantsDataRaw) {
       throw new Error('Missing required fields');
     }
 
     const team_name = normalizeString(raw_team_name);
+    const normalized_payee_upi_id = normalizeString(payee_upi_id);
+    
+    if (!normalized_payee_upi_id.includes('@')) {
+        throw new Error('Invalid Payee UPI ID format');
+    }
+
     let participantsData = JSON.parse(participantsDataRaw.toString());
     
     if (participantsData.length !== 6) {
@@ -152,6 +159,7 @@ serve(async (req) => {
       p_team_id: p_team_id,
       p_team_name: team_name,
       p_payment_receipt_path: payment_receipt_path,
+      p_payee_upi_id: normalized_payee_upi_id,
       p_participants: participantsData,
     });
 
