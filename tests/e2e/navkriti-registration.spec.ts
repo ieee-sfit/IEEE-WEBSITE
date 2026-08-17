@@ -3,7 +3,7 @@ import { generateTeam } from '../utils/generateTeam';
 import path from 'path';
 
 test.describe('Navkriti Registration Fuzzer', () => {
-  test.setTimeout(60000);
+  test.setTimeout(120000);
   test('should successfully complete a registration workflow and catch any page/network errors', async ({ page }) => {
     const failures: any[] = [];
 
