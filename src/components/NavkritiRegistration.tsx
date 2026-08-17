@@ -364,10 +364,7 @@ export default function NavkritiRegistration() {
           <div className="flex flex-col md:flex-row gap-8 items-center">
             <div className="w-full md:w-1/3 text-center">
               <div className="bg-white p-4 rounded-xl inline-block shadow-sm mb-4 border border-slate-200">
-                {/* Placeholder for UPI QR Code */}
-                <div className="w-40 h-40 bg-slate-100 flex items-center justify-center text-slate-400 font-mono text-sm border-2 border-dashed border-slate-300">
-                  [UPI QR CODE]
-                </div>
+                <img src="/navkriti-qr.png" alt="UPI QR Code for Payment" className="w-48 h-auto max-w-[200px] object-contain rounded" />
               </div>
               <p className="text-sm font-medium">Scan to pay ₹300</p>
             </div>
