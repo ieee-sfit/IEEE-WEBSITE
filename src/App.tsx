@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ErrorBoundary } from './ErrorBoundary';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import Header from './components/Header';
 import HomePage from './pages/HomePage';
 import EventsPage from './pages/EventsPage';
@@ -10,11 +11,25 @@ import NavkritiPortal from './pages/NavkritiPortal';
 import NotFoundPage from './pages/NotFoundPage';
 import ScrollToTop from './components/ScrollToTop';
 
+const SplashCursor = lazy(() => import('./components/ui/SplashCursor/SplashCursor'));
+
 function App() {
+  const [isLaptop, setIsLaptop] = useState(window.innerWidth > 768);
+  useEffect(() => {
+    const handleResize = () => setIsLaptop(window.innerWidth > 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <ErrorBoundary>
       <Router>
       <ScrollToTop />
+      {isLaptop && (
+        <Suspense fallback={null}>
+          <SplashCursor SPLAT_RADIUS={0.01} />
+        </Suspense>
+      )}
       <div className="min-h-screen">
         <Header />
         <Routes>

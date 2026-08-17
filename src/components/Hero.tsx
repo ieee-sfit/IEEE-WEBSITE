@@ -1,23 +1,14 @@
-import { useState, useEffect, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles, Users, Calendar } from 'lucide-react';
 import Counter from './Counter';
 
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
-const SplashCursor = lazy(() => import('./ui/SplashCursor/SplashCursor'));
 
 const Hero = () => {
   const { ref: heroRef, isVisible: heroVisible } = useScrollAnimation({
     threshold: 0.2,
     triggerOnce: true
   });
-  
-  const [isLaptop, setIsLaptop] = useState(window.innerWidth > 768);
-  useEffect(() => {
-    const handleResize = () => setIsLaptop(window.innerWidth > 768);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   return (
     <section
@@ -25,11 +16,6 @@ const Hero = () => {
       id="home"
       className="min-h-screen relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 animate-gradient-shift"
     >
-      {isLaptop ? (
-        <Suspense fallback={null}>
-          <SplashCursor SPLAT_RADIUS={0.01} />
-        </Suspense>
-      ) : null}
       
       {/* Animated Background Elements */}
       <div className="absolute inset-0">
