@@ -52,12 +52,12 @@ export const eventsData: EventData[] = [
     registrations: 0,
     category: 'Hackathon',
     status: 'upcoming',
-    description: 'The official internal ideathon qualifier for Smart India Hackathon 2026. Top 50 teams will be shortlisted to represent SFIT.',
-    detailedDescription: 'Navkriti 26 is the internal qualifier round for Smart India Hackathon 2026 organized by IEEExWIE, RAW, and IIC at St. Francis Institute of Technology. Teams of 6 (with at least 1 female member) will pitch their ideas using the official SIH template.',
+    description: "The internal selection round for SFIT's SIH 2026 participation. Top 50 teams will be shortlisted to represent SFIT.",
+    detailedDescription: "Navkriti 26 is the internal selection round for SFIT's Smart India Hackathon 2026 participation, organized by IEEExWIE, RAW, and IIC at St. Francis Institute of Technology. Teams of 6 (with at least 1 female member) will pitch their ideas using the prescribed SIH template.",
     image: 'https://i.ytimg.com/vi/znMbKz6ZPno/maxresdefault.jpg',
     featured: true,
     highlights: [
-      'Official SIH Qualifier for SFIT',
+      "Internal selection round for SFIT's SIH 2026 participation",
       'Exactly 6 members per team (min 1 female mandatory)',
       'Idea presentation using SIH template',
       'Top 50 teams shortlisted for SIH 2026'

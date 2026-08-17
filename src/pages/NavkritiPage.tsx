@@ -82,7 +82,7 @@ const NavkritiPage = () => {
                 <Info className="w-6 h-6 text-blue-500" /> What is NAVKRITI '26?
               </h2>
               <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
-                <strong className="text-slate-900 dark:text-white">NAVKRITI '26</strong> is SFIT's college-level internal ideathon and the official qualifier for Smart India Hackathon 2026 (SIH 2026). It gives students a structured platform to tackle real-world challenges, demonstrate engineering ingenuity, and pitch their ideas to industry evaluators — all before competing at the national stage.
+                <strong className="text-slate-900 dark:text-white">NAVKRITI '26</strong> is SFIT's college-level internal ideathon and the internal selection round for SFIT's SIH 2026 participation. It gives students a structured platform to tackle real-world challenges, demonstrate engineering ingenuity, and pitch their ideas to industry evaluators — all before competing at the national stage.
               </p>
               <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-5 mb-4">
                 <h4 className="font-bold text-blue-900 dark:text-blue-300 mb-1">Inculcating Innovation</h4>

@@ -6,7 +6,10 @@ import UpdateTeamForm from '../components/UpdateTeamForm';
 import { navkritiConfig } from '../config/navkritiConfig';
 
 export default function NavkritiPortal() {
-  const [session, setSession] = useState<{ teamId: string, token: string } | null>(null);
+  const [session, setSession] = useState<{ teamId: string, token: string } | null>(() => {
+    const saved = sessionStorage.getItem('navkriti_session');
+    return saved ? JSON.parse(saved) : null;
+  });
   const [teamIdInput, setTeamIdInput] = useState('');
   const [secretInput, setSecretInput] = useState('');
   
@@ -41,7 +44,9 @@ export default function NavkritiPortal() {
       if (data?.error) throw new Error(data.error);
       
       // Store session state with secure token
-      setSession({ teamId: teamIdInput, token: data.token });
+      const sessionData = { teamId: teamIdInput, token: data.token };
+      setSession(sessionData);
+      sessionStorage.setItem('navkriti_session', JSON.stringify(sessionData));
     } catch (err: any) {
       setError(err.message || 'Invalid Team ID or Secret');
     } finally {
@@ -51,6 +56,7 @@ export default function NavkritiPortal() {
 
   const handleLogout = () => {
     setSession(null);
+    sessionStorage.removeItem('navkriti_session');
     setTeamIdInput('');
     setSecretInput('');
     setUploadSuccess(false);

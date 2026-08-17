@@ -173,7 +173,7 @@ export default function NavkritiRegistration() {
         <div className="max-w-md mx-auto bg-blue-50 dark:bg-blue-900/10 p-4 rounded-lg mt-6 text-sm text-blue-800 dark:text-blue-300">
           <p>
             <strong className="text-red-600 dark:text-red-400">IMPORTANT:</strong> Please save this <strong>Submission Secret</strong> securely!
-            You will need both your Team ID and Secret to upload your PPT on August 25th. Do not share it outside your team.
+            You will need both your Team ID and Secret to upload your PPT starting on {new Date(navkritiConfig.submission.opens).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}. Do not share it outside your team.
           </p>
         </div>
       </div>

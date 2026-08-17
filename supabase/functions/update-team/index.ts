@@ -80,6 +80,17 @@ serve(async (req) => {
         const email = normalizeString(m.email).toLowerCase();
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error(`Invalid email for participant ${idx + 1}`);
         if (!/^\d{10}$/.test(normalizeString(m.phone))) throw new Error(`Phone number must be exactly 10 digits for participant ${idx + 1}`);
+        
+        const branch = normalizeString(m.branch);
+        const validBranches = ['CMPN', 'INFT', 'EXTC', 'ELEC', 'MECH', 'ECS', 'AIML'];
+        if (!validBranches.includes(branch)) throw new Error(`Invalid branch for participant ${idx + 1}`);
+        
+        const year = normalizeString(m.year);
+        const validYears = ['FE', 'SE', 'TE', 'BE'];
+        if (!validYears.includes(year)) throw new Error(`Invalid year for participant ${idx + 1}`);
+        
+        const pid = normalizeString(m.pid);
+        if (!pid) throw new Error(`PID cannot be empty for participant ${idx + 1}`);
 
         return {
             team_id: teamUuid,
@@ -97,6 +108,16 @@ serve(async (req) => {
     const femaleCount = participants.filter((m: any) => m.gender === 'Female').length;
     if (femaleCount < 1) {
       throw new Error('Team must have at least one female participant according to SIH rules.');
+    }
+
+    const pids = participants.map((m: any) => m.pid);
+    if (new Set(pids).size !== 6) {
+      throw new Error('All 6 members must have unique PIDs.');
+    }
+
+    const emails = participants.map((m: any) => m.email);
+    if (new Set(emails).size !== 6) {
+      throw new Error('All 6 members must have unique emails.');
     }
 
     const supabaseClient = createClient(

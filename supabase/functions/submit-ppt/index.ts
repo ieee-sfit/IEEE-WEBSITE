@@ -145,6 +145,7 @@ serve(async (req) => {
         }, { onConflict: 'team_id' });
 
     if (dbError) {
+        await supabaseClient.storage.from('sih_presentations').remove([filePath]);
         throw new Error('Database error: ' + dbError.message);
     }
 

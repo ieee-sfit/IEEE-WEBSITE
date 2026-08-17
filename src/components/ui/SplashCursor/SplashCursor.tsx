@@ -991,15 +991,32 @@ export default function SplashCursor({
 
     let lastUpdateTime = Date.now();
     let colorUpdateTimer = 0.0;
+    
+    let fpsFrames = 0;
+    let lastFpsTime = Date.now();
 
     function updateFrame() {
+      animationId = requestAnimationFrame(updateFrame);
+      if (document.visibilityState === "hidden") return;
+
       const dt = calcDeltaTime();
+      
+      const now = Date.now();
+      fpsFrames++;
+      if (now - lastFpsTime > 1000) {
+        const fps = fpsFrames / ((now - lastFpsTime) / 1000);
+        if (fps < 45 && config.PRESSURE_ITERATIONS > Math.max(1, Math.floor(PRESSURE_ITERATIONS! / 2))) {
+          config.PRESSURE_ITERATIONS = Math.max(1, Math.floor(config.PRESSURE_ITERATIONS / 2));
+        }
+        fpsFrames = 0;
+        lastFpsTime = now;
+      }
+
       if (resizeCanvas()) initFramebuffers();
       updateColors(dt);
       applyInputs();
       step(dt);
       render(null);
-      animationId = requestAnimationFrame(updateFrame);
     }
 
     function calcDeltaTime() {

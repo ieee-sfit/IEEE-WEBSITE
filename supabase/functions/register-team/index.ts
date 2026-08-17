@@ -71,9 +71,19 @@ serve(async (req) => {
     // Normalize participant data
     participantsData = participantsData.map((m: any, idx: number) => {
         const email = normalizeString(m.email).toLowerCase();
-        // Basic validations
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error(`Invalid email for participant ${idx + 1}`);
         if (!/^\d{10}$/.test(normalizeString(m.phone))) throw new Error(`Phone number must be exactly 10 digits for participant ${idx + 1}`);
+        
+        const branch = normalizeString(m.branch);
+        const validBranches = ['CMPN', 'INFT', 'EXTC', 'ELEC', 'MECH', 'ECS', 'AIML'];
+        if (!validBranches.includes(branch)) throw new Error(`Invalid branch for participant ${idx + 1}`);
+        
+        const year = normalizeString(m.year);
+        const validYears = ['FE', 'SE', 'TE', 'BE'];
+        if (!validYears.includes(year)) throw new Error(`Invalid year for participant ${idx + 1}`);
+        
+        const pid = normalizeString(m.pid);
+        if (!pid) throw new Error(`PID cannot be empty for participant ${idx + 1}`);
 
         return {
             is_leader: idx === 0,
@@ -90,6 +100,16 @@ serve(async (req) => {
     const femaleCount = participantsData.filter((m: any) => m.gender === 'Female').length;
     if (femaleCount < 1) {
       throw new Error('Team must have at least one female participant according to SIH rules.');
+    }
+
+    const pids = participantsData.map((m: any) => m.pid);
+    if (new Set(pids).size !== 6) {
+      throw new Error('All 6 members must have unique PIDs.');
+    }
+
+    const emails = participantsData.map((m: any) => m.email);
+    if (new Set(emails).size !== 6) {
+      throw new Error('All 6 members must have unique emails.');
     }
 
     if (!(payment_receipt instanceof File)) {
@@ -144,6 +164,10 @@ serve(async (req) => {
     // data contains { success: true, team_uuid, team_id, is_duplicate }
     const actual_team_uuid = data.team_uuid;
     const actual_team_id = data.team_id;
+
+    if (data.is_duplicate) {
+      await supabaseClient.storage.from('payment_receipts').remove([payment_receipt_path]);
+    }
 
     // 4. Generate Deterministic Secret
     const secret = await generateTeamSecret(actual_team_uuid);
