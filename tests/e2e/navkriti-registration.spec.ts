@@ -64,7 +64,8 @@ test.describe('Navkriti Registration Fuzzer', () => {
 
     // 5. Upload Fake Payment Receipt
     // The input is hidden, so we need to set the files directly on the input element
-    await page.setInputFiles('input#file-upload', './tests/fixtures/test-receipt.png');
+    const fileUpload = page.locator('input#file-upload');
+    await fileUpload.setInputFiles('./tests/fixtures/test-receipt.png');
 
     // 6. Tick Checkboxes
     // SIH agreement checkbox

@@ -61,7 +61,7 @@ GRANT ALL ON TABLE public.participants TO service_role;
 GRANT ALL ON TABLE public.submissions TO service_role;
 
 -- 7. Create RPC for atomic team registration
-CREATE OR REPLACE FUNCTION register_team(
+CREATE OR REPLACE FUNCTION public.register_team(
     p_registration_request_id UUID,
     p_team_id VARCHAR,
     p_team_name VARCHAR,
@@ -70,6 +70,7 @@ CREATE OR REPLACE FUNCTION register_team(
 ) RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = ''
 AS $$
 DECLARE
     v_team_uuid UUID;
@@ -83,7 +84,7 @@ BEGIN
     
     IF v_team_uuid IS NOT NULL THEN
         -- Already registered, return success with existing IDs
-        RETURN jsonb_build_object('success', true, 'team_uuid', v_team_uuid, 'team_id', v_existing_team_id, 'is_duplicate', true);
+        RETURN pg_catalog.jsonb_build_object('success', true, 'team_uuid', v_team_uuid, 'team_id', v_existing_team_id, 'is_duplicate', true);
     END IF;
 
     -- Insert Team
@@ -99,8 +100,8 @@ BEGIN
         p_payment_receipt_path
     ) RETURNING id INTO v_team_uuid;
 
-    -- Loop through participants and insert
-    FOR v_participant IN SELECT * FROM jsonb_array_elements(p_participants)
+    -- Insert Participants
+    FOR v_participant IN SELECT * FROM pg_catalog.jsonb_array_elements(p_participants)
     LOOP
         INSERT INTO public.participants (
             team_id,
@@ -114,7 +115,7 @@ BEGIN
             year
         ) VALUES (
             v_team_uuid,
-            (v_participant->>'is_leader')::BOOLEAN,
+            (v_participant->>'is_leader')::boolean,
             v_participant->>'pid',
             v_participant->>'email',
             v_participant->>'name',
@@ -125,9 +126,76 @@ BEGIN
         );
     END LOOP;
 
-    RETURN jsonb_build_object('success', true, 'team_uuid', v_team_uuid, 'team_id', p_team_id, 'is_duplicate', false);
-EXCEPTION WHEN OTHERS THEN
-    -- If any error occurs, the transaction will automatically be rolled back
-    RAISE;
+    RETURN pg_catalog.jsonb_build_object('success', true, 'team_uuid', v_team_uuid, 'team_id', p_team_id, 'is_duplicate', false);
 END;
 $$;
+
+-- 8. Create RPC for team updates
+CREATE OR REPLACE FUNCTION public.update_team(
+    p_team_uuid UUID,
+    p_participants JSONB
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+DECLARE
+    v_participant JSONB;
+    v_deleted_count INTEGER;
+    v_inserted_count INTEGER := 0;
+BEGIN
+    -- Delete existing participants for this team
+    DELETE FROM public.participants
+    WHERE team_id = p_team_uuid;
+    
+    GET DIAGNOSTICS v_deleted_count = ROW_COUNT;
+
+    -- Insert new participants
+    FOR v_participant IN SELECT * FROM pg_catalog.jsonb_array_elements(p_participants)
+    LOOP
+        INSERT INTO public.participants (
+            team_id,
+            is_leader,
+            pid,
+            email,
+            name,
+            phone,
+            gender,
+            branch,
+            year
+        ) VALUES (
+            p_team_uuid,
+            (v_participant->>'is_leader')::boolean,
+            v_participant->>'pid',
+            v_participant->>'email',
+            v_participant->>'name',
+            v_participant->>'phone',
+            v_participant->>'gender',
+            v_participant->>'branch',
+            v_participant->>'year'
+        );
+        v_inserted_count := v_inserted_count + 1;
+    END LOOP;
+
+    RETURN pg_catalog.jsonb_build_object(
+        'success', true,
+        'deleted', v_deleted_count,
+        'inserted', v_inserted_count
+    );
+EXCEPTION WHEN OTHERS THEN
+    RETURN pg_catalog.jsonb_build_object(
+        'success', false,
+        'error', SQLERRM
+    );
+END;
+$$;
+
+
+-- 9. Revoke EXECUTE from default roles to secure the RPCs
+REVOKE EXECUTE ON FUNCTION public.register_team(UUID, VARCHAR, VARCHAR, VARCHAR, JSONB) FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.update_team(UUID, JSONB) FROM PUBLIC, anon, authenticated;
+
+-- 10. Grant EXECUTE to service_role ONLY (Edge Functions)
+GRANT EXECUTE ON FUNCTION public.register_team(UUID, VARCHAR, VARCHAR, VARCHAR, JSONB) TO service_role;
+GRANT EXECUTE ON FUNCTION public.update_team(UUID, JSONB) TO service_role;
