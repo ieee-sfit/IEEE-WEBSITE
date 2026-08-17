@@ -162,6 +162,30 @@ const NavkritiPage = () => {
               </div>
             </div>
 
+            {/* === Problem Statements Teaser === */}
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
+              <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+              <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                  <h2 className="text-2xl font-bold mb-3 flex items-center gap-3 text-white">
+                    <FileText className="w-6 h-6 text-blue-200" /> Problem Statements
+                  </h2>
+                  <p className="text-blue-100 text-lg mb-2">
+                    The official problem statements for Navkriti '26 will be revealed on <strong className="text-white">{navkritiConfig.problemStatements.displayDate}</strong>.
+                  </p>
+                  <p className="text-blue-200 text-sm">
+                    Registered teams will be notified via the portal and WhatsApp group.
+                  </p>
+                </div>
+                <div className="shrink-0 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 text-center">
+                  <div className="text-blue-100 text-xs font-semibold uppercase tracking-wider mb-1">Status</div>
+                  <div className="text-xl font-black text-white flex items-center gap-2 justify-center">
+                    <AlertCircle className="w-5 h-5 text-yellow-300" /> Dropping Soon
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* === How It Works === */}
             <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8">
               <h2 className="text-2xl font-bold mb-6 flex items-center gap-3 text-slate-900 dark:text-white">

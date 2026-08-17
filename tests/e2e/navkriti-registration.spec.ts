@@ -44,7 +44,7 @@ test.describe('Navkriti Registration Fuzzer', () => {
     const testRunId = Math.floor(Math.random() * 10000);
     const fakeTeam = generateTeam(testRunId);
     // Explicitly set the leader's email as requested with a unique tag
-    fakeTeam.members[0].email = `veergopani55+${testRunId}@gmail.com`;
+    fakeTeam.members[0].email = `betamalescara+${testRunId}@gmail.com`;
 
     // 3. Fill Team Details
     await page.fill('input#team-name', fakeTeam.teamName);

@@ -34,7 +34,7 @@ export default function NavkritiPortal() {
     
     try {
       const { data, error: functionError } = await supabase.functions.invoke('login-team', {
-        body: { team_id: teamIdInput, secret: secretInput }
+        body: { team_id: teamIdInput.trim(), secret: secretInput.trim() }
       });
       
       if (functionError) throw new Error(functionError.message);

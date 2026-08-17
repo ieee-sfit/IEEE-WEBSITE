@@ -65,7 +65,8 @@ serve(async (req) => {
     );
 
     const body = await req.json();
-    const { team_id, secret } = body;
+    const team_id = body.team_id?.trim();
+    const secret = body.secret?.trim();
 
     if (!team_id || !secret) {
       throw new Error('Team ID and Secret are required');
