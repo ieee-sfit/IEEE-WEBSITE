@@ -263,7 +263,7 @@ const NavkritiPage = () => {
                 <li><strong>Exactly 6 members</strong> per team — partial teams will not be accepted.</li>
                 <li><strong>Minimum 1 female</strong> participant per team is a mandatory SIH requirement.</li>
                 <li>All participants must be active enrolled students of SFIT.</li>
-                <li>The official SIH Idea Presentation Template is mandatory — any modification leads to disqualification.</li>
+                <li>The official SIH Idea Presentation Template is mandatory — any modification leads to disqualification. You must <a href="/Navkriti26-IDEA-Presentation-Format.pdf" download className="text-red-900 dark:text-red-100 font-bold underline hover:text-red-700 decoration-2 underline-offset-2">download and use this exact template</a>.</li>
                 <li>Submissions will close after the {navkritiConfig.submission.displayDeadline} deadline and will not be accepted under any circumstances.</li>
               </ul>
             </div>

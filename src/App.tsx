@@ -27,7 +27,7 @@ function App() {
       <ScrollToTop />
       {isLaptop && (
         <Suspense fallback={null}>
-          <SplashCursor SPLAT_RADIUS={0.1} PRESSURE_ITERATIONS={16} DYE_RESOLUTION={1200} />
+          <SplashCursor SPLAT_RADIUS={0.02} PRESSURE_ITERATIONS={16} DYE_RESOLUTION={1200} />
         </Suspense>
       )}
       <div className="min-h-screen">

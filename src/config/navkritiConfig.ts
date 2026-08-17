@@ -33,6 +33,6 @@ export const navkritiConfig = {
       { name: 'Rich Rebello', phone: '8828242446' },
     ],
     email: 'ieeesfit@sfit.ac.in', // Placeholder
-    whatsappGroupLink: 'https://chat.whatsapp.com/placeholder-link'
+    whatsappGroupLink: 'https://chat.whatsapp.com/IUWSn3zOWUK8Vp5mFJWaeQ'
   }
 };
