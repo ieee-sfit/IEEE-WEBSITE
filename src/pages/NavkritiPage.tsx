@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   Calendar, Users, Trophy, ChevronRight, FileText,
-  Info, AlertCircle, Lightbulb, Phone, CheckCircle2, XCircle, MessageCircle
+  Info, AlertCircle, Lightbulb, Phone, CheckCircle2, XCircle, MessageCircle, Eye, Download
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import NavkritiRegistration from '../components/NavkritiRegistration';
@@ -263,9 +263,29 @@ const NavkritiPage = () => {
                 <li><strong>Exactly 6 members</strong> per team — partial teams will not be accepted.</li>
                 <li><strong>Minimum 1 female</strong> participant per team is a mandatory SIH requirement.</li>
                 <li>All participants must be active enrolled students of SFIT.</li>
-                <li>The official SIH Idea Presentation Template is mandatory — any modification leads to disqualification. You must <a href="/Navkriti26-IDEA-Presentation-Format.pdf" download className="text-red-900 dark:text-red-100 font-bold underline hover:text-red-700 decoration-2 underline-offset-2">download and use this exact template</a>.</li>
+                <li>The official SIH Idea Presentation Template is mandatory — any modification leads to disqualification.</li>
                 <li>Submissions will close after the {navkritiConfig.submission.displayDeadline} deadline and will not be accepted under any circumstances.</li>
               </ul>
+              
+              <div className="mt-5 p-5 border border-slate-200 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-900/30 flex items-center justify-center shrink-0">
+                    <FileText className="w-6 h-6 text-blue-600 dark:text-blue-400" strokeWidth={1.5} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-slate-900 dark:text-white leading-tight">NAVKRITI '26 Idea Presentation Format</h3>
+                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wider mt-1 uppercase">PDF Document</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 w-full md:w-auto">
+                  <a href="/Navkriti26-IDEA-Presentation-Format.pdf" target="_blank" rel="noreferrer" className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                    <Eye className="w-4 h-4" /> View
+                  </a>
+                  <a href="/Navkriti26-IDEA-Presentation-Format.pdf" download className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-700 transition-colors shadow-sm shadow-blue-600/20">
+                    <Download className="w-4 h-4" /> Download
+                  </a>
+                </div>
+              </div>
             </div>
 
             {/* === Common Mistakes === */}
