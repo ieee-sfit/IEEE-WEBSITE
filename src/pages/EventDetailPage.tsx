@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, type Variants } from 'framer-motion';
 import {
-  Calendar, MapPin, Users, Clock, ArrowLeft, Award, TrendingUp,
+  Calendar, MapPin, Users, Clock, Award, TrendingUp,
   CheckCircle, Tag, User, Building2, ChevronRight, ExternalLink, ZoomIn, X
 } from 'lucide-react';
 import { getEventBySlug, eventsData, EventData } from '../data/eventsData';
