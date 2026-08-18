@@ -80,16 +80,6 @@ const EventDetailPage: React.FC = () => {
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/70" />
 
-        {/* Back button — offset below fixed navbar */}
-        <div className="absolute top-20 left-6">
-          <button
-            onClick={() => navigate('/events')}
-            className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white rounded-full font-medium transition-all duration-200 border border-white/30"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Events
-          </button>
-        </div>
 
         {/* Hero content */}
         <div className="absolute bottom-0 left-0 right-0 px-6 sm:px-12 pb-10 max-w-6xl mx-auto w-full" style={{ left: '50%', transform: 'translateX(-50%)' }}>
@@ -150,11 +140,11 @@ const EventDetailPage: React.FC = () => {
 
             {/* About section */}
             <motion.section variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-              <h2 className="text-2xl font-bold text-gray-800 mb-5 flex items-center gap-2">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-5 flex items-center gap-2">
                 <span className="w-1 h-6 bg-gradient-to-b from-blue-600 to-purple-600 rounded-full inline-block" />
                 About This Event
               </h2>
-              <div className="text-gray-600 leading-relaxed space-y-4 text-base">
+              <div className="text-gray-600 dark:text-gray-300 leading-relaxed space-y-4 text-base">
                 {(event.detailedDescription || event.description)
                   .split('\n')
                   .filter(Boolean)
@@ -167,7 +157,7 @@ const EventDetailPage: React.FC = () => {
             {/* Highlights */}
             {event.highlights && event.highlights.length > 0 && (
               <motion.section variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1}>
-                <h2 className="text-2xl font-bold text-gray-800 mb-5 flex items-center gap-2">
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-5 flex items-center gap-2">
                   <span className="w-1 h-6 bg-gradient-to-b from-blue-600 to-purple-600 rounded-full inline-block" />
                   What You'll Learn
                 </h2>
@@ -180,10 +170,10 @@ const EventDetailPage: React.FC = () => {
                       whileInView="visible"
                       viewport={{ once: true }}
                       custom={i * 0.5}
-                      className="flex items-start gap-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl px-4 py-3 border border-blue-100"
+                      className="flex items-start gap-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl px-4 py-3 border border-blue-100 dark:border-blue-800/30"
                     >
                       <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-700 text-sm leading-snug">{h}</span>
+                      <span className="text-gray-700 dark:text-gray-300 text-sm leading-snug">{h}</span>
                     </motion.div>
                   ))}
                 </div>
@@ -193,19 +183,19 @@ const EventDetailPage: React.FC = () => {
             {/* Speaker */}
             {event.speaker && (
               <motion.section variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={2}>
-                <h2 className="text-2xl font-bold text-gray-800 mb-5 flex items-center gap-2">
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-5 flex items-center gap-2">
                   <span className="w-1 h-6 bg-gradient-to-b from-blue-600 to-purple-600 rounded-full inline-block" />
                   Speaker
                 </h2>
-                <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 border border-blue-100 flex gap-5">
+                <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-2xl p-6 border border-blue-100 dark:border-blue-800/30 flex gap-5">
                   <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
                     <User className="w-8 h-8 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-800">{event.speaker.name}</h3>
-                    <p className="text-purple-600 font-medium text-sm mb-2">{event.speaker.title}</p>
+                    <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">{event.speaker.name}</h3>
+                    <p className="text-purple-600 dark:text-purple-400 font-medium text-sm mb-2">{event.speaker.title}</p>
                     {event.speaker.bio && (
-                      <p className="text-gray-600 text-sm leading-relaxed">{event.speaker.bio}</p>
+                      <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{event.speaker.bio}</p>
                     )}
                   </div>
                 </div>
@@ -215,7 +205,7 @@ const EventDetailPage: React.FC = () => {
             {/* Gallery */}
             {event.gallery && event.gallery.length > 0 && (
               <motion.section variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={3}>
-                <h2 className="text-2xl font-bold text-gray-800 mb-5 flex items-center gap-2">
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-5 flex items-center gap-2">
                   <span className="w-1 h-6 bg-gradient-to-b from-blue-600 to-purple-600 rounded-full inline-block" />
                   Event Gallery
                 </h2>
@@ -224,7 +214,7 @@ const EventDetailPage: React.FC = () => {
                     <motion.div
                       key={i}
                       whileHover={{ scale: 1.02 }}
-                      className="relative overflow-hidden rounded-xl cursor-pointer group aspect-video bg-gray-100"
+                      className="relative overflow-hidden rounded-xl cursor-pointer group aspect-video bg-gray-100 dark:bg-gray-800"
                       onClick={() => setLightboxImg(img)}
                     >
                       <img
@@ -245,23 +235,23 @@ const EventDetailPage: React.FC = () => {
             {/* Attendance Chart */}
             {event.attendance && (
               <motion.section variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={4}>
-                <h2 className="text-2xl font-bold text-gray-800 mb-5 flex items-center gap-2">
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-5 flex items-center gap-2">
                   <span className="w-1 h-6 bg-gradient-to-b from-blue-600 to-purple-600 rounded-full inline-block" />
                   Attendance Breakdown
                 </h2>
-                <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 border border-blue-100">
+                <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-2xl p-6 border border-blue-100 dark:border-blue-800/30">
                   <div className="flex items-center justify-between mb-6">
                     <div>
-                      <p className="text-sm text-gray-500 font-medium">Total Participants</p>
-                      <p className="text-4xl font-bold text-gray-800">{event.attendance.total}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Total Participants</p>
+                      <p className="text-4xl font-bold text-gray-800 dark:text-gray-100">{event.attendance.total}</p>
                     </div>
                     <TrendingUp className="w-10 h-10 text-blue-500 opacity-60" />
                   </div>
                   <div className="space-y-3">
                     {event.attendance.breakdown.map((dept, i) => (
                       <div key={i} className="flex items-center gap-3">
-                        <span className="text-sm font-semibold text-gray-700 w-14 flex-shrink-0">{dept.department}</span>
-                        <div className="flex-1 bg-white/70 rounded-full h-3 overflow-hidden shadow-inner">
+                        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 w-14 flex-shrink-0">{dept.department}</span>
+                        <div className="flex-1 bg-white/70 dark:bg-gray-800 rounded-full h-3 overflow-hidden shadow-inner">
                           <motion.div
                             initial={{ width: 0 }}
                             whileInView={{ width: `${(dept.count / maxAttendance) * 100}%` }}
@@ -270,7 +260,7 @@ const EventDetailPage: React.FC = () => {
                             className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"
                           />
                         </div>
-                        <span className="text-sm font-bold text-gray-700 w-8 text-right">{dept.count}</span>
+                        <span className="text-sm font-bold text-gray-700 dark:text-gray-300 w-8 text-right">{dept.count}</span>
                       </div>
                     ))}
                   </div>
@@ -281,7 +271,7 @@ const EventDetailPage: React.FC = () => {
             {/* Topics */}
             {event.topics && event.topics.length > 0 && (
               <motion.section variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={5}>
-                <h2 className="text-2xl font-bold text-gray-800 mb-5 flex items-center gap-2">
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-5 flex items-center gap-2">
                   <span className="w-1 h-6 bg-gradient-to-b from-blue-600 to-purple-600 rounded-full inline-block" />
                   Topics Covered
                 </h2>
@@ -289,7 +279,7 @@ const EventDetailPage: React.FC = () => {
                   {event.topics.map((topic, i) => (
                     <span
                       key={i}
-                      className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-blue-50 to-purple-50 text-blue-800 text-sm font-medium rounded-full border border-blue-200"
+                      className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 text-blue-800 dark:text-blue-300 text-sm font-medium rounded-full border border-blue-200 dark:border-blue-800/50"
                     >
                       <Tag className="w-3.5 h-3.5" />
                       {topic}
@@ -309,65 +299,65 @@ const EventDetailPage: React.FC = () => {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              className="bg-white border border-gray-200 rounded-2xl shadow-lg p-6"
+              className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl shadow-lg p-6"
             >
-              <h3 className="text-lg font-bold text-gray-800 mb-5">Event Details</h3>
+              <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-5">Event Details</h3>
               <ul className="space-y-4">
                 <li className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
-                    <Calendar className="w-4 h-4 text-blue-600" />
+                  <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                    <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Date</p>
-                    <p className="text-gray-700 font-semibold text-sm">{event.displaydate}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 font-medium uppercase tracking-wide">Date</p>
+                    <p className="text-gray-700 dark:text-gray-300 font-semibold text-sm">{event.displaydate}</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0">
-                    <Clock className="w-4 h-4 text-purple-600" />
+                  <div className="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center flex-shrink-0">
+                    <Clock className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Time</p>
-                    <p className="text-gray-700 font-semibold text-sm">{event.time}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 font-medium uppercase tracking-wide">Time</p>
+                    <p className="text-gray-700 dark:text-gray-300 font-semibold text-sm">{event.time}</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-pink-50 flex items-center justify-center flex-shrink-0">
-                    <MapPin className="w-4 h-4 text-pink-600" />
+                  <div className="w-9 h-9 rounded-xl bg-pink-50 dark:bg-pink-900/30 flex items-center justify-center flex-shrink-0">
+                    <MapPin className="w-4 h-4 text-pink-600 dark:text-pink-400" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Location</p>
-                    <p className="text-gray-700 font-semibold text-sm">{event.location}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 font-medium uppercase tracking-wide">Location</p>
+                    <p className="text-gray-700 dark:text-gray-300 font-semibold text-sm">{event.location}</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-green-50 flex items-center justify-center flex-shrink-0">
-                    <Users className="w-4 h-4 text-green-600" />
+                  <div className="w-9 h-9 rounded-xl bg-green-50 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
+                    <Users className="w-4 h-4 text-green-600 dark:text-green-400" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Participants</p>
-                    <p className="text-gray-700 font-semibold text-sm">{event.attendees}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 font-medium uppercase tracking-wide">Participants</p>
+                    <p className="text-gray-700 dark:text-gray-300 font-semibold text-sm">{event.attendees}</p>
                   </div>
                 </li>
                 {event.organizer && (
                   <li className="flex items-start gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center flex-shrink-0">
-                      <Building2 className="w-4 h-4 text-orange-600" />
+                    <div className="w-9 h-9 rounded-xl bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center flex-shrink-0">
+                      <Building2 className="w-4 h-4 text-orange-600 dark:text-orange-400" />
                     </div>
                     <div>
-                      <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Organizer</p>
-                      <p className="text-gray-700 font-semibold text-sm">{event.organizer}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 font-medium uppercase tracking-wide">Organizer</p>
+                      <p className="text-gray-700 dark:text-gray-300 font-semibold text-sm">{event.organizer}</p>
                     </div>
                   </li>
                 )}
                 {event.satisfaction && (
                   <li className="flex items-start gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-yellow-50 flex items-center justify-center flex-shrink-0">
-                      <Award className="w-4 h-4 text-yellow-600" />
+                    <div className="w-9 h-9 rounded-xl bg-yellow-50 dark:bg-yellow-900/30 flex items-center justify-center flex-shrink-0">
+                      <Award className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
                     </div>
                     <div>
-                      <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Satisfaction</p>
-                      <p className="text-gray-700 font-semibold text-sm">{event.satisfaction}%</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 font-medium uppercase tracking-wide">Satisfaction</p>
+                      <p className="text-gray-700 dark:text-gray-300 font-semibold text-sm">{event.satisfaction}%</p>
                     </div>
                   </li>
                 )}
@@ -404,12 +394,12 @@ const EventDetailPage: React.FC = () => {
                 initial="hidden"
                 animate="visible"
                 custom={1}
-                className="bg-white border border-gray-200 rounded-2xl shadow-lg p-6"
+                className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl shadow-lg p-6"
               >
-                <h3 className="text-lg font-bold text-gray-800 mb-4">Speakers</h3>
+                <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">Speakers</h3>
                 <ul className="space-y-2">
                   {event.speakers.map((sp, i) => (
-                    <li key={i} className="flex items-center gap-3 text-gray-700 text-sm">
+                    <li key={i} className="flex items-center gap-3 text-gray-700 dark:text-gray-300 text-sm">
                       <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center flex-shrink-0">
                         <User className="w-3.5 h-3.5 text-white" />
                       </div>
@@ -432,10 +422,10 @@ const EventDetailPage: React.FC = () => {
             className="mt-20"
           >
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-bold text-gray-800">More Events</h2>
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">More Events</h2>
               <Link
                 to="/events"
-                className="flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium text-sm transition-colors"
+                className="flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium text-sm transition-colors"
               >
                 View all <ChevronRight className="w-4 h-4" />
               </Link>
@@ -450,7 +440,7 @@ const EventDetailPage: React.FC = () => {
                   whileInView="visible"
                   viewport={{ once: true }}
                   whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                  className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow cursor-pointer"
+                  className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow cursor-pointer"
                   onClick={() => navigate(`/events/${rel.slug}`)}
                 >
                   <div className="h-40 overflow-hidden">
@@ -462,13 +452,13 @@ const EventDetailPage: React.FC = () => {
                     />
                   </div>
                   <div className="p-4">
-                    <span className="text-xs font-semibold text-purple-600 bg-purple-50 px-2 py-1 rounded-full">
+                    <span className="text-xs font-semibold text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/30 px-2 py-1 rounded-full">
                       {rel.category}
                     </span>
-                    <h4 className="mt-2 font-bold text-gray-800 line-clamp-2 text-sm leading-snug">
+                    <h4 className="mt-2 font-bold text-gray-800 dark:text-gray-100 line-clamp-2 text-sm leading-snug">
                       {rel.title}
                     </h4>
-                    <div className="flex items-center gap-1.5 mt-2 text-gray-500 text-xs">
+                    <div className="flex items-center gap-1.5 mt-2 text-gray-500 dark:text-gray-400 text-xs">
                       <Calendar className="w-3 h-3" />
                       {rel.displaydate}
                     </div>
