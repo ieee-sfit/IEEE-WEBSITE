@@ -22,6 +22,8 @@ export default function NavkritiPortal() {
   // New Submission Fields
   const [domain, setDomain] = useState('');
   const [problemStatement, setProblemStatement] = useState('');
+  const [psTitle, setPsTitle] = useState('');
+  const [category, setCategory] = useState('');
   const [solutionTitle, setSolutionTitle] = useState('');
   const [summary, setSummary] = useState('');
   const [pptFile, setPptFile] = useState<File | null>(null);
@@ -96,6 +98,8 @@ export default function NavkritiPortal() {
       const formData = new FormData();
       formData.append('domain', domain);
       formData.append('problem_statement', problemStatement);
+      formData.append('ps_title', psTitle);
+      formData.append('category', category);
       formData.append('solution_title', solutionTitle);
       formData.append('summary', summary);
       formData.append('ppt_file', pptFile);
@@ -247,7 +251,7 @@ export default function NavkritiPortal() {
           <form onSubmit={handleUpload} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-semibold mb-2">Project Domain</label>
+                <label className="block text-sm font-semibold mb-2">Theme</label>
                 <select
                   required
                   value={domain}
@@ -275,13 +279,40 @@ export default function NavkritiPortal() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-semibold mb-2">Problem Statement</label>
+                <label className="block text-sm font-semibold mb-2">Category</label>
+                <select
+                  required
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none"
+                >
+                  <option value="">Select Category</option>
+                  <option value="Software">Software</option>
+                  <option value="Hardware">Hardware</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-semibold mb-2">PS Number (ID)</label>
                 <input
                   type="text"
                   required
                   value={problemStatement}
                   onChange={(e) => setProblemStatement(e.target.value)}
-                  placeholder="e.g., SIH1234 or Custom Problem"
+                  placeholder="e.g., 26001"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold mb-2">Problem Statement Title</label>
+                <input
+                  type="text"
+                  required
+                  value={psTitle}
+                  onChange={(e) => setPsTitle(e.target.value)}
+                  placeholder="Enter the full PS Title from SIH Portal"
                   className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none"
                 />
               </div>
