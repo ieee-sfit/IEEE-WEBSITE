@@ -89,12 +89,12 @@ serve(async (req) => {
         const validYears = ['FE', 'SE', 'TE', 'BE'];
         if (!validYears.includes(year)) throw new Error(`Invalid year for participant ${idx + 1}`);
         
-        const pid = normalizeString(m.pid);
+        const pid = normalizeString(m.pid).toUpperCase();
         if (!pid) throw new Error(`PID cannot be empty for participant ${idx + 1}`);
 
         return {
             is_leader: idx === 0,
-            pid: normalizeString(m.pid),
+            pid: pid,
             email: email,
             name: normalizeString(m.name),
             phone: normalizeString(m.phone),
@@ -166,7 +166,17 @@ serve(async (req) => {
     if (error) {
       console.error('RPC Error:', error);
       await supabaseClient.storage.from('payment_receipts').remove([payment_receipt_path]);
-      throw new Error(error.message);
+      
+      let friendlyMessage = error.message;
+      if (friendlyMessage.includes('participants_email_key') || friendlyMessage.includes('unique constraint') && friendlyMessage.includes('email')) {
+          friendlyMessage = 'One or more emails are already registered with another team.';
+      } else if (friendlyMessage.includes('participants_pid_key') || friendlyMessage.includes('unique constraint') && friendlyMessage.includes('pid')) {
+          friendlyMessage = 'One or more PIDs are already registered with another team.';
+      } else if (friendlyMessage.includes('teams_team_name_key') || friendlyMessage.includes('unique constraint') && friendlyMessage.includes('team_name')) {
+          friendlyMessage = 'This team name is already taken. Please choose another one.';
+      }
+      
+      throw new Error(friendlyMessage);
     }
 
     // data contains { success: true, team_uuid, team_id, is_duplicate }
