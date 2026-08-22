@@ -1,6 +1,8 @@
 import os
+import os
 import json
 import urllib.request
+import urllib.parse
 import pandas as pd
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
@@ -81,6 +83,10 @@ for t in teams:
     
     if not leader: continue
     
+    # Generate Direct Payment Proof Link
+    receipt_path = t.get('payment_receipt_path')
+    payment_link = f"{SUPABASE_URL}/storage/v1/object/public/payment_receipts/{urllib.parse.quote(receipt_path)}" if receipt_path else ""
+
     row = {
         'Sr. No.': len(df) + len(new_rows) + 1,
         'Submitted At': parse_date(t.get('created_at')),
@@ -92,7 +98,7 @@ for t in teams:
         'Phone Number': leader.get('phone'),
         'Department': leader.get('branch'),
         'Year': leader.get('year'),
-        'Payment Proof': t.get('payment_receipt_path'),
+        'Payment Proof': payment_link,
         "Payee's Upi ID": t.get('payee_upi_id')
     }
     
