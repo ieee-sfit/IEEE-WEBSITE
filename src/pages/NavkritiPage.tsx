@@ -48,8 +48,8 @@ const NavkritiPage = () => {
             <button
               onClick={() => setActiveTab('register')}
               className={`px-8 py-4 rounded-xl font-bold transition-all duration-300 flex items-center gap-2 ${activeTab === 'register'
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30 scale-105'
-                  : 'bg-slate-900 dark:bg-slate-800 text-white hover:bg-blue-600 hover:text-white'
+                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30 scale-105'
+                : 'bg-slate-900 dark:bg-slate-800 text-white hover:bg-blue-600 hover:text-white'
                 }`}
             >
               Register Team <ChevronRight className="w-5 h-5" />
@@ -57,8 +57,8 @@ const NavkritiPage = () => {
             <button
               onClick={() => setActiveTab('info')}
               className={`px-8 py-4 rounded-xl font-bold transition-all duration-300 ${activeTab === 'info'
-                  ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-2 border-blue-600 dark:border-blue-500'
-                  : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-blue-400'
+                ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-2 border-blue-600 dark:border-blue-500'
+                : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-blue-400'
                 }`}
             >
               Event Details
@@ -125,7 +125,7 @@ const NavkritiPage = () => {
                     <strong className="text-sm text-green-900 dark:text-green-100">Join the Official WhatsApp Group</strong>
                   </div>
                   <p className="text-xs text-green-800 dark:text-green-300 leading-relaxed">
-                    All participants must join the WhatsApp group for important announcements, status updates, queries, etc.
+                    Only the team leader should join the WhatsApp group for important announcements, status updates, queries, etc.
                   </p>
                   <a
                     href={navkritiConfig.contact.whatsappGroupLink}
@@ -163,28 +163,52 @@ const NavkritiPage = () => {
             </div>
 
             {/* === Problem Statements Teaser === */}
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
-              <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
-              <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div>
-                  <h2 className="text-2xl font-bold mb-3 flex items-center gap-3 text-white">
-                    <FileText className="w-6 h-6 text-blue-200" /> Problem Statements
-                  </h2>
-                  <p className="text-blue-100 text-lg mb-2">
-                    The official problem statements for Navkriti '26 will be revealed on <strong className="text-white">{navkritiConfig.problemStatements.displayDate}</strong>.
-                  </p>
-                  <p className="text-blue-200 text-sm">
-                    Registered teams will be notified via the portal and WhatsApp group.
-                  </p>
-                </div>
-                <div className="shrink-0 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 text-center">
-                  <div className="text-blue-100 text-xs font-semibold uppercase tracking-wider mb-1">Status</div>
-                  <div className="text-xl font-black text-white flex items-center gap-2 justify-center">
-                    <AlertCircle className="w-5 h-5 text-yellow-300" /> Dropping Soon
+            {Date.now() >= new Date(navkritiConfig.problemStatements.releaseDate).getTime() ? (
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
+                <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+                <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                  <div>
+                    <h2 className="text-2xl font-bold mb-3 flex items-center gap-3 text-white">
+                      <FileText className="w-6 h-6 text-blue-200" /> Problem Statements Are Live
+                    </h2>
+                    <p className="text-blue-100 text-lg mb-2">
+                      The official problem statements for Navkriti '26 are now available. 
+                    </p>
+                    <p className="text-blue-200 text-sm">
+                      Pick a theme that fits your team's strengths and start innovating!
+                    </p>
+                  </div>
+                  <div className="shrink-0">
+                    <Link to="/navkriti/problem-statements" className="px-6 py-3 bg-white text-blue-700 font-bold rounded-xl hover:bg-blue-50 transition-colors shadow-sm inline-flex items-center gap-2">
+                      View Statements <ChevronRight className="w-4 h-4" />
+                    </Link>
                   </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
+                <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+                <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                  <div>
+                    <h2 className="text-2xl font-bold mb-3 flex items-center gap-3 text-white">
+                      <FileText className="w-6 h-6 text-blue-200" /> Problem Statements
+                    </h2>
+                    <p className="text-blue-100 text-lg mb-2">
+                      The official problem statements for Navkriti '26 will be revealed on <strong className="text-white">{navkritiConfig.problemStatements.displayDate}</strong>.
+                    </p>
+                    <p className="text-blue-200 text-sm">
+                      Registered teams will be notified via the portal and WhatsApp group.
+                    </p>
+                  </div>
+                  <div className="shrink-0 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 text-center">
+                    <div className="text-blue-100 text-xs font-semibold uppercase tracking-wider mb-1">Status</div>
+                    <div className="text-xl font-black text-white flex items-center gap-2 justify-center">
+                      <AlertCircle className="w-5 h-5 text-yellow-300" /> Dropping Soon
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* === How It Works === */}
             <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8">
@@ -266,7 +290,7 @@ const NavkritiPage = () => {
                 <li>The official SIH 2026 Idea Presentation Template is mandatory — any modification leads to disqualification.</li>
                 <li>Submissions will close after the {navkritiConfig.submission.displayDeadline} deadline and will not be accepted under any circumstances.</li>
               </ul>
-              
+
               <div className="mt-5 p-5 border border-slate-200 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="w-14 h-14 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-900/30 flex items-center justify-center shrink-0">

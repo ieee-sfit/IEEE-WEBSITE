@@ -86,12 +86,7 @@ const morphingCard = {
   }
 };
 
-const STATS_DATA = [
-  { icon: Award, value: 10, suffix: '+', label: 'Events Organized', color: 'blue', textClass: 'text-blue-600' },
-  { icon: Users, value: 1200, suffix: '+', label: 'Total Participants', color: 'purple', textClass: 'text-purple-600' },
-  { icon: TrendingUp, value: 89, suffix: '%', label: 'Avg Satisfaction', color: 'green', textClass: 'text-green-600' },
-  { icon: Target, value: 8, suffix: '', label: 'Completed Events', color: 'pink', textClass: 'text-pink-600' },
-];
+
 
 const ORB_CONFIG = [
   { color: 'bg-purple-200', w: 40, h: 40, top: 8, left: 5 },
@@ -116,7 +111,20 @@ const EventsPage = () => {
 
   const allEvents = eventsData;
   const featuredEvent = allEvents.find(event => event.featured);
-  const statsData = STATS_DATA;
+  
+  const completedEvents = allEvents.filter(e => e.status === 'completed');
+  const totalParticipants = completedEvents.reduce((acc, curr) => acc + (curr.attendees || 0), 0);
+  const eventsWithSatisfaction = completedEvents.filter(e => e.satisfaction != null);
+  const avgSatisfaction = eventsWithSatisfaction.length
+    ? Math.round(eventsWithSatisfaction.reduce((acc, curr) => acc + curr.satisfaction!, 0) / eventsWithSatisfaction.length)
+    : 0;
+
+  const statsData = [
+    { icon: Award, value: allEvents.length, suffix: '', label: 'Events Organized', color: 'blue', textClass: 'text-blue-600' },
+    { icon: Users, value: totalParticipants, suffix: '+', label: 'Total Participants', color: 'purple', textClass: 'text-purple-600' },
+    { icon: TrendingUp, value: avgSatisfaction, suffix: '%', label: 'Avg Satisfaction', color: 'green', textClass: 'text-green-600' },
+    { icon: Target, value: completedEvents.length, suffix: '', label: 'Completed Events', color: 'pink', textClass: 'text-pink-600' },
+  ];
 
   const filteredEvents = useMemo(() => {
     if (activeFilter === 'all') return allEvents;

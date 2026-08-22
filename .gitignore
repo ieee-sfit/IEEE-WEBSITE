@@ -30,3 +30,6 @@ dist-ssr
 playwright-report/
 test-results/
 *.tsbuildinfo
+# Data files
+*.xlsx
+*.csv

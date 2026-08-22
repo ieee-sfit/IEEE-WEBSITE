@@ -76,7 +76,7 @@ export const eventsData: EventData[] = [
     time: 'TBD',
     location: 'Lab 2, SFIT',
     attendees: 60,
-    registrations: 50,
+    registrations: 65,
     category: 'Workshop',
     status: 'completed',
     description:
@@ -98,6 +98,15 @@ export const eventsData: EventData[] = [
     satisfaction: 87,
     form: '',
     organizer: 'IEEE SFIT Student Branch',
+    attendance: {
+      total: 60,
+      breakdown: [
+        { department: 'CMPN', count: 25 },
+        { department: 'INFT', count: 20 },
+        { department: 'EXTC', count: 10 },
+        { department: 'ELEC', count: 5 },
+      ]
+    },
   },
   {
     id: 6,
@@ -163,7 +172,7 @@ export const eventsData: EventData[] = [
     time: 'TBD',
     location: 'SFIT Campus',
     attendees: 50,
-    registrations: 45,
+    registrations: 55,
     category: 'Orientation',
     status: 'completed',
     description:
@@ -184,6 +193,15 @@ export const eventsData: EventData[] = [
     satisfaction: 90,
     form: '',
     organizer: 'IEEE SFIT Student Branch',
+    attendance: {
+      total: 50,
+      breakdown: [
+        { department: 'CMPN', count: 20 },
+        { department: 'INFT', count: 15 },
+        { department: 'EXTC', count: 10 },
+        { department: 'ELEC', count: 5 },
+      ]
+    },
   },
   {
     id: 8,
@@ -203,13 +221,6 @@ export const eventsData: EventData[] = [
       "Techno Art Showdown — National Space Day Special\n\nOn National Space Day, IEEE SFIT conducted the Techno Art Showdown, a groundbreaking fusion of technology and creativity that captivated participants and spectators alike. Held in honor of the day dedicated to exploring the cosmos, this event showcased a unique blend of technical prowess and artistic expression.\n\nThe event took place offline in Room 602 in a dynamic two-phase format.\n\nPhase 1 — Creativity with Pixels (Digital Art Contest)\n\nParticipants channelled their imagination through digital tools to create space-themed artworks, blending technical skills with artistic creativity. The contest celebrated individual expression and design thinking.\n\nDigital Art Winners:\n• Shriya Saxena (TE, CMPN-B)\n• Scania Dsilva (TE, CMPN-A)\n• Roshit Jain (TE, ELEC-A)\n• Annie Dande (SE, INFT-A)\n\nPhase 2 — Virtual Treasure Hunt\n\nTeams raced through a digitally crafted treasure hunt that tested problem-solving, teamwork, and quick thinking in a fun competitive format.\n\nTreasure Hunt Winners:\n🥇 1st Place — Aditya Shinde, Swapnil Singh, Rahul & Ansley Rebello (TE, CMPN-B)\n🥈 2nd Place — Steve, Noel & Siddhant Rangole (SE, CMPN-B)\n\nThe event concluded with prize distribution for exceptional performances. The success of the Techno Art Showdown underscored the growing interest in blending technology with creative pursuits and highlighted IEEE SFIT's commitment to fostering innovation and exploration in both fields.",
     image:
       'https://i.postimg.cc/QtHvHCdW/The-IEEE-Student-Branch-WIE-conducted-the-Techno-Art-Showdown-Phase-1-Techno-Art-Showdown-showca.jpg',
-    gallery: [
-      '/events/techno-art-showdown/image1.jpg',
-      '/events/techno-art-showdown/image2.jpg',
-      '/events/techno-art-showdown/image3.jpg',
-      '/events/techno-art-showdown/image4.jpg',
-      '/events/techno-art-showdown/image5.jpg',
-    ],
     featured: false,
     highlights: [
       '136 participants across CMPN, INFT, EXTC, ELEC & MECH',
@@ -253,13 +264,6 @@ export const eventsData: EventData[] = [
     detailedDescription:
       "RADIANT RUMBLE: A Glow-Ring Football Tournament\n\nRadiant Rumble was organized by the IEEE SFIT Student Branch (ISSB) for Mosaic 2023. In contrast to traditional ring football, Glow Ring-Football is played in a unique setting where the playing field is illuminated by UV black light and marked with reflective tape. This distinct version involved two teams of three players each, competing in a dimly lit room.\n\nEach player was given a glow-stick band in their team colour and a UV-reflective vest. The football itself was also UV-reflective. As part of the Mosaic technical spirit, teams completed a technical buzzer challenge instead of a traditional coin toss — the team that buzzed first and answered correctly chose their side and kicked off the game. Matches were conducted simultaneously on two grounds in Rooms 614 and 615, while participants waited and assembled in Room 613.\n\nDay 1 — September 15, 2023\n\nFollowing the Mosaic inauguration, the first round of the tournament commenced. Each match was played for 5 minutes, and the winning team qualified for the next round. Faculty members also joined in friendly matches between rounds to show their support and add to the energy. The day concluded with the completion of the first round and the start of several second-round matches.\n\nDay 2 — September 16, 2023\n\nQualified teams returned for the knockout rounds. Second and third knockout rounds were played simultaneously on both grounds. After navigating through those, winners advanced to the fourth knockout round. The triumphant teams from the fourth round competed in the semifinals to secure a finals spot. The two teams knocked out in the semifinals played a third-place match.\n\nThe event concluded with great success as ISSB Core members awarded the winners with cash prizes, footballs, and football jerseys.",
     image: 'https://i.postimg.cc/C1sSszVr/Radiant-Rumble.jpg',
-    gallery: [
-      '/events/radiant-rumble/image1.jpg',
-      '/events/radiant-rumble/image2.jpg',
-      '/events/radiant-rumble/image3.jpg',
-      '/events/radiant-rumble/image4.jpg',
-      '/events/radiant-rumble/image5.jpg',
-    ],
     featured: false,
     highlights: [
       '306 students registered across SFIT and other colleges',
@@ -296,7 +300,7 @@ export const eventsData: EventData[] = [
     time: '11:00 AM – 5:00 PM',
     location: 'Google Meet (Online)',
     attendees: 54,
-    registrations: 14,
+    registrations: 54,
     category: 'Quiz Competition',
     status: 'completed',
     description:
@@ -304,13 +308,6 @@ export const eventsData: EventData[] = [
     detailedDescription:
       "InQUIZITIVE: Discover the Prodigy Among Us\n\nSt. Francis Institute of Technology (SFIT) launched its first-ever female-centric technical community 'Techess', aimed at giving opportunities to female engineers and inspiring them to achieve their goals. The Techess Community, along with the IEEE SFIT Student Branch, organized InQUIZitive as their first flagship event for the academic year on Saturday, 9th April 2022, conducted over Google Meet with 14 participants and an audience of 40.\n\nThe session began at 11:00 AM, with Techess member Ms. Balin Menezes welcoming all the audience and introducing the event. This was followed by a short welcoming speech by Ms. Preksha Prakash, Chairperson of Techess. Before starting the competition, Ms. Simran Dubey explained the rules and regulations to all participants.\n\nRound 1 — General Quiz\n\nThere were 7 teams of two members each. Every team was asked 10 questions based on technology, general knowledge, and current affairs. Each correct answer was worth 10 points, and each team had 2 lifelines. The time limit per question was 45 seconds. If a team exceeded the time limit, they received zero points for that question.\n\nLifeline 1 — Swap the Question: The current question was swapped with a new one.\nLifeline 2 — Expert Advice: Experts Ms. Anushka Somvanshi and Mr. Sahil Sawant (ex-members of IEEE SFIT Student Branch) assisted teams.\n\nRound 1 Results:\n• Semil Shah & Vishakha Mistry — 90/100\n• Jash Tailor & Abraham Thothiyil — 80/100\n• Gaurav Yadav & Rahul Biya — 70/100\n• Tripti Nayak & Lian Sequeira — 65/100\n• Arsalan Haidery & Amogh Vartak — 55/100\n\nThe top three teams advanced to the Final Round.\n\nRound 2 — Fastest Buzzer Final Showdown\n\nThe second part of the session started at 3:00 PM, preceded by an amazing musical performance of 'Saath Surr'. The Final Showdown was a Fastest Buzzer Round conducted using 'justbuzz.in'. Three teams competed across 15 questions of increasing difficulty, each worth 10 points.\n\nBuzzer Rules: First buzz and correct answer = 10 points. First buzz but no answer within 5 seconds = −5 points. Second buzz and correct answer = 5 points.\n\nFinal Round Results:\n• Gaurav Yadav & Rahul Biya — 45 points 🏆 1st Place\n• Semil Shah & Vishakha Mistry — 30 points 🥈 2nd Place\n• Jash Tailor & Abraham Thothiyil — −5 points\n\nGuest Lecture & Prize Distribution\n\nIEEE Techess in collaboration with the SFIT Alumni Association invited guest speaker Ms. Joann Martins, Technical Lead CMATS Design R1 at Airservices Australia. She shared her professional journey, motivated the audience, and announced the winners. Gaurav Yadav & Rahul Biya won the first prize of ₹1,250 cash and certificates. Semil Shah & Vishakha Mistry won the second prize of ₹750 cash and certificates. The event concluded at 5:00 PM with a vote of thanks by Ms. Vaishnavi Puthran and a quick photo session.",
     image: 'https://i.postimg.cc/BnmFMnJ6/Inquizitive.jpg',
-    gallery: [
-      '/events/inquizitive/image1.jpg',
-      '/events/inquizitive/image2.jpg',
-      '/events/inquizitive/image3.jpg',
-      '/events/inquizitive/image4.jpg',
-      '/events/inquizitive/image5.jpg',
-    ],
     featured: false,
     highlights: [
       '7 teams of 2 participants competed across two rounds',
@@ -332,11 +329,11 @@ export const eventsData: EventData[] = [
     form: '',
     organizer: 'IEEE Techess & IEEE SFIT Student Branch',
     attendance: {
-      total: 14,
+      total: 54,
       breakdown: [
-        { department: 'CMPN', count: 6 },
-        { department: 'INFT', count: 6 },
-        { department: 'EXTC', count: 2 },
+        { department: 'CMPN', count: 25 },
+        { department: 'INFT', count: 20 },
+        { department: 'EXTC', count: 9 },
       ],
     },
   },
@@ -349,7 +346,7 @@ export const eventsData: EventData[] = [
     time: '3:00 PM – 5:00 PM',
     location: 'Room 618, SFIT',
     attendees: 30,
-    registrations: 0,
+    registrations: 35,
     category: 'Workshop',
     status: 'completed',
     description:
@@ -374,6 +371,14 @@ export const eventsData: EventData[] = [
     satisfaction: null,
     form: '',
     organizer: 'IEEE × WIE SFIT Student Branch',
+    attendance: {
+      total: 30,
+      breakdown: [
+        { department: 'CMPN', count: 12 },
+        { department: 'INFT', count: 10 },
+        { department: 'EXTC', count: 8 },
+      ],
+    },
   },
   {
     id: 13,
@@ -384,7 +389,7 @@ export const eventsData: EventData[] = [
     time: '1:00 PM – 5:00 PM',
     location: 'Room 618, SFIT',
     attendees: 40,
-    registrations: 0,
+    registrations: 45,
     category: 'Quiz Competition',
     status: 'completed',
     description:
@@ -408,6 +413,14 @@ export const eventsData: EventData[] = [
     satisfaction: null,
     form: '',
     organizer: 'WIE SFIT Student Branch',
+    attendance: {
+      total: 40,
+      breakdown: [
+        { department: 'CMPN', count: 15 },
+        { department: 'INFT', count: 15 },
+        { department: 'EXTC', count: 10 },
+      ],
+    },
   },
   {
     id: 11,
@@ -426,13 +439,6 @@ export const eventsData: EventData[] = [
     detailedDescription:
       "NEON KICKOFF: 3v3 UV Football under the Glow\n\nNeon Kickoff was organised by the IEEE SFIT Student Branch as part of Mosaic 2025 — a high-energy 3-vs-3 mini football tournament played in a glowing arena under UV floodlights and LED strips. The field, goalposts, ball, and player jerseys all illuminated under black light, creating a visually electrifying atmosphere that fused competitive sport with a tech-fest vibe.\n\nField & Setup\n\nThe arena was approximately 20 m × 12 m (mini futsal size), with boundaries marked using UV glow tape and LED ropes. Goalposts stood 4 ft (H) × 6 ft (W) as glowing mini-goals. Each team wore distinct neon jerseys and glow bands (neon green vs neon pink), and the ball was a fluorescent glow-in-the-dark football. Laser-tag foul markers lined the sides of the field.\n\nGame Format & Rules\n\nEach match lasted 13 minutes — a 3-minute technical challenge followed by a 10-minute football match. Before kick-off, one player from each team scanned QR codes to unlock a riddle; the first team to solve it won toss advantage and a free kick at the start. Each team fielded 3 players: attacker, midfielder, and defender.\n\nScoring System:\n• Normal Goal = 1 point\n• Golden Minute Goal = 2 points (with special sound & light effects)\n• Mystery Ball Goal = 3 points (different colour ball, extra fanfare)\n• Long-range shot from midline circle = +2 bonus points\n\nFouls & Penalties:\n• Push, handball, or slide tackle = Free kick\n• Crossing the laser-tag foul section = Foul\n• Draws → Penalty shootout (3 kicks per team) with obstacles in front of goalpost\n\nMatches concluded at 10 minutes or when a team first reached 10 goals. An on-field referee and a scorer/announcer tracked the live score.\n\nTechnical & Creative Add-ons\n\nA projector/LED screen displayed live scores and team names. A leaderboard tracked teams with the most goals and fastest times. Background music played throughout, with louder beats for goals. Volunteers roamed the arena with scorecards showing each team's tally for crowd engagement.\n\nSummary — Rocket League Side Game\n\nA side e-sports station was set up in the waiting room for teams not currently playing. Participants could challenge each other on Rocket League — a football video game where cars play soccer in a glowing arena — keeping the football & glow theme alive even off the main field. Managed by a dedicated volunteer, the mini e-sports corner offered 1v1 or 2v2 matches (5–10 minutes each), with a leaderboard for the highest scorer of the day.",
     image: 'https://i.postimg.cc/5yGw4Rgn/Whats-App-Image-2025-10-15-at-10-12-07-7e32472a.jpg',
-    gallery: [
-      '/events/neon-kickoff/image1.jpg',
-      '/events/neon-kickoff/image2.jpg',
-      '/events/neon-kickoff/image3.jpg',
-      '/events/neon-kickoff/image4.jpg',
-      '/events/neon-kickoff/image5.jpg',
-    ],
     featured: false,
     highlights: [
       '83 participants from CMPN, INFT, EXTC, MECH, AIML, ECS & ELEC',
@@ -472,7 +478,7 @@ export const eventsData: EventData[] = [
     time: 'TBD',
     location: 'SFIT Campus',
     attendees: 120,
-    registrations: 45,
+    registrations: 140,
     category: 'Competition',
     status: 'completed',
     description:
@@ -494,6 +500,15 @@ export const eventsData: EventData[] = [
     satisfaction: null,
     form: '',
     organizer: 'IEEE SFIT x WIE Student Branch',
+    attendance: {
+      total: 120,
+      breakdown: [
+        { department: 'CMPN', count: 50 },
+        { department: 'INFT', count: 40 },
+        { department: 'AIML', count: 20 },
+        { department: 'EXTC', count: 10 },
+      ],
+    },
   },
 ];
 

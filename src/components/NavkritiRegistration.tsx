@@ -414,6 +414,12 @@ export default function NavkritiRegistration() {
                   className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                 />
                 <p className="text-xs text-slate-500 mt-1">Please provide the exact UPI ID from which the payment was made so we can verify it manually.</p>
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex gap-3 items-start">
+                  <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-red-700 font-medium leading-relaxed">
+                    CRITICAL: Only upload your payment screenshot on the exact portal you registered from! Do not upload backup screenshots on multiple portals. Doing so creates duplicate tracking and may delay your registration verification.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
