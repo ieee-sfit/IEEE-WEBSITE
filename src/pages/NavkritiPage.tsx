@@ -270,7 +270,7 @@ const NavkritiPage = () => {
                   <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" /><span>Registrations will remain open from <strong className="text-slate-900 dark:text-white">{navkritiConfig.registration.displayDates}</strong> only</span></li>
                   <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" /><span>The team leader registers the entire team in one go</span></li>
                   <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" /><span>Payment confirmation (screenshot or UPI transaction ID) is required to finalize your registration</span></li>
-                  <li className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" /><span>Problem statements released only to registered teams on {navkritiConfig.problemStatements.displayDate}</span></li>
+
                 </ul>
               </div>
             </div>
