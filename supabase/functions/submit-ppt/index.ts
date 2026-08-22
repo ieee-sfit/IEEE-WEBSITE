@@ -120,10 +120,19 @@ serve(async (req) => {
     }
 
     // 3. Upload File Deterministically
-    const fileExt = ppt_file.name.split('.').pop();
-    const filePath = `presentations/${teamUuid}/current.${fileExt}`;
+    const sanitizedName = ppt_file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const filePath = `presentations/${teamUuid}/${sanitizedName}`;
     
-    // upsert: true ensures we don't accumulate garbage. The old 'current.ext' is overwritten.
+    // Clean up any existing files in this team's directory to avoid orphans
+    const { data: existingFiles } = await supabaseClient.storage
+      .from('sih_presentations')
+      .list(`presentations/${teamUuid}`);
+      
+    if (existingFiles && existingFiles.length > 0) {
+      const filesToRemove = existingFiles.map(f => `presentations/${teamUuid}/${f.name}`);
+      await supabaseClient.storage.from('sih_presentations').remove(filesToRemove);
+    }
+    
     const { error: uploadError } = await supabaseClient.storage
       .from('sih_presentations')
       .upload(filePath, ppt_file, { upsert: true });
