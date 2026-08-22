@@ -112,12 +112,6 @@ const EventsPage = () => {
   const allEvents = eventsData;
   const featuredEvent = allEvents.find(event => event.featured);
   
-  const completedEvents = allEvents.filter(e => e.status === 'completed');
-  const totalParticipants = completedEvents.reduce((acc, curr) => acc + (curr.attendees || 0), 0);
-  const eventsWithSatisfaction = completedEvents.filter(e => e.satisfaction != null);
-  const avgSatisfaction = eventsWithSatisfaction.length
-    ? Math.round(eventsWithSatisfaction.reduce((acc, curr) => acc + curr.satisfaction!, 0) / eventsWithSatisfaction.length)
-    : 0;
 
   const statsData = [
     { icon: Award, value: 10, suffix: '+', label: 'Events Organized', color: 'blue', textClass: 'text-blue-600' },
