@@ -83,9 +83,26 @@ for t in teams:
     
     if not leader: continue
     
-    # Generate Direct Payment Proof Link
+    # Generate Direct Payment Proof Link (10-year signed URL)
     receipt_path = t.get('payment_receipt_path')
-    payment_link = f"{SUPABASE_URL}/storage/v1/object/public/payment_receipts/{urllib.parse.quote(receipt_path)}" if receipt_path else ""
+    payment_link = ""
+    if receipt_path:
+        try:
+            req = urllib.request.Request(
+                f"{SUPABASE_URL}/storage/v1/object/sign/payment_receipts/{urllib.parse.quote(receipt_path)}",
+                data=json.dumps({"expiresIn": 315360000}).encode('utf-8'),
+                headers={
+                    'apikey': SERVICE_ROLE_KEY,
+                    'Authorization': f"Bearer {SERVICE_ROLE_KEY}",
+                    'Content-Type': 'application/json'
+                },
+                method='POST'
+            )
+            with urllib.request.urlopen(req) as response:
+                signed_data = json.loads(response.read().decode())
+                payment_link = f"{SUPABASE_URL}/storage/v1{signed_data['signedURL']}"
+        except Exception as e:
+            print(f"Failed to generate signed URL for {team_name}: {e}")
 
     row = {
         'Sr. No.': len(df) + len(new_rows) + 1,
