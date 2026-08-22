@@ -120,10 +120,10 @@ const EventsPage = () => {
     : 0;
 
   const statsData = [
-    { icon: Award, value: allEvents.length, suffix: '', label: 'Events Organized', color: 'blue', textClass: 'text-blue-600' },
-    { icon: Users, value: totalParticipants, suffix: '+', label: 'Total Participants', color: 'purple', textClass: 'text-purple-600' },
-    { icon: TrendingUp, value: avgSatisfaction, suffix: '%', label: 'Avg Satisfaction', color: 'green', textClass: 'text-green-600' },
-    { icon: Target, value: completedEvents.length, suffix: '', label: 'Completed Events', color: 'pink', textClass: 'text-pink-600' },
+    { icon: Award, value: 10, suffix: '+', label: 'Events Organized', color: 'blue', textClass: 'text-blue-600' },
+    { icon: Users, value: 1200, suffix: '+', label: 'Total Participants', color: 'purple', textClass: 'text-purple-600' },
+    { icon: TrendingUp, value: 89, suffix: '%', label: 'Avg Satisfaction', color: 'green', textClass: 'text-green-600' },
+    { icon: Target, value: 8, suffix: '', label: 'Completed Events', color: 'pink', textClass: 'text-pink-600' },
   ];
 
   const filteredEvents = useMemo(() => {
