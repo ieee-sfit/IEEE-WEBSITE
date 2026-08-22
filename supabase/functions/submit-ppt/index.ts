@@ -92,12 +92,13 @@ serve(async (req) => {
 
     const formData = await req.formData();
     const problem_statement = normalizeString(formData.get('problem_statement'));
+    const ps_title = normalizeString(formData.get('ps_title'));
+    const category = normalizeString(formData.get('category'));
     const domain = normalizeString(formData.get('domain'));
     const solution_title = normalizeString(formData.get('solution_title'));
-    const summary = normalizeString(formData.get('summary'));
     const ppt_file = formData.get('ppt_file');
 
-    if (!problem_statement || !domain || !solution_title || !summary || !ppt_file) {
+    if (!problem_statement || !ps_title || !category || !domain || !solution_title || !ppt_file) {
       throw new Error('All submission fields (including PPT) are required.');
     }
 
@@ -137,9 +138,10 @@ serve(async (req) => {
         .upsert({
             team_id: teamUuid,
             problem_statement,
+            ps_title,
+            category,
             domain,
             solution_title,
-            summary,
             ppt_file_path: filePath,
             updated_at: new Date().toISOString()
         }, { onConflict: 'team_id' });

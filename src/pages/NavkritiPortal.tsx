@@ -25,7 +25,6 @@ export default function NavkritiPortal() {
   const [psTitle, setPsTitle] = useState('');
   const [category, setCategory] = useState('');
   const [solutionTitle, setSolutionTitle] = useState('');
-  const [summary, setSummary] = useState('');
   const [pptFile, setPptFile] = useState<File | null>(null);
 
   const now = Date.now();
@@ -101,7 +100,6 @@ export default function NavkritiPortal() {
       formData.append('ps_title', psTitle);
       formData.append('category', category);
       formData.append('solution_title', solutionTitle);
-      formData.append('summary', summary);
       formData.append('ppt_file', pptFile);
       
       const { data, error: functionError } = await supabase.functions.invoke('submit-ppt', {
@@ -251,6 +249,44 @@ export default function NavkritiPortal() {
           <form onSubmit={handleUpload} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
+                <label className="block text-sm font-semibold mb-2">PS Number (ID)</label>
+                <input
+                  type="text"
+                  required
+                  value={problemStatement}
+                  onChange={(e) => setProblemStatement(e.target.value)}
+                  placeholder="e.g., SIH26041"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold mb-2">Problem Statement Title</label>
+                <input
+                  type="text"
+                  required
+                  value={psTitle}
+                  onChange={(e) => setPsTitle(e.target.value)}
+                  placeholder="Enter the full PS Title from SIH Portal"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-semibold mb-2">Category</label>
+                <select
+                  required
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none"
+                >
+                  <option value="">Select Category</option>
+                  <option value="Software">Software</option>
+                  <option value="Hardware">Hardware</option>
+                </select>
+              </div>
+              <div>
                 <label className="block text-sm font-semibold mb-2">Theme</label>
                 <select
                   required
@@ -258,7 +294,7 @@ export default function NavkritiPortal() {
                   onChange={(e) => setDomain(e.target.value)}
                   className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none"
                 >
-                  <option value="">Select Domain</option>
+                  <option value="">Select Theme</option>
                   <option value="Smart Automation">Smart Automation</option>
                   <option value="Fitness & Sports">Fitness & Sports</option>
                   <option value="Heritage & Culture">Heritage & Culture</option>
@@ -278,44 +314,6 @@ export default function NavkritiPortal() {
                   <option value="Miscellaneous">Miscellaneous</option>
                 </select>
               </div>
-              <div>
-                <label className="block text-sm font-semibold mb-2">Category</label>
-                <select
-                  required
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none"
-                >
-                  <option value="">Select Category</option>
-                  <option value="Software">Software</option>
-                  <option value="Hardware">Hardware</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-semibold mb-2">PS Number (ID)</label>
-                <input
-                  type="text"
-                  required
-                  value={problemStatement}
-                  onChange={(e) => setProblemStatement(e.target.value)}
-                  placeholder="e.g., 26001"
-                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold mb-2">Problem Statement Title</label>
-                <input
-                  type="text"
-                  required
-                  value={psTitle}
-                  onChange={(e) => setPsTitle(e.target.value)}
-                  placeholder="Enter the full PS Title from SIH Portal"
-                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none"
-                />
-              </div>
             </div>
 
             <div>
@@ -327,18 +325,6 @@ export default function NavkritiPortal() {
                 onChange={(e) => setSolutionTitle(e.target.value)}
                 placeholder="Enter a descriptive title for your solution"
                 className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold mb-2">Executive Summary</label>
-              <textarea
-                required
-                rows={4}
-                value={summary}
-                onChange={(e) => setSummary(e.target.value)}
-                placeholder="Briefly describe your solution approach..."
-                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none resize-none"
               />
             </div>
 
