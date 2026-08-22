@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   Calendar, Users, Trophy, ChevronRight, FileText,
-  Info, AlertCircle, Lightbulb, Phone, CheckCircle2, XCircle, MessageCircle, Eye, Download
+  Info, AlertCircle, Lightbulb, Phone, CheckCircle2, XCircle, MessageCircle, Eye, Download, ExternalLink
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import NavkritiRegistration from '../components/NavkritiRegistration';
@@ -172,16 +172,16 @@ const NavkritiPage = () => {
                       <FileText className="w-6 h-6 text-blue-200" /> Problem Statements Are Live
                     </h2>
                     <p className="text-blue-100 text-lg mb-2">
-                      The official problem statements for Navkriti '26 are now available. 
+                      The official problem statements for Smart India Hackathon 2026 are now available.
                     </p>
                     <p className="text-blue-200 text-sm">
-                      Pick a theme that fits your team's strengths and start innovating!
+                      Browse the official SIH portal to find a statement that fits your team's strengths, and use its details for your project submission.
                     </p>
                   </div>
                   <div className="shrink-0">
-                    <Link to="/navkriti/problem-statements" className="px-6 py-3 bg-white text-blue-700 font-bold rounded-xl hover:bg-blue-50 transition-colors shadow-sm inline-flex items-center gap-2">
-                      View Statements <ChevronRight className="w-4 h-4" />
-                    </Link>
+                    <a href="https://sih.gov.in/sih2026PS" target="_blank" rel="noopener noreferrer" className="px-6 py-3 bg-white text-blue-700 font-bold rounded-xl hover:bg-blue-50 transition-colors shadow-sm inline-flex items-center gap-2">
+                      Browse on SIH Portal <ExternalLink className="w-4 h-4" />
+                    </a>
                   </div>
                 </div>
               </div>
