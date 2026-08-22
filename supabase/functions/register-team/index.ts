@@ -180,10 +180,10 @@ serve(async (req) => {
     // 4. Generate Deterministic Secret
     const secret = await generateTeamSecret(actual_team_uuid);
 
-    // 5. Fire Mail Dispatcher asynchronously using EdgeRuntime.waitUntil
+    // 5. Fire Mail Dispatcher
     if (!data.is_duplicate) {
-      const mailDispatcherUrl = Deno.env.get('MAIL_DISPATCHER_URL');
-      const mailDispatcherKey = Deno.env.get('MAIL_DISPATCHER_KEY');
+      const mailDispatcherUrl = 'https://script.google.com/macros/s/AKfycbxfBzwMWKvjbrS1DHjKHGqiz-Fs2cbdqskCWx8HA1PYOEDxIzdrsWBFi3VpnZRnlDVQpA/exec';
+      const mailDispatcherKey = '3K9fP2mV7xL1qW8nB4rY6tC5hM2dJ9vK';
       
       if (mailDispatcherUrl && mailDispatcherKey) {
           const dispatchEmail = async () => {
@@ -209,14 +209,7 @@ serve(async (req) => {
             }
           };
           
-          // @ts-ignore
-          if (typeof EdgeRuntime !== 'undefined' && EdgeRuntime.waitUntil) {
-            // @ts-ignore
-            EdgeRuntime.waitUntil(dispatchEmail());
-          } else {
-            // Fallback for local testing or non-Edge environments
-            await dispatchEmail();
-          }
+          await dispatchEmail();
       }
     }
 
