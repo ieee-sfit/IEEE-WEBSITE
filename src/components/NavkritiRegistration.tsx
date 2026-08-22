@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Upload, CheckCircle, AlertCircle, Loader2, Users, Copy } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { supabase } from '../lib/supabaseClient';
 import { navkritiConfig } from '../config/navkritiConfig';
 
@@ -130,6 +131,7 @@ export default function NavkritiRegistration() {
       }
 
       // Success
+      toast.success('Registration completed successfully! Please save your Team ID and Secret.');
       setSuccessData({
         teamId: functionData.team_id,
         secret: functionData.secret,

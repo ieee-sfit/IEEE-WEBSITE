@@ -10,6 +10,7 @@ import NavkritiPage from './pages/NavkritiPage';
 import NavkritiPortal from './pages/NavkritiPortal';
 import NotFoundPage from './pages/NotFoundPage';
 import ScrollToTop from './components/ScrollToTop';
+import { Toaster } from 'react-hot-toast';
 
 const SplashCursor = lazy(() => import('./components/ui/SplashCursor/SplashCursor'));
 
@@ -25,6 +26,7 @@ function App() {
     <ErrorBoundary>
       <Router>
       <ScrollToTop />
+      <Toaster position="bottom-right" />
       {isLaptop && (
         <Suspense fallback={null}>
           <SplashCursor SPLAT_RADIUS={0.02} PRESSURE_ITERATIONS={16} DYE_RESOLUTION={1200} />

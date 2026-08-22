@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Upload, LogOut, CheckCircle, AlertCircle, FileText, Lock, Layout } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 import { supabase } from '../lib/supabaseClient';
 import UpdateTeamForm from '../components/UpdateTeamForm';
@@ -112,6 +113,7 @@ export default function NavkritiPortal() {
       if (functionError) throw new Error(functionError.message);
       if (data?.error) throw new Error(data.error);
 
+      toast.success('Project details and presentation uploaded successfully!');
       setUploadSuccess(true);
       setPptFile(null);
     } catch (err: any) {
