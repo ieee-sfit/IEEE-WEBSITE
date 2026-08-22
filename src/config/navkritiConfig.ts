@@ -3,8 +3,8 @@ export const navkritiConfig = {
   registration: {
     // Dates are ISO strings for backend comparison if needed, but display strings for UI
     opens: '2026-08-17T00:00:00+05:30',
-    closes: '2026-08-22T23:59:59+05:30',
-    displayDates: 'Aug 17 – 22',
+    closes: '2026-08-23T23:59:59+05:30',
+    displayDates: 'Aug 17 – 23',
   },
   problemStatements: {
     releaseDate: '2026-08-24T10:00:00+05:30',
