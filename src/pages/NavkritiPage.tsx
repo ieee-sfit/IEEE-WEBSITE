@@ -302,10 +302,10 @@ const NavkritiPage = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-3 w-full md:w-auto">
-                  <a href="/Navkriti26-IDEA-Presentation-Format.pdf" target="_blank" rel="noreferrer" className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                  <a href="/Navkriti26-IDEA-Presentation-Format.pptx" target="_blank" rel="noreferrer" className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                     <Eye className="w-4 h-4" /> View
                   </a>
-                  <a href="/Navkriti26-IDEA-Presentation-Format.pdf" download className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-700 transition-colors shadow-sm shadow-blue-600/20">
+                  <a href="/Navkriti26-IDEA-Presentation-Format.pptx" download className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-700 transition-colors shadow-sm shadow-blue-600/20">
                     <Download className="w-4 h-4" /> Download
                   </a>
                 </div>
