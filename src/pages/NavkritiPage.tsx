@@ -239,11 +239,13 @@ const NavkritiPage = () => {
                 <h2 className="text-2xl font-bold mb-6 flex items-center gap-3 text-slate-900 dark:text-white">
                   <Trophy className="w-6 h-6 text-yellow-500" /> Prize Pool: ₹{navkritiConfig.rules.prizePool.toLocaleString()}
                 </h2>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   {[
                     { emoji: '🥇', label: '1st Prize', amount: '₹5,000' },
                     { emoji: '🥈', label: '2nd Prize', amount: '₹2,500' },
                     { emoji: '🥉', label: '3rd Prize', amount: '₹1,500' },
+                    { emoji: '🏅', label: '4th Prize', amount: '₹1,000' },
+                    { emoji: '🏅', label: '5th Prize', amount: '₹1,000' },
                   ].map((p) => (
                     <div key={p.label} className="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800 text-center">
                       <div className="text-3xl mb-2">{p.emoji}</div>
@@ -251,6 +253,9 @@ const NavkritiPage = () => {
                       <div className="text-blue-600 dark:text-blue-400 font-extrabold text-xl">{p.amount}</div>
                     </div>
                   ))}
+                </div>
+                <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50 rounded-xl text-blue-800 dark:text-blue-200 text-sm font-medium text-center">
+                  All winners will also get certificates and direct selection into SIH 2026.
                 </div>
                 <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 space-y-2 text-sm text-slate-600 dark:text-slate-400">
                   <div className="flex justify-between"><span>Registration Fee:</span><strong className="text-slate-900 dark:text-white">₹{navkritiConfig.rules.fee} per team</strong></div>

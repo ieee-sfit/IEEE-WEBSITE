@@ -27,7 +27,7 @@ export const navkritiConfig = {
     teamSize: 6,
     minimumFemaleMembers: 1,
     fee: 300,
-    prizePool: 9000,
+    prizePool: 11000,
   },
   contact: {
     coordinators: [
