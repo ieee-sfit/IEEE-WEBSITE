@@ -218,7 +218,7 @@ const NavkritiPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
                   { step: '01', title: 'Register', desc: `Fill the team registration form on the RAW or IEEExWIE SFIT website. Pay the ₹${navkritiConfig.rules.fee} team fee to confirm your slot.` },
-                  { step: '02', title: 'Choose a Problem', desc: `On ${navkritiConfig.problemStatements.displayDate}, problem statements are released across a few domains. Pick a domain that fits your team's strengths.` },
+                  { step: '02', title: 'Choose a Problem', desc: `Browse the official SIH 2026 portal to find a problem statement that fits your team's strengths. Note its details and submit your chosen PS via the Navkriti portal.` },
                   { step: '03', title: 'Submit Your Idea PPT', desc: `Use the official SIH 2026 Idea Presentation Template — no edits to the format. Submit your deck on or before ${navkritiConfig.submission.displayDeadline}.` },
                   { step: '04', title: 'Pitch to Judges', desc: `Present live on ${navkritiConfig.pitch.displayDate}. Top qualifying teams will represent SFIT at Smart India Hackathon ${navkritiConfig.edition}.` },
                 ].map((s) => (

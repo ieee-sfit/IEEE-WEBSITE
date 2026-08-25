@@ -96,6 +96,7 @@ serve(async (req) => {
     const category = normalizeString(formData.get('category'));
     const domain = normalizeString(formData.get('domain'));
     const solution_title = normalizeString(formData.get('solution_title'));
+    const organization = normalizeString(formData.get('organization'));
     const ppt_file = formData.get('ppt_file');
 
     if (!problem_statement || !ps_title || !category || !domain || !solution_title || !ppt_file) {
@@ -151,6 +152,7 @@ serve(async (req) => {
             category,
             domain,
             solution_title,
+            organization,
             ppt_file_path: filePath,
             updated_at: new Date().toISOString()
         }, { onConflict: 'team_id' });
@@ -173,7 +175,7 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ error: error.message }),
-      { headers: errHeaders, status: 400 }
+      { headers: errHeaders, status: 200 }
     );
   }
 });

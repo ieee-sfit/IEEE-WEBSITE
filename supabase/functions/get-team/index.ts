@@ -79,8 +79,19 @@ serve(async (req) => {
       throw new Error('Failed to fetch participants: ' + error.message);
     }
 
+    const { data: psDraft, error: psError } = await supabaseClient
+      .from('ps_drafts')
+      .select('*')
+      .eq('team_id', teamUuid)
+      .single();
+      
+    // It's okay if there's no PS draft yet, so we don't throw on error if it's PGRST116 (0 rows)
+    if (psError && psError.code !== 'PGRST116') {
+        console.error('Failed to fetch PS draft', psError);
+    }
+
     headers.set('Content-Type', 'application/json');
-    return new Response(JSON.stringify({ participants }), { headers, status: 200 });
+    return new Response(JSON.stringify({ participants, psDraft: psDraft || null }), { headers, status: 200 });
   } catch (error: any) {
     const origin = req.headers.get('Origin');
     const errHeaders = new Headers(corsHeaders);
@@ -89,7 +100,7 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ error: error.message }),
-      { headers: errHeaders, status: 400 }
+      { headers: errHeaders, status: 200 }
     );
   }
 });

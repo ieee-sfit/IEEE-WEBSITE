@@ -430,6 +430,9 @@ verify_jwt = false
 [functions.submit-ppt]
 verify_jwt = false
 
+[functions.save-ps-draft]
+verify_jwt = false
+
 
 [functions.view-receipt]
 enabled = true

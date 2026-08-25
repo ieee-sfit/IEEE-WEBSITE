@@ -123,6 +123,7 @@ export default function NavkritiRegistration() {
       });
 
       if (functionError) {
+        if (functionError.message.includes('non-2xx') || functionError.message.includes('Failed to send')) throw new Error('Network error connecting to the server. Please check your connection and try again.');
         throw new Error('Failed to complete registration: ' + functionError.message);
       }
 

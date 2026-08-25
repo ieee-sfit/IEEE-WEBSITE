@@ -69,6 +69,7 @@ serve(async (req) => {
     const secret = body.secret?.trim();
 
     if (!team_id || !secret) {
+      console.error(`Login failed: Missing credentials for request.`);
       throw new Error('Team ID and Secret are required');
     }
 
@@ -79,6 +80,7 @@ serve(async (req) => {
       .single();
 
     if (error || !data) {
+      console.error(`Login failed: Invalid Team ID provided (${team_id})`);
       throw new Error('Invalid Team ID or Secret');
     }
 
@@ -86,6 +88,7 @@ serve(async (req) => {
     
     // Constant time comparison
     if (expectedSecret.length !== secret.length) {
+        console.error(`Login failed: Secret length mismatch for Team ID (${team_id})`);
         throw new Error('Invalid Team ID or Secret');
     }
     
@@ -95,6 +98,7 @@ serve(async (req) => {
     }
 
     if (mismatch !== 0) {
+      console.error(`Login failed: Incorrect secret for Team ID (${team_id})`);
       throw new Error('Invalid Team ID or Secret');
     }
 
@@ -116,7 +120,7 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ error: error.message }),
-      { headers: errHeaders, status: 400 }
+      { headers: errHeaders, status: 200 }
     );
   }
 });

@@ -14,7 +14,7 @@ type MemberData = {
   year: string;
 };
 
-export default function UpdateTeamForm({ token }: { token: string }) {
+export default function UpdateTeamForm({ token, onDataLoaded }: { token: string, onDataLoaded?: (psDraft: any) => void }) {
   const [members, setMembers] = useState<MemberData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -33,6 +33,10 @@ export default function UpdateTeamForm({ token }: { token: string }) {
         // Sort to ensure leader is always index 0
         const sortedMembers = data.participants.sort((a: any, b: any) => (b.is_leader ? 1 : 0) - (a.is_leader ? 1 : 0));
         setMembers(sortedMembers);
+
+        if (onDataLoaded) {
+            onDataLoaded(data.psDraft);
+        }
       } catch (err: any) {
         setError(err.message || 'Failed to fetch team members');
       } finally {
@@ -40,7 +44,7 @@ export default function UpdateTeamForm({ token }: { token: string }) {
       }
     };
     fetchMembers();
-  }, [token]);
+  }, [token, onDataLoaded]);
 
   const updateMember = (index: number, field: keyof MemberData, value: string) => {
     const newMembers = [...members];
@@ -65,7 +69,10 @@ export default function UpdateTeamForm({ token }: { token: string }) {
         body: { participants: members }
       });
 
-      if (functionError) throw new Error(functionError.message);
+      if (functionError) {
+        if (functionError.message.includes('non-2xx') || functionError.message.includes('Failed to send')) throw new Error('Network error connecting to the server. Please check your connection and try again.');
+        throw new Error(functionError.message);
+      }
       if (data?.error) throw new Error(data.error);
 
       setSuccess('Team details updated successfully!');

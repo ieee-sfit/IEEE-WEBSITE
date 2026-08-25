@@ -151,7 +151,7 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ error: error.message }),
-      { headers: errHeaders, status: 400 }
+      { headers: errHeaders, status: 200 }
     );
   }
 });
