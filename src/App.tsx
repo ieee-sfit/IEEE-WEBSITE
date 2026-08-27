@@ -8,6 +8,7 @@ import EventDetailPage from './pages/EventDetailPage';
 import TeamPage from './pages/TeamPage';
 import NavkritiPage from './pages/NavkritiPage';
 import NavkritiPortal from './pages/NavkritiPortal';
+import NavkritiOpenSubmit from './pages/NavkritiOpenSubmit';
 import NotFoundPage from './pages/NotFoundPage';
 import ScrollToTop from './components/ScrollToTop';
 import { Toaster } from 'react-hot-toast';
@@ -38,6 +39,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/navkriti" element={<NavkritiPage />} />
           <Route path="/navkriti/portal" element={<NavkritiPortal />} />
+          <Route path="/navkriti/open-submit" element={<NavkritiOpenSubmit />} />
           <Route path="/events" element={<EventsPage />} />
           <Route path="/events/:slug" element={<EventDetailPage />} />
           <Route path="/team" element={<TeamPage />} />
