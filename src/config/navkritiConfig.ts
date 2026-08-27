@@ -12,8 +12,8 @@ export const navkritiConfig = {
   },
   submission: {
     opens: '2026-08-22T00:00:00+05:30',
-    closes: '2026-08-28T23:59:59+05:30',
-    displayDeadline: 'Aug 28, 11:59 PM',
+    closes: '2026-08-28T10:00:00+05:30',
+    displayDeadline: 'Aug 28, 10:00 AM',
   },
   psDrafting: {
     closes: '2026-08-26T23:59:59+05:30',
