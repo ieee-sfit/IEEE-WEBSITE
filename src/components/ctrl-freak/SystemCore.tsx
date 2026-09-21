@@ -1,9 +1,50 @@
-import { useRef, useMemo, useState } from 'react';
+import { useRef, useMemo, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Points, PointMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 import { MotionValue } from 'framer-motion';
 import { ControlChamber } from './ControlChamber';
+
+const generateTextPoints = (text: string, count: number): Float32Array => {
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  const result = new Float32Array(count * 3);
+  if (!ctx) return result;
+  
+  ctx.fillStyle = 'black';
+  ctx.fillRect(0, 0, 256, 128);
+  ctx.fillStyle = 'white';
+  ctx.font = 'bold 80px monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, 128, 64);
+  
+  const imageData = ctx.getImageData(0, 0, 256, 128);
+  const data = imageData.data;
+  
+  const validPoints: [number, number][] = [];
+  for (let y = 0; y < 128; y++) {
+    for (let x = 0; x < 256; x++) {
+      const index = (y * 256 + x) * 4;
+      if (data[index] > 128) { // If pixel is bright
+        validPoints.push([(x - 128) / 10, -(y - 64) / 10]);
+      }
+    }
+  }
+  
+  // Map particles to the valid pixels
+  for (let i = 0; i < count; i++) {
+    const pt = validPoints[i % validPoints.length];
+    if (pt) {
+      result[i*3] = pt[0] + (Math.random() - 0.5) * 0.3; // Slight jitter
+      result[i*3+1] = pt[1] + (Math.random() - 0.5) * 0.3;
+      result[i*3+2] = (Math.random() - 0.5) * 1.5; // Depth jitter
+    }
+  }
+  return result;
+};
 // A massive, glitching point cloud that evolves into specific formations based on scroll progress
 const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) => {
   const pointsRef = useRef<THREE.Points>(null);
@@ -60,25 +101,29 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
         network[i3 + 2] = n1[2] + (n2[2] - n1[2]) * t + (Math.random() - 0.5) * 0.1;
       }
 
-      // 4. GRID (Vision Binarization)
-      const col = i % gridSize;
-      const row = Math.floor(i / gridSize);
-      grid[i3] = (col / gridSize - 0.5) * 12;
-      grid[i3 + 1] = (row / gridSize - 0.5) * 12;
-      grid[i3 + 2] = (Math.random() - 0.5) * 0.2;
+      // 4. VOXEL GRID (Vision Binarization)
+      const size3D = Math.ceil(Math.cbrt(count));
+      const gX = i % size3D;
+      const gY = Math.floor(i / size3D) % size3D;
+      const gZ = Math.floor(i / (size3D * size3D));
+      grid[i3] = (gX / size3D - 0.5) * 10;
+      grid[i3 + 1] = (gY / size3D - 0.5) * 10;
+      grid[i3 + 2] = (gZ / size3D - 0.5) * 10;
 
-      // 5. CIRCUIT (Logic gates/traces)
-      const isHorizontal = Math.random() > 0.5;
-      const track = Math.floor((Math.random() - 0.5) * 16); // 16 discrete tracks
-      const distance = (Math.random() - 0.5) * 10;
-      if (isHorizontal) {
-        circuit[i3] = distance;
-        circuit[i3 + 1] = track * 0.4;
-      } else {
-        circuit[i3] = track * 0.4;
-        circuit[i3 + 1] = distance;
-      }
-      circuit[i3 + 2] = (Math.random() - 0.5) * 0.2;
+      // 5. LOCK MECHANISM (Logic gates/lockdown)
+      // Represented as segmented, nested concentric rings of a vault door
+      const layer = Math.floor(Math.random() * 5); // 5 concentric rings
+      const lockRadius = 2 + layer * 1.5;
+      const rawAngle = Math.random() * Math.PI * 2;
+      const lockDepth = (Math.random() - 0.5) * 4;
+      
+      // Snap angles to rigid chunks to look like an interlocking mechanical puzzle
+      const snapSize = Math.PI / 4;
+      const snappedAngle = Math.floor(rawAngle / snapSize) * snapSize + (rawAngle % (Math.PI / 16));
+      
+      circuit[i3] = Math.cos(snappedAngle) * lockRadius;
+      circuit[i3 + 1] = Math.sin(snappedAngle) * lockRadius;
+      circuit[i3 + 2] = lockDepth;
 
       // 6. RING (The Clock / 12:00)
       const angle = Math.random() * Math.PI * 2;
@@ -93,6 +138,28 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
 
   // Initial render buffer
   const [positions] = useState(() => new Float32Array(count * 3));
+
+  // --- THE CLOCK ---
+  const [timeLeft, setTimeLeft] = useState(720); // 12 minutes
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeLeft((t) => Math.max(0, t - 1));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const min = Math.floor(timeLeft / 60);
+    const sec = (timeLeft % 60).toString().padStart(2, '0');
+    const text = `${min}:${sec}`;
+    const newRing = generateTextPoints(text, count);
+    
+    // Mutate the ring buffer directly so useFrame picks it up without reallocation
+    for (let i = 0; i < count * 3; i++) {
+      shapes.ring[i] = newRing[i];
+    }
+  }, [timeLeft, shapes, count]);
 
   // Helper function to smoothstep interpolation
   const smoothstep = (min: number, max: number, value: number) => {
@@ -149,14 +216,7 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       shape1 = shapes.ring; shape2 = shapes.ring; lerpFactor = 0;
     }
 
-    // Dynamic color morphing based on scroll depth
-    const material = pointsRef.current.material as THREE.PointsMaterial;
-    // Starts harsh red, ends pure cyan
-    const r = Math.max(0.1, 1.0 - progress * 1.5);
-    const g = Math.min(1.0, 0.2 + (progress * 1.2));
-    const b = Math.min(1.0, 0.2 + (progress * 1.2));
-    material.color.setRGB(r, g, b);
-
+    // Color logic moved to the bottom of the loop
     // Apply the morphing and specific shape animations
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
@@ -190,15 +250,15 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
         x *= glitch; y *= glitch; z *= glitch;
       }
 
-      // RING ROTATION (Clock)
+      // 720 COUNTDOWN (Clock)
+      // We don't rotate the text so it stays readable, but we add a heartbeat pulse
       if (shape1 === shapes.ring || shape2 === shapes.ring) {
         const ringWeight = shape1 === shapes.ring ? (1 - lerpFactor) : lerpFactor;
         if (ringWeight > 0) {
-           // Rotate the ring around Y axis
-           const angle = Math.atan2(z, x) + t * 0.5 * ringWeight;
-           const radius = Math.sqrt(x*x + z*z);
-           x = Math.cos(angle) * radius;
-           z = Math.sin(angle) * radius;
+           const pulse = 1.0 + Math.sin(t * Math.PI * 2) * 0.05 * ringWeight;
+           x *= pulse;
+           y *= pulse;
+           z *= pulse;
         }
       }
 
@@ -210,8 +270,60 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
     posAttribute.needsUpdate = true;
     
     // Global rotation to give life
-    pointsRef.current.rotation.y = Math.sin(t * 0.2) * 0.2;
-    pointsRef.current.rotation.x = Math.cos(t * 0.1) * 0.1;
+    pointsRef.current.rotation.y = Math.sin(t * 0.2) * 0.1; // Reduced rotation so text is legible
+    pointsRef.current.rotation.x = Math.cos(t * 0.1) * 0.05;
+
+    // --- COLOR LOGIC ---
+    const material = pointsRef.current.material as THREE.PointsMaterial;
+    if (timeLeft === 0 && (Math.floor(t * 2) % 2 === 0)) {
+      // Emergency Flash Red
+      material.color.setRGB(1, 0, 0);
+    } else {
+      const r = Math.max(0.1, 1.0 - progress * 1.5);
+      const g = Math.min(1.0, 0.2 + (progress * 1.2));
+      const b = Math.min(1.0, 0.2 + (progress * 1.2));
+      material.color.setRGB(r, g, b);
+    }
+
+    // --- CORE PLACEMENT HACK ---
+    // Dynamically shift the Core's position relative to the camera's right vector
+    // so it always occupies the empty side of the screen (UI is alternating Left/Right).
+    // Also upscale the core proportionally while it's in the station views.
+    let targetOffsetX = 0; 
+    let targetScale = 0.6;
+    
+    if (progress > 0.20 && progress <= 0.35) {
+      // Station 01: UI Left, Core Right
+      const t = smoothstep(0.20, 0.25, progress);
+      targetOffsetX = 6 * t; 
+      targetScale = 0.6 + 0.3 * t;
+    } else if (progress > 0.35 && progress <= 0.50) {
+      // Station 02: UI Right, Core Left
+      const t = smoothstep(0.35, 0.40, progress);
+      targetOffsetX = 6 - 12 * t;
+      targetScale = 0.9;
+    } else if (progress > 0.50 && progress <= 0.65) {
+      // Station 03: UI Left, Core Right
+      const t = smoothstep(0.50, 0.55, progress);
+      targetOffsetX = -6 + 12 * t;
+      targetScale = 0.9;
+    } else if (progress > 0.65 && progress <= 0.80) {
+      // Station 04: UI Right, Core Left
+      const t = smoothstep(0.65, 0.70, progress);
+      targetOffsetX = 6 - 12 * t;
+      targetScale = 0.9;
+    } else if (progress > 0.80 && progress <= 0.85) {
+      // Return to Center
+      const t = smoothstep(0.80, 0.85, progress);
+      targetOffsetX = -6 * (1 - t);
+      targetScale = 0.9 - 0.3 * t;
+    }
+
+    const rightVec = new THREE.Vector3(1, 0, 0).applyQuaternion(state.camera.quaternion);
+    const targetPos = new THREE.Vector3(0, 0, 0).add(rightVec.multiplyScalar(targetOffsetX));
+    
+    pointsRef.current.position.lerp(targetPos, 0.05);
+    pointsRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.05);
   });
 
   return (
