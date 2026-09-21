@@ -1,10 +1,19 @@
-import React from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { useRef } from 'react';
+import { useScroll } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { SystemCore } from '../components/ctrl-freak/SystemCore';
 
 const CtrlFreakPage = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Track the scroll progress of the entire page
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"]
+  });
+
   return (
-    <div className="relative bg-[#050505] text-white min-h-[800vh] font-mono selection:bg-[#FF3333] selection:text-white overflow-x-hidden">
+    <div ref={containerRef} className="relative bg-[#050505] text-white min-h-[800vh] font-mono selection:bg-[#FF3333] selection:text-white overflow-x-hidden">
       
       {/* HEADER NAV */}
       <div className="fixed top-0 left-0 w-full z-50 p-6 flex justify-between items-start pointer-events-none">
@@ -24,37 +33,36 @@ const CtrlFreakPage = () => {
 
       {/* 
         3D CANVAS BACKGROUND 
-        The object does the visual heavy lifting. It occupies the right 45-50% of the viewport.
+        This is now the unified System Core that evolves over the 8 scroll beats.
+        It sits fixed under the scrolling narrative HTML.
       */}
-      <div className="fixed inset-0 z-0 pointer-events-none flex justify-end">
-        <div className="w-full md:w-1/2 h-full opacity-40 flex items-center justify-center border-l border-gray-900/30">
-          {/* Persistent Three.js scene will go here, driven by scroll position */}
-        </div>
+      <div className="fixed inset-0 z-0">
+        <SystemCore scrollProgress={scrollYProgress} />
       </div>
 
-      {/* NARRATIVE HTML OVERLAY */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12">
+      {/* NARRATIVE HTML OVERLAYS (Heads Up Display) */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12 pointer-events-none">
         
         {/* 00 - ARRIVAL (Hero) */}
-        <section className="h-screen flex flex-col justify-center items-start w-full md:w-1/2">
-          <h1 className="text-6xl md:text-8xl font-bold tracking-tighter uppercase font-sans leading-none">
+        <section className="h-screen flex flex-col justify-center items-start w-full md:w-1/2 pointer-events-auto">
+          <h1 className="text-6xl md:text-8xl font-bold tracking-tighter uppercase font-sans leading-none mix-blend-difference">
             Ctrl Freak
           </h1>
-          <p className="text-xl md:text-2xl text-gray-400 mt-6 tracking-widest uppercase mb-16">
-            Critical Point<br/>Or Mission
+          <p className="text-xl md:text-2xl text-gray-400 mt-6 tracking-widest uppercase mb-16 mix-blend-difference">
+            Incident Detected
           </p>
 
-          <div className="border-t border-gray-800 w-full max-w-sm pt-8 mb-16">
+          <div className="border-t border-gray-800 w-full max-w-sm pt-8 mb-16 mix-blend-difference">
             <p className="text-sm text-gray-300 uppercase tracking-widest leading-loose">
-              Four technical systems.
+              Systems: 4
               <br/>
-              Something is wrong.
+              Status: UNSTABLE
             </p>
           </div>
 
           <div className="w-full max-w-sm">
             <div 
-              className="w-full flex items-center justify-between border border-white hover:bg-white hover:text-black transition-colors cursor-pointer px-6 py-4 font-bold text-xs tracking-[0.2em] uppercase group"
+              className="w-full flex items-center justify-between border border-white bg-black/50 backdrop-blur-sm hover:bg-white hover:text-black transition-colors cursor-pointer px-6 py-4 font-bold text-xs tracking-[0.2em] uppercase group"
               onClick={() => {
                 window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
               }}
@@ -66,194 +74,108 @@ const CtrlFreakPage = () => {
         </section>
 
         {/* 01 - WHAT ARE YOU LOOKING AT? */}
-        <section className="min-h-screen py-32 flex flex-col justify-center w-full md:w-1/2 pr-8">
-          <h2 className="text-3xl font-sans tracking-tight uppercase mb-8">This isn't a quiz.</h2>
-          <div className="w-12 h-px bg-[#FF3333] mb-8"></div>
-          <p className="text-gray-400 leading-relaxed text-sm tracking-wide">
-            Ctrl Freak puts your team inside four browser-based technical scenarios. 
-            Each station gives you a system that isn't behaving as expected.
-          </p>
-          <p className="text-gray-400 leading-relaxed text-sm tracking-wide mt-4">
-            Your job is to identify what is wrong, intervene, and get it back within its required limits.
-          </p>
+        <section className="min-h-screen py-32 flex flex-col justify-center items-center w-full">
+          <div className="text-center mix-blend-difference">
+            <h2 className="text-4xl md:text-6xl font-sans font-bold tracking-tight uppercase mb-8">
+              OBSERVE. IDENTIFY.<br/>INTERVENE. VERIFY.
+            </h2>
+          </div>
         </section>
 
-        {/* 02 - ANC (Situation -> Intervention -> Result) */}
+        {/* 02 - ANC */}
         <section className="min-h-screen py-32 flex flex-col justify-center w-full md:w-1/2">
-          <div className="space-y-12">
+          <div className="space-y-12 bg-black/40 backdrop-blur-md p-8 border-l border-[#FF3333]">
             <div>
-              <div className="text-[10px] text-gray-500 tracking-[0.2em] mb-4">01 // GoAT ANC</div>
-              <h2 className="text-3xl font-sans tracking-tight uppercase text-white">Active Noise Cancellation</h2>
-              <p className="text-gray-400 text-sm mt-4">Two waves are failing to cancel.</p>
+              <div className="text-[10px] text-[#FF3333] tracking-[0.2em] mb-4">01 // GoAT ANC</div>
+              <h2 className="text-2xl font-sans tracking-tight uppercase text-white">Signal Integrity</h2>
             </div>
             
-            <div className="font-mono text-xs max-w-sm space-y-4 border-l border-gray-800 pl-4">
+            <div className="font-mono text-xs max-w-sm space-y-4">
+              <div className="text-gray-400 mb-6 uppercase tracking-widest leading-relaxed">
+                OBSERVATION:<br/>Two periodic signals detected.
+              </div>
               <div className="flex justify-between text-gray-500">
-                <span>PHASE TARGET</span><span>180°</span>
+                <span>EXPECTED</span><span>180°</span>
               </div>
               <div className="flex justify-between text-[#FF3333]">
-                <span>CURRENT</span><span>[ ILLUSTRATIVE: 137° ]</span>
+                <span>OBSERVED</span><span>≠ 180°</span>
               </div>
-              <div className="flex justify-between text-gray-400 pt-2 border-t border-gray-800/50">
-                <span>OUTPUT</span><span>82 dB</span>
+              <div className="flex justify-between text-[#FF3333] pt-4 border-t border-gray-800/80">
+                <span>STATUS</span><span className="animate-pulse">INTERFERENCE</span>
               </div>
-            </div>
-
-            <div className="text-[10px] text-gray-500 tracking-[0.2em] uppercase">
-              Phase shifts → Waveform aligns → Interference decreases
-            </div>
-
-            <div className="font-mono text-xs max-w-sm space-y-4 border-l border-[#FF3333] pl-4">
-              <div className="flex justify-between text-white">
-                <span>OUTPUT</span><span>61 dB</span>
-              </div>
-              <div className="text-[#FF3333] tracking-widest pt-2">WITHIN LIMIT</div>
             </div>
           </div>
         </section>
 
-        {/* 03 - NETWORK (Situation -> Intervention -> Result) */}
-        <section className="min-h-screen py-32 flex flex-col justify-center w-full md:w-1/2">
-          <div className="space-y-12">
-            <div>
-              <div className="text-[10px] text-gray-500 tracking-[0.2em] mb-4">02 // F1 0-LAG STREAM</div>
-              <h2 className="text-3xl font-sans tracking-tight uppercase text-white">Network Saturation</h2>
-              <p className="text-gray-400 text-sm mt-4">Traffic is taking the wrong path.</p>
+        {/* 03 - NETWORK */}
+        <section className="min-h-screen py-32 flex flex-col justify-end items-end w-full">
+          <div className="w-full md:w-1/2 space-y-12 bg-black/40 backdrop-blur-md p-8 border-r border-[#FF3333]">
+            <div className="text-right">
+              <div className="text-[10px] text-[#FF3333] tracking-[0.2em] mb-4">02 // F1 0-LAG STREAM</div>
+              <h2 className="text-2xl font-sans tracking-tight uppercase text-white">Network Saturation</h2>
             </div>
             
-            <div className="font-mono text-xs max-w-sm space-y-4 border-l border-gray-800 pl-4">
-              <div className="flex justify-between text-gray-500">
-                <span>TARGET LATENCY</span><span>&lt; 1.50 s</span>
+            <div className="font-mono text-xs w-full space-y-4">
+              <div className="text-gray-400 mb-6 uppercase tracking-widest leading-relaxed text-right">
+                OBSERVATION:<br/>Node overload detected.
               </div>
-              <div className="flex justify-between text-gray-500">
-                <span>TARGET LOAD</span><span>&lt; 80%</span>
+              <div className="flex justify-between text-[#FF3333] pt-4 border-t border-gray-800/80">
+                <span>LATENCY</span><span className="animate-pulse">2.84 s</span>
               </div>
-              <div className="flex justify-between text-[#FF3333] pt-2 border-t border-gray-800/50">
-                <span>CURRENT LATENCY</span><span>[ ILLUSTRATIVE: 2.84 s ]</span>
-              </div>
-              <div className="flex justify-between text-[#FF3333]">
-                <span>SERVER LOAD</span><span>78%</span>
-              </div>
-            </div>
-
-            <div className="text-[10px] text-gray-500 tracking-[0.2em] uppercase">
-              Reroute connection → Downgrade 4K to 1080p → Latency falls
-            </div>
-
-            <div className="font-mono text-xs max-w-sm space-y-4 border-l border-[#FF3333] pl-4">
-              <div className="flex justify-between text-white">
-                <span>CURRENT LATENCY</span><span>1.21 s</span>
-              </div>
-              <div className="text-[#FF3333] tracking-widest pt-2">WITHIN LIMIT</div>
             </div>
           </div>
         </section>
 
-        {/* 04 - VISION (Situation -> Intervention -> Result) */}
+        {/* 04 - VISION */}
         <section className="min-h-screen py-32 flex flex-col justify-center w-full md:w-1/2">
-          <div className="space-y-12">
+          <div className="space-y-12 bg-black/40 backdrop-blur-md p-8 border-l border-[#FF3333]">
             <div>
-              <div className="text-[10px] text-gray-500 tracking-[0.2em] mb-4">03 // eCHALLAN POLICE</div>
-              <h2 className="text-3xl font-sans tracking-tight uppercase text-white">Optical Recognition</h2>
-              <p className="text-gray-400 text-sm mt-4">The camera can't read the plate.</p>
+              <div className="text-[10px] text-[#FF3333] tracking-[0.2em] mb-4">03 // eCHALLAN POLICE</div>
+              <h2 className="text-2xl font-sans tracking-tight uppercase text-white">Optical Recognition</h2>
             </div>
             
-            <div className="font-mono text-xs max-w-sm space-y-4 border-l border-gray-800 pl-4">
-              <div className="flex justify-between text-gray-500">
-                <span>REQUIRED CONFIDENCE</span><span>&gt; 90%</span>
+            <div className="font-mono text-xs max-w-sm space-y-4">
+              <div className="text-gray-400 mb-6 uppercase tracking-widest leading-relaxed">
+                OBSERVATION:<br/>Vision threshold impaired.
               </div>
-              <div className="flex justify-between text-[#FF3333] pt-2 border-t border-gray-800/50">
-                <span>CONFIDENCE</span><span>[ ILLUSTRATIVE: 63% ]</span>
+              <div className="flex justify-between text-[#FF3333] pt-4 border-t border-gray-800/80">
+                <span>CONFIDENCE</span><span className="animate-pulse">34.1%</span>
               </div>
-            </div>
-
-            <div className="text-[10px] text-gray-500 tracking-[0.2em] uppercase">
-              Contrast ↑ → Binarization ↑ → Confidence climbs
-            </div>
-
-            <div className="font-mono text-xs max-w-sm space-y-4 border-l border-[#FF3333] pl-4">
-              <div className="flex justify-between text-gray-400">
-                <span>CONFIDENCE</span><span>78%</span>
-              </div>
-              <div className="flex justify-between text-white">
-                <span>CONFIDENCE</span><span>91%</span>
-              </div>
-              <div className="text-[#FF3333] tracking-widest pt-2 border-t border-gray-800/50">IDENTIFIED</div>
             </div>
           </div>
         </section>
 
-        {/* 05 - LOGIC (Situation -> Intervention -> Result) */}
-        <section className="min-h-screen py-32 flex flex-col justify-center w-full md:w-1/2">
-          <div className="space-y-12">
-            <div>
-              <div className="text-[10px] text-gray-500 tracking-[0.2em] mb-4">04 // AREA 51</div>
-              <h2 className="text-3xl font-sans tracking-tight uppercase text-white">Facility Lockdown</h2>
-              <p className="text-gray-400 text-sm mt-4">The circuit output is wrong.</p>
+        {/* 05 - LOGIC */}
+        <section className="min-h-screen py-32 flex flex-col justify-end items-end w-full">
+          <div className="w-full md:w-1/2 space-y-12 bg-black/40 backdrop-blur-md p-8 border-r border-[#FF3333]">
+            <div className="text-right">
+              <div className="text-[10px] text-[#FF3333] tracking-[0.2em] mb-4">04 // AREA 51</div>
+              <h2 className="text-2xl font-sans tracking-tight uppercase text-white">Facility Lockdown</h2>
             </div>
             
-            <div className="font-mono text-xs max-w-sm space-y-4 border-l border-gray-800 pl-4 text-gray-500 leading-relaxed">
-              <div>INPUT ↓</div>
-              <div>[ AND ] ↓</div>
-              <div>[ XOR ] ↓</div>
-              <div className="text-[#FF3333] pt-2 border-t border-gray-800/50">OUTPUT 0</div>
-            </div>
-
-            <div className="text-[10px] text-gray-500 tracking-[0.2em] uppercase">
-              One gate changes → Signal propagates → Output flips
-            </div>
-
-            <div className="font-mono text-xs max-w-sm space-y-4 border-l border-[#FF3333] pl-4">
-              <div className="flex justify-between text-white">
-                <span>OUTPUT</span><span>1</span>
+            <div className="font-mono text-xs w-full space-y-4">
+              <div className="text-gray-400 mb-6 uppercase tracking-widest leading-relaxed text-right">
+                OBSERVATION:<br/>Emergency lockdown active.
               </div>
-              <div className="text-[#FF3333] tracking-widest pt-2 border-t border-gray-800/50">SAFE STATE</div>
+              <div className="flex justify-between text-[#FF3333] pt-4 border-t border-gray-800/80">
+                <span>OUTPUT</span><span className="animate-pulse">0 (LOCKED)</span>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* 06 - THE COMMON THREAD */}
-        <section className="min-h-screen py-32 flex flex-col justify-center w-full md:w-1/2">
-          <h2 className="text-3xl font-sans tracking-tight uppercase mb-8">Different systems.<br/>Same problem.</h2>
-          <div className="w-12 h-px bg-[#FF3333] mb-12"></div>
-          
-          <div className="space-y-6 text-sm tracking-widest uppercase font-bold text-gray-400">
-            <div>OBSERVE <span className="text-gray-800 ml-4">↓</span></div>
-            <div>IDENTIFY <span className="text-gray-800 ml-4">↓</span></div>
-            <div>INTERVENE <span className="text-gray-800 ml-4">↓</span></div>
-            <div className="text-white">VERIFY</div>
-          </div>
-        </section>
-
-        {/* 07 - THE CLOCK */}
-        <section className="min-h-screen py-32 flex flex-col justify-center items-center text-center w-full max-w-3xl mx-auto z-20 relative">
-          <div className="bg-black/90 p-12 md:p-24 border border-[#FF3333]/20 w-full">
+        {/* 06 - THE CLOCK */}
+        <section className="min-h-screen py-32 flex flex-col justify-center items-center text-center w-full z-20 relative pointer-events-auto">
+          <div className="bg-black/90 backdrop-blur-lg p-12 md:p-24 border border-[#FF3333]/20 w-full max-w-3xl mx-auto">
             <div className="text-6xl md:text-8xl font-sans font-bold text-[#FF3333] mb-4">
               12:00
             </div>
-            <div className="text-sm tracking-[0.3em] uppercase text-white mb-16">
-              12 Minutes.
-            </div>
             
-            <div className="flex flex-col md:flex-row justify-between items-center gap-12 mb-16 text-xs text-gray-400 uppercase tracking-widest">
-              <div className="flex flex-col items-center">
-                <span className="text-white font-bold mb-2">MODULE A</span>
-                <span>Rapid Checks</span>
-                <span className="text-[10px] mt-2 text-gray-600">01:30</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <span className="text-white font-bold mb-2">MODULE B</span>
-                <span>Core Incident</span>
-                <span className="text-[10px] mt-2 text-gray-600">04:30</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <span className="text-white font-bold mb-2">MODULE C</span>
-                <span>Launch Protocol</span>
-                <span className="text-[10px] mt-2 text-gray-600">06:00</span>
-              </div>
+            <div className="text-xs text-white tracking-widest leading-loose mb-16 uppercase">
+              SYSTEM STATUS <span className="text-gray-500">████████████████</span> NOMINAL<br/>
+              READY FOR OPERATORS
             </div>
 
-            {/* 08 - CTA */}
             <Link to="/ctrl-freak/info" className="inline-block border border-white hover:bg-white hover:text-black transition-colors px-12 py-4 font-bold text-xs tracking-[0.2em] uppercase">
               Enter Ctrl Freak
             </Link>
