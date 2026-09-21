@@ -31,19 +31,18 @@ export function ControlChamber() {
 
     const dummy = new THREE.Object3D();
 
-    // 1. PILLARS (The Octagonal/Circular Shell)
+    // 1. PILLARS (The Octagonal/Circular Shell) - Much wider now
     for (let i = 0; i < pillarCount; i++) {
       const angle = (i / pillarCount) * Math.PI * 2;
-      const radius = 45 + Math.random() * 15; // Rough outer perimeter
+      const radius = 70 + Math.random() * 20; // Expanded perimeter
       
       dummy.position.set(
         Math.cos(angle) * radius,
-        -10 + Math.random() * 20, // Vary vertical start slightly
+        -20 + Math.random() * 40, 
         Math.sin(angle) * radius
       );
-      dummy.rotation.set(0, angle, 0); // Face inward
-      // Randomize tallness slightly
-      dummy.scale.set(1, 1 + Math.random() * 0.5, 1); 
+      dummy.rotation.set(0, angle, 0); 
+      dummy.scale.set(1, 1.5 + Math.random() * 1.5, 1); // Taller pillars
       
       dummy.updateMatrix();
       pillarRef.current.setMatrixAt(i, dummy.matrix);
@@ -53,9 +52,9 @@ export function ControlChamber() {
     // 2. BEAMS (The Structure)
     for (let i = 0; i < beamCount; i++) {
       dummy.position.set(
-        (Math.random() - 0.5) * 80,
-        -20 + Math.random() * 60,
-        (Math.random() - 0.5) * 80
+        (Math.random() - 0.5) * 120, // Wider spread
+        -30 + Math.random() * 100, // Higher vertical spread
+        (Math.random() - 0.5) * 120
       );
       
       // Mostly orthographic rotations (0, 90, 180 deg)
@@ -98,11 +97,11 @@ export function ControlChamber() {
     // 4. STAIRCASES
     for (let i = 0; i < stairCount; i++) {
       const angle = (i / stairCount) * Math.PI * 2;
-      const radius = 30;
+      const radius = 50 + Math.random() * 10; // Pushed outward
       
       dummy.position.set(
         Math.cos(angle) * radius,
-        -10 + (i * 5),
+        -20 + (i * 8),
         Math.sin(angle) * radius
       );
       
@@ -126,8 +125,8 @@ export function ControlChamber() {
   return (
     <group>
       {/* Floor & Deep Void */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -40, 0]}>
-        <circleGeometry args={[150, 32]} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -60, 0]}>
+        <circleGeometry args={[250, 32]} />
         <meshStandardMaterial color="#050505" roughness={1} />
       </mesh>
       
@@ -155,24 +154,31 @@ export function ControlChamber() {
       {/* Basic Architecture Lighting (No real-time shadows yet) */}
       <ambientLight intensity={0.1} />
       
-      {/* Key spotlight shining straight down the central shaft */}
+      {/* Key spotlight shining down and angled slightly to give the pillars bright faces */}
       <directionalLight 
-        position={[0, 80, 0]} 
+        position={[20, 80, 40]} 
         intensity={2.5} 
         color="#ffffff" 
       />
       
-      {/* Harsh stark rim light to catch edges */}
+      {/* Harsh stark rim light from the opposite side */}
       <directionalLight 
-        position={[50, -20, -50]} 
+        position={[-50, 20, -50]} 
         intensity={1.0} 
-        color="#aa0000" 
+        color="#ff3333" 
       />
       
-      <hemisphereLight groundColor="#000000" color="#222222" intensity={0.6} />
+      {/* Secondary stark blue/white rim light to create cinematic contrast */}
+      <directionalLight 
+        position={[60, 0, -20]} 
+        intensity={1.5} 
+        color="#88ccff" 
+      />
       
-      {/* Dense fog to hide the limits of the procedural geometry */}
-      <fog attach="fog" args={['#000', 30, 120]} />
+      <hemisphereLight groundColor="#000000" color="#222222" intensity={0.3} />
+      
+      {/* Dense fog pushed back so we can actually see the chamber */}
+      <fog attach="fog" args={['#050505', 40, 180]} />
     </group>
   );
 }

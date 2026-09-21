@@ -231,7 +231,7 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
 export const SystemCore = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) => {
   return (
     <div className="w-full h-full">
-      <Canvas camera={{ position: [0, 0, 10], fov: 45 }}>
+      <Canvas camera={{ position: [0, 0, 22], fov: 45 }}>
         <color attach="background" args={['#050505']} />
         <ambientLight intensity={0.5} />
         
