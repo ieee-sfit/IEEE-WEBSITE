@@ -228,10 +228,41 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
   );
 };
 
+const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) => {
+  // A cinematic spline path for the camera to fly through the brutalist chamber
+  const cameraPath = useMemo(() => {
+    return new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0, 50, 80),    // 0.0: Arrival High (looking down at the core)
+      new THREE.Vector3(0, 0, 22),     // 0.2: Core Center (incident detected)
+      new THREE.Vector3(-25, -10, 15), // 0.35: Station 1 (Left Low, ANC)
+      new THREE.Vector3(25, -15, 20),  // 0.5: Station 2 (Right Lower, Network)
+      new THREE.Vector3(30, 20, -5),   // 0.65: Station 3 (Right High, behind the core, Vision)
+      new THREE.Vector3(-20, 15, -20), // 0.8: Station 4 (Back Left High, Logic)
+      new THREE.Vector3(0, 0, 22),     // 1.0: Final Clock (Front Center)
+    ], false, 'catmullrom', 0.5);
+  }, []);
+
+  useFrame((state) => {
+    // We smooth the raw scroll progress so the camera feels weighty and doesn't stop instantly
+    const progress = scrollProgress.get();
+    
+    // Get the exact point on the curve for this scroll percentage
+    const targetPosition = cameraPath.getPoint(progress);
+    
+    // Smoothly lerp the camera towards the target position
+    state.camera.position.lerp(targetPosition, 0.05);
+    
+    // Always keep the camera focused on the System Core at the center of the room
+    state.camera.lookAt(0, 0, 0);
+  });
+
+  return null;
+};
+
 export const SystemCore = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) => {
   return (
     <div className="w-full h-full">
-      <Canvas camera={{ position: [0, 0, 22], fov: 45 }}>
+      <Canvas camera={{ position: [0, 50, 80], fov: 45 }}>
         <color attach="background" args={['#050505']} />
         <ambientLight intensity={0.5} />
         
@@ -240,6 +271,9 @@ export const SystemCore = ({ scrollProgress }: { scrollProgress: MotionValue<num
         
         {/* Phase 1: The Field (6,000 particles) */}
         <ParticleSystem scrollProgress={scrollProgress} />
+
+        {/* Phase 2: Camera Choreography */}
+        <CameraRig scrollProgress={scrollProgress} />
       </Canvas>
     </div>
   );
