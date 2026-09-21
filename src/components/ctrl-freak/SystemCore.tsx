@@ -269,9 +269,23 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
     
     posAttribute.needsUpdate = true;
     
-    // Global rotation to give life
-    pointsRef.current.rotation.y = Math.sin(t * 0.2) * 0.1; // Reduced rotation so text is legible
-    pointsRef.current.rotation.x = Math.cos(t * 0.1) * 0.05;
+    // --- ORIENTATION FIX ---
+    // Make the Core explicitly face the camera so shapes (like sine wave and clock) 
+    // are perfectly legible regardless of where the camera flies in the room.
+    const targetMatrix = new THREE.Matrix4().lookAt(
+      pointsRef.current.position,
+      state.camera.position,
+      new THREE.Vector3(0, 1, 0)
+    );
+    const targetQuaternion = new THREE.Quaternion().setFromRotationMatrix(targetMatrix);
+    
+    // Add a slight wobble for life
+    const wobble = new THREE.Quaternion().setFromEuler(
+      new THREE.Euler(Math.cos(t * 0.1) * 0.05, Math.sin(t * 0.2) * 0.1, 0)
+    );
+    targetQuaternion.multiply(wobble);
+    
+    pointsRef.current.quaternion.copy(targetQuaternion);
 
     // --- COLOR LOGIC ---
     const material = pointsRef.current.material as THREE.PointsMaterial;
