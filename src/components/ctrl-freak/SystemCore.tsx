@@ -215,7 +215,7 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
   });
 
   return (
-    <Points ref={pointsRef} positions={positions} stride={3} frustumCulled={false}>
+    <Points ref={pointsRef} positions={positions} stride={3} frustumCulled={false} scale={0.6}>
       <PointMaterial
         transparent
         color="#ff3333"
