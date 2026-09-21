@@ -140,26 +140,31 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
   const [positions] = useState(() => new Float32Array(count * 3));
 
   // --- THE CLOCK ---
-  const [timeLeft, setTimeLeft] = useState(720); // 12 minutes
+  // Starts at 720 (12 minutes). When it hits 0, it goes negative, which we use to count upwards in red.
+  const [timeState, setTimeState] = useState(720); 
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimeLeft((t) => Math.max(0, t - 1));
+      setTimeState((t) => {
+        if (t > -720) return t - 1; // Count down to 0, then count up to -720
+        return t;
+      });
     }, 1000);
     return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
-    const min = Math.floor(timeLeft / 60);
-    const sec = (timeLeft % 60).toString().padStart(2, '0');
-    const text = `${min}:${sec}`;
+    const absTime = Math.abs(timeState);
+    const min = Math.floor(absTime / 60);
+    const sec = (absTime % 60).toString().padStart(2, '0');
+    const text = `${min.toString().padStart(2, '0')}:${sec}`;
     const newRing = generateTextPoints(text, count);
     
     // Mutate the ring buffer directly so useFrame picks it up without reallocation
     for (let i = 0; i < count * 3; i++) {
       shapes.ring[i] = newRing[i];
     }
-  }, [timeLeft, shapes, count]);
+  }, [timeState, shapes, count]);
 
   // Helper function to smoothstep interpolation
   const smoothstep = (min: number, max: number, value: number) => {
@@ -251,16 +256,8 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       }
 
       // 720 COUNTDOWN (Clock)
-      // We don't rotate the text so it stays readable, but we add a heartbeat pulse
-      if (shape1 === shapes.ring || shape2 === shapes.ring) {
-        const ringWeight = shape1 === shapes.ring ? (1 - lerpFactor) : lerpFactor;
-        if (ringWeight > 0) {
-           const pulse = 1.0 + Math.sin(t * Math.PI * 2) * 0.05 * ringWeight;
-           x *= pulse;
-           y *= pulse;
-           z *= pulse;
-        }
-      }
+      // Kept completely static for that monolithic, unyielding digital feel.
+      // (No pulse or rotation applied)
 
       posArray[i3] = x;
       posArray[i3 + 1] = y;
@@ -289,8 +286,8 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
 
     // --- COLOR LOGIC ---
     const material = pointsRef.current.material as THREE.PointsMaterial;
-    if (timeLeft === 0 && (Math.floor(t * 2) % 2 === 0)) {
-      // Emergency Flash Red
+    if (timeState <= 0) {
+      // Solid Emergency Red when counting up
       material.color.setRGB(1, 0, 0);
     } else {
       const r = Math.max(0.1, 1.0 - progress * 1.5);
