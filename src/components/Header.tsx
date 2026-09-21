@@ -21,7 +21,7 @@ const Header = () => {
   const navItems = [
     { name: 'Home', href: '/', type: 'route' },
     { name: 'About', href: '#about', type: 'scroll' },
-    { name: 'Navkriti \'26', href: '/navkriti', type: 'route' },
+    { name: 'IEEE Xtreme', href: '/xtreme', type: 'route' },
     { name: 'Events', href: '/events', type: 'route' },
     { name: 'Our Team', href: '/team', type: 'route' },
     { name: 'Contact', href: '#contact', type: 'scroll' },

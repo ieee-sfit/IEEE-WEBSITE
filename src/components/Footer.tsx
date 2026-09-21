@@ -199,7 +199,7 @@ const Footer = () => {
                 </div>
                 <div className="flex items-center space-x-3 group hover:scale-105 transition-transform duration-300">
                   <Phone className="w-5 h-5 text-green-400 group-hover:animate-bounce" />
-                  <span className="text-gray-300 group-hover:text-green-400 transition-colors duration-300">+91 88282 32392</span>
+                  <span className="text-gray-300 group-hover:text-green-400 transition-colors duration-300">+91 79772 14604</span>
                 </div>
               </div>
             </div>

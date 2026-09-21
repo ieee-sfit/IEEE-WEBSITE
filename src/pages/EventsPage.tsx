@@ -109,7 +109,7 @@ const EventsPage = () => {
 
   const getSlug = (id: number) => eventsData.find((e) => e.id === id)?.slug ?? null;
 
-  const allEvents = eventsData;
+  const allEvents = [...eventsData].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   const featuredEvent = allEvents.find(event => event.featured);
   
 
