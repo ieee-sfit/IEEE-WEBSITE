@@ -29,7 +29,8 @@ const generateTextPoints = (text: string, count: number): Float32Array => {
     for (let x = 0; x < 256; x++) {
       const index = (y * 256 + x) * 4;
       if (data[index] > 128) { // If pixel is bright
-        validPoints.push([(x - 128) / 10, -(y - 64) / 10]);
+        // Invert X because the billboarding orientation (lookAt) makes us look at the "back" of the XY plane
+        validPoints.push([-(x - 128) / 10, -(y - 64) / 10]);
       }
     }
   }
