@@ -37,7 +37,7 @@ const CtrlFreakInfoPage = () => {
             </div>
             <div className="flex justify-between border-b border-gray-800 pb-2">
               <span className="text-gray-500">TEAM SIZE</span>
-              <span className="text-right">2 - 3 Players<br/><span className="text-gray-600 text-xs">(Solo play allowed with +1 committee member)</span></span>
+              <span className="text-right">2 - 3 Players</span>
             </div>
             <div className="flex justify-between border-b border-gray-800 pb-2">
               <span className="text-gray-500">FORMAT</span>
