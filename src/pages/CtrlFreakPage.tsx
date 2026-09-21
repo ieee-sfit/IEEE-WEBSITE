@@ -36,7 +36,7 @@ const CtrlFreakPage = () => {
         This is now the unified System Core that evolves over the 8 scroll beats.
         It sits fixed under the scrolling narrative HTML.
       */}
-      <div className="fixed inset-0 z-0">
+      <div className="fixed inset-0 z-0 pointer-events-none">
         <SystemCore scrollProgress={scrollYProgress} />
       </div>
 

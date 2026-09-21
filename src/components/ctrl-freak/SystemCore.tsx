@@ -3,7 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Points, PointMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 import { MotionValue } from 'framer-motion';
-
+import { ControlChamber } from './ControlChamber';
 // A massive, glitching point cloud that evolves into specific formations based on scroll progress
 const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) => {
   const pointsRef = useRef<THREE.Points>(null);
@@ -234,6 +234,11 @@ export const SystemCore = ({ scrollProgress }: { scrollProgress: MotionValue<num
       <Canvas camera={{ position: [0, 0, 10], fov: 45 }}>
         <color attach="background" args={['#050505']} />
         <ambientLight intensity={0.5} />
+        
+        {/* Phase 0: The Architectural Prototype */}
+        <ControlChamber />
+        
+        {/* Phase 1: The Field (6,000 particles) */}
         <ParticleSystem scrollProgress={scrollProgress} />
       </Canvas>
     </div>
