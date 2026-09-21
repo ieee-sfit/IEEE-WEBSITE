@@ -511,6 +511,33 @@ export const eventsData: EventData[] = [
       ],
     },
   },
+  {
+    id: 15,
+    slug: 'ctrl-freak',
+    title: 'Ctrl Freak',
+    date: '2026-09-30',
+    displaydate: 'Mosaic Technical Arena',
+    time: 'TBD',
+    location: 'Lab 620',
+    attendees: 0,
+    registrations: 0,
+    category: 'Simulation',
+    status: 'upcoming',
+    description: 'A cinematic tech simulation where you investigate and intervene in critical system failures across four distinct stations. Zero coding required.',
+    detailedDescription: 'The page represents CtrlFreak as a whole. The four stations become four investigations within that world: GoAT ANC, F1 0-Lag Stream, eChallan Police, and Area51 Facility Lockdown.',
+    image: 'https://i.postimg.cc/QtHvHCdW/The-IEEE-Student-Branch-WIE-conducted-the-Techno-Art-Showdown-Phase-1-Techno-Art-Showdown-showca.jpg',
+    featured: true,
+    highlights: [
+      'Investigate system failures',
+      'Intervene before time runs out',
+      'Zero coding required'
+    ],
+    speakers: [],
+    topics: ['Simulation', 'Problem Solving', 'Teamwork'],
+    satisfaction: null,
+    form: '/ctrl-freak',
+    organizer: 'IEEE x WIE SFIT',
+  },
 ];
 
 export function getEventBySlug(slug: string): EventData | undefined {
