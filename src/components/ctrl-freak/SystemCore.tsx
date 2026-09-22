@@ -8,7 +8,11 @@ import { ControlChamber } from './ControlChamber';
 import { useCtrlFreakStore } from '../../store/useCtrlFreakStore';
 
 const PRIMARY_HUBS = [
-  [-15, 5, 0], [15, 5, 0], [-5, 12, -5], [0, 5, 5], [5, -2, -5]
+  [-12, 0, 0],   // 0: SRC (Left)
+  [-2, 0, 0],    // 1: DST (Right)
+  [-7, 6, -2],   // 2: RLY-1 (Top)
+  [-7, 0, 3],    // 3: RLY-2 (Center / Corrupted)
+  [-7, -6, -2]   // 4: RLY-3 (Bottom)
 ];
 const CORRUPTED_IDX = 3;
 
@@ -114,7 +118,7 @@ const SceneExporter = () => {
 const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) => {
   const pointsRef = useRef<THREE.Points>(null);
 
-  const count = 6000; // Increased count for better shape definition
+  const count = 12000; // Doubled count for massive density increase
   
   // Pre-calculate all target shapes
   const shapes = useMemo(() => {
@@ -162,20 +166,22 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
         }
         const hub = PRIMARY_HUBS[hubIdx];
         const radius = hubIdx === CORRUPTED_IDX ? 3.2 : 1.8;
+        // Volumetric filling instead of a hollow shell
+        const rVol = radius * Math.cbrt(Math.random());
         const theta = Math.random() * Math.PI * 2;
         const phi = Math.acos(Math.random() * 2 - 1);
-        network[i3]     = hub[0] + radius * Math.sin(phi) * Math.cos(theta);
-        network[i3 + 1] = hub[1] + radius * Math.sin(phi) * Math.sin(theta);
-        network[i3 + 2] = hub[2] + radius * Math.cos(phi);
+        network[i3]     = hub[0] + rVol * Math.sin(phi) * Math.cos(theta);
+        network[i3 + 1] = hub[1] + rVol * Math.sin(phi) * Math.sin(theta);
+        network[i3 + 2] = hub[2] + rVol * Math.cos(phi);
       } else {
         // FLOW POOL — 45%, reserved for route-streaming in useFrame.
         // Idle default: loosely orbiting the corrupted hub (the "congestion").
         const hub = PRIMARY_HUBS[CORRUPTED_IDX];
-        const r = 5 + Math.random() * 4;
+        const rVol = (3 + Math.random() * 5) * Math.cbrt(Math.random());
         const theta = Math.random() * Math.PI * 2;
-        network[i3]     = hub[0] + Math.cos(theta) * r;
-        network[i3 + 1] = hub[1] + Math.sin(theta) * r * 0.6;
-        network[i3 + 2] = hub[2] + (Math.random() - 0.5) * 3;
+        network[i3]     = hub[0] + Math.cos(theta) * rVol;
+        network[i3 + 1] = hub[1] + Math.sin(theta) * rVol * 0.6;
+        network[i3 + 2] = hub[2] + (Math.random() - 0.5) * 4;
       }
 
       // 4. VOXEL GRID (Vision Binarization)
@@ -346,15 +352,26 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
             const bad = route.includes('3');
             const flowSpeed = networkState.solved ? 2.0 : bad ? 0.3 : 0.8;
             const tFlow = (t * flowSpeed + (i / count) * 6) % 1.0;
-            const jitter = bad && !networkState.solved ? (Math.random() - 0.5) * 1.5 : 0;
+            
+            // Add baseline jitter so the streams have thickness, increase heavily if corrupted
+            const thickness = 0.4;
+            const jitterX = (Math.random() - 0.5) * (bad && !networkState.solved ? 3.0 : thickness);
+            const jitterY = (Math.random() - 0.5) * (bad && !networkState.solved ? 3.0 : thickness);
+            const jitterZ = (Math.random() - 0.5) * (bad && !networkState.solved ? 3.0 : thickness);
 
-            x = (p1[0] + (p2[0] - p1[0]) * tFlow + jitter) * netWeight + x * (1 - netWeight);
-            y = (p1[1] + (p2[1] - p1[1]) * tFlow + jitter) * netWeight + y * (1 - netWeight);
-            z = (p1[2] + (p2[2] - p1[2]) * tFlow + jitter) * netWeight + z * (1 - netWeight);
+            // Add an arc / bulge to the routes so they aren't perfectly straight lines
+            const bulge = Math.sin(tFlow * Math.PI) * 1.5; 
+            // Push outwards from the center (X=-7, Z=0)
+            const midX = (p1[0] + p2[0]) / 2;
+            const dirX = midX > -7 ? 1 : -1;
+
+            x = (p1[0] + (p2[0] - p1[0]) * tFlow + jitterX + (dirX * bulge)) * netWeight + x * (1 - netWeight);
+            y = (p1[1] + (p2[1] - p1[1]) * tFlow + jitterY) * netWeight + y * (1 - netWeight);
+            z = (p1[2] + (p2[2] - p1[2]) * tFlow + jitterZ + bulge) * netWeight + z * (1 - netWeight);
           } else {
             // Ambient behavior
-            const isCorruptedNeighborhood = Math.hypot(x - PRIMARY_HUBS[3][0], y - PRIMARY_HUBS[3][1], z - PRIMARY_HUBS[3][2]) < 4;
-            const pulse = isCorruptedNeighborhood ? (Math.sin(t * 3 + i) * 0.4 + 0.4) : 0.1;
+            const isCorruptedNeighborhood = Math.hypot(x - PRIMARY_HUBS[3][0], y - PRIMARY_HUBS[3][1], z - PRIMARY_HUBS[3][2]) < 6;
+            const pulse = isCorruptedNeighborhood ? (Math.sin(t * 3 + i) * 0.5 + 0.5) : 0.1;
             x += (Math.random() - 0.5) * pulse * netWeight;
             y += (Math.random() - 0.5) * pulse * netWeight;
             z += (Math.random() - 0.5) * pulse * netWeight;
