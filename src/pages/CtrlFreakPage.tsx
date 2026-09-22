@@ -1,38 +1,10 @@
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import { useScroll } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Canvas, useThree } from '@react-three/fiber';
-import { GLTFExporter } from 'three-stdlib';
 import { SystemCore } from '../components/ctrl-freak/SystemCore';
 import { AncStationUI } from '../components/ctrl-freak/AncStationUI';
 
-// Temporary utility to export the scene to Blender
-const SceneExporter = () => {
-  const { scene } = useThree();
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'E' && e.shiftKey) {
-        const exporter = new GLTFExporter();
-        exporter.parse(
-          scene,
-          (gltf) => {
-            const blob = new Blob([JSON.stringify(gltf)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'control_chamber.gltf';
-            link.click();
-          },
-          (error) => console.error('An error happened during export:', error),
-          { binary: false } // Export as .gltf
-        );
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [scene]);
-  return null;
-};
+
 
 const CtrlFreakPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -68,10 +40,7 @@ const CtrlFreakPage = () => {
         It sits fixed under the scrolling narrative HTML.
       */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <Canvas camera={{ position: [0, 0, 22], fov: 60, near: 0.1, far: 200 }}>
-          <SceneExporter />
-          <SystemCore scrollProgress={scrollYProgress} />
-        </Canvas>
+        <SystemCore scrollProgress={scrollYProgress} />
       </div>
 
       {/* NARRATIVE HTML OVERLAYS (Heads Up Display) */}

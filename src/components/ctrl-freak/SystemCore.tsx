@@ -1,7 +1,8 @@
 import { useRef, useMemo, useState, useEffect } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Points, PointMaterial } from '@react-three/drei';
 import * as THREE from 'three';
+import { GLTFExporter } from 'three-stdlib';
 import { MotionValue } from 'framer-motion';
 import { ControlChamber } from './ControlChamber';
 import { useCtrlFreakStore } from '../../store/useCtrlFreakStore';
@@ -47,6 +48,35 @@ const generateTextPoints = (text: string, count: number): Float32Array => {
   }
   return result;
 };
+
+// Temporary utility to export the scene to Blender
+const SceneExporter = () => {
+  const { scene } = useThree();
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'E' && e.shiftKey) {
+        const exporter = new GLTFExporter();
+        exporter.parse(
+          scene,
+          (gltf) => {
+            const blob = new Blob([JSON.stringify(gltf)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'control_chamber.gltf';
+            link.click();
+          },
+          (error) => console.error('An error happened during export:', error),
+          { binary: false } // Export as .gltf
+        );
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [scene]);
+  return null;
+};
+
 // A massive, glitching point cloud that evolves into specific formations based on scroll progress
 const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) => {
   const pointsRef = useRef<THREE.Points>(null);
@@ -421,6 +451,7 @@ export const SystemCore = ({ scrollProgress }: { scrollProgress: MotionValue<num
   return (
     <div className="w-full h-full">
       <Canvas camera={{ position: [0, 50, 80], fov: 45 }}>
+        <SceneExporter />
         <color attach="background" args={['#050505']} />
         <ambientLight intensity={0.5} />
         
