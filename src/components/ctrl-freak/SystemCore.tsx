@@ -1,6 +1,6 @@
 import { useRef, useMemo, useState, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Points, PointMaterial } from '@react-three/drei';
+import { Points, PointMaterial, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { GLTFExporter } from 'three-stdlib';
 import { MotionValue } from 'framer-motion';
@@ -52,9 +52,21 @@ const generateTextPoints = (text: string, count: number): Float32Array => {
 // Temporary utility to export the scene to Blender
 const SceneExporter = () => {
   const { scene } = useThree();
+  const [exported, setExported] = useState(false);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'E' && e.shiftKey) {
+        setExported(true);
+        setTimeout(() => setExported(false), 5000);
+        
+        console.log(
+          "%c[CTRL-FREAK]%c AUTHORIZATION OVERRIDE ACCEPTED.\\n%cENVIRONMENT GEOMETRY EXFILTRATED SUCCESSFULLY.", 
+          "color: #FF3333; font-weight: bold; font-size: 14px; background: black; padding: 2px 4px;",
+          "color: white; font-weight: bold; font-size: 14px; background: black; padding: 2px 4px;",
+          "color: #00FF00; font-weight: normal; font-size: 12px; background: black; padding: 2px 4px; display: block; margin-top: 4px;"
+        );
+
         const exporter = new GLTFExporter();
         exporter.parse(
           scene,
@@ -74,7 +86,23 @@ const SceneExporter = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [scene]);
-  return null;
+
+  if (!exported) return null;
+
+  return (
+    <Html center zIndexRange={[100, 0]}>
+      <div className="fixed inset-0 flex items-center justify-center pointer-events-none w-screen h-screen">
+        <div className="text-[#FF3333] font-mono text-center animate-pulse bg-black/80 p-8 md:p-12 border border-[#FF3333] backdrop-blur-md">
+          <div className="text-2xl md:text-4xl font-bold tracking-[0.2em] uppercase mb-4 font-sans">
+            Easter Egg Unlocked
+          </div>
+          <div className="text-xs md:text-sm tracking-[0.3em] uppercase text-white">
+            [SYS_OVERRIDE] Environment Data Exfiltrated
+          </div>
+        </div>
+      </div>
+    </Html>
+  );
 };
 
 // A massive, glitching point cloud that evolves into specific formations based on scroll progress
