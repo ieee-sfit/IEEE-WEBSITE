@@ -1,7 +1,38 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { useScroll } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { Canvas, useThree } from '@react-three/fiber';
+import { GLTFExporter } from 'three-stdlib';
 import { SystemCore } from '../components/ctrl-freak/SystemCore';
+import { AncStationUI } from '../components/ctrl-freak/AncStationUI';
+
+// Temporary utility to export the scene to Blender
+const SceneExporter = () => {
+  const { scene } = useThree();
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'E' && e.shiftKey) {
+        const exporter = new GLTFExporter();
+        exporter.parse(
+          scene,
+          (gltf) => {
+            const blob = new Blob([JSON.stringify(gltf)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'control_chamber.gltf';
+            link.click();
+          },
+          (error) => console.error('An error happened during export:', error),
+          { binary: false } // Export as .gltf
+        );
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [scene]);
+  return null;
+};
 
 const CtrlFreakPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -37,7 +68,10 @@ const CtrlFreakPage = () => {
         It sits fixed under the scrolling narrative HTML.
       */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <SystemCore scrollProgress={scrollYProgress} />
+        <Canvas camera={{ position: [0, 0, 22], fov: 60, near: 0.1, far: 200 }}>
+          <SceneExporter />
+          <SystemCore scrollProgress={scrollYProgress} />
+        </Canvas>
       </div>
 
       {/* NARRATIVE HTML OVERLAYS (Heads Up Display) */}
@@ -83,28 +117,8 @@ const CtrlFreakPage = () => {
         </section>
 
         {/* 02 - ANC */}
-        <section className="min-h-screen py-32 flex flex-col justify-center w-full md:w-1/2">
-          <div className="space-y-12 bg-black/40 backdrop-blur-md p-8 border-l border-[#FF3333]">
-            <div>
-              <div className="text-[10px] text-[#FF3333] tracking-[0.2em] mb-4">01 // GoAT ANC</div>
-              <h2 className="text-2xl font-sans tracking-tight uppercase text-white">Signal Integrity</h2>
-            </div>
-            
-            <div className="font-mono text-xs max-w-sm space-y-4">
-              <div className="text-gray-400 mb-6 uppercase tracking-widest leading-relaxed">
-                OBSERVATION:<br/>Two periodic signals detected.
-              </div>
-              <div className="flex justify-between text-gray-500">
-                <span>EXPECTED</span><span>180°</span>
-              </div>
-              <div className="flex justify-between text-[#FF3333]">
-                <span>OBSERVED</span><span>≠ 180°</span>
-              </div>
-              <div className="flex justify-between text-[#FF3333] pt-4 border-t border-gray-800/80">
-                <span>STATUS</span><span className="animate-pulse">INTERFERENCE</span>
-              </div>
-            </div>
-          </div>
+        <section className="min-h-screen py-32 flex flex-col justify-center w-full md:w-1/2 pointer-events-auto relative z-20">
+          <AncStationUI />
         </section>
 
         {/* 03 - NETWORK */}

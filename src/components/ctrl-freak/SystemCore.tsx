@@ -4,6 +4,7 @@ import { Points, PointMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 import { MotionValue } from 'framer-motion';
 import { ControlChamber } from './ControlChamber';
+import { useCtrlFreakStore } from '../../store/useCtrlFreakStore';
 
 const generateTextPoints = (text: string, count: number): Float32Array => {
   const canvas = document.createElement('canvas');
@@ -55,7 +56,7 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
   // Pre-calculate all target shapes
   const shapes = useMemo(() => {
     const sphere = new Float32Array(count * 3);
-    const sine = new Float32Array(count * 3);
+    const wave = new Float32Array(count * 3);
     const network = new Float32Array(count * 3);
     const grid = new Float32Array(count * 3);
     const circuit = new Float32Array(count * 3);
@@ -77,11 +78,11 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       sphere[i3 + 2] = r * Math.cos(phi);
 
       // 2. SINE WAVES (ANC - Base positions, animated in useFrame)
-      const x = (Math.random() - 0.5) * 12; // span width
-      const isTop = i % 2 === 0;
-      sine[i3] = x;
-      sine[i3 + 1] = isTop ? 1 : -1; // Y offset base
-      sine[i3 + 2] = (Math.random() - 0.5) * 0.5;
+      const waveX = (i / count) * 20 - 10;
+      let waveY = i % 2 === 0 ? 1.5 : -1.5;
+      wave[i3] = waveX;
+      wave[i3 + 1] = waveY;
+      wave[i3 + 2] = 0;
 
       // 3. NETWORK TOPOLOGY
       if (Math.random() < 0.75) {
@@ -154,7 +155,7 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       ring[i3 + 2] = (Math.random() - 0.5) * 1.5;
     }
 
-    return { sphere, sine, network, grid, circuit, ring };
+    return { sphere, wave, network, grid, circuit, ring };
   }, [count]);
 
   // Initial render buffer
@@ -203,8 +204,8 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
 
     // Define transition zones based on the 8 sections (approx 12.5% each)
     // 0.00 - 0.20: Sphere (Arrival)
-    // 0.20 - 0.25: Transition -> Sine
-    // 0.25 - 0.35: Sine (ANC)
+    // 0.20 - 0.25: Transition -> Wave
+    // 0.25 - 0.35: Wave (ANC)
     // 0.35 - 0.40: Transition -> Network
     // 0.40 - 0.50: Network (Network Saturation)
     // 0.50 - 0.55: Transition -> Grid
@@ -221,11 +222,11 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
     if (progress < 0.20) {
       shape1 = shapes.sphere; shape2 = shapes.sphere; lerpFactor = 0;
     } else if (progress < 0.25) {
-      shape1 = shapes.sphere; shape2 = shapes.sine; lerpFactor = smoothstep(0.20, 0.25, progress);
+      shape1 = shapes.sphere; shape2 = shapes.wave; lerpFactor = smoothstep(0.20, 0.25, progress);
     } else if (progress < 0.35) {
-      shape1 = shapes.sine; shape2 = shapes.sine; lerpFactor = 0;
+      shape1 = shapes.wave; shape2 = shapes.wave; lerpFactor = 0;
     } else if (progress < 0.40) {
-      shape1 = shapes.sine; shape2 = shapes.network; lerpFactor = smoothstep(0.35, 0.40, progress);
+      shape1 = shapes.wave; shape2 = shapes.network; lerpFactor = smoothstep(0.35, 0.40, progress);
     } else if (progress < 0.50) {
       shape1 = shapes.network; shape2 = shapes.network; lerpFactor = 0;
     } else if (progress < 0.55) {
@@ -254,18 +255,30 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
 
       // Add specific shape animations based on which shape we are currently at
       
-      // SINE WAVE ANIMATION (Active when shape1 or shape2 is sine)
-      if (shape1 === shapes.sine || shape2 === shapes.sine) {
+      // SINE WAVE ANIMATION (Active when shape1 or shape2 is wave)
+      if (shape1 === shapes.wave || shape2 === shapes.wave) {
         // Calculate how much "sine" behavior to apply
-        const sineWeight = shape1 === shapes.sine ? (1 - lerpFactor) : lerpFactor;
+        const sineWeight = shape1 === shapes.wave ? (1 - lerpFactor) : lerpFactor;
         if (sineWeight > 0) {
           const isTop = i % 2 === 0;
-          // The bottom wave starts out of phase and slowly aligns as progress increases through the section (0.25 to 0.35)
-          const localProgress = Math.max(0, Math.min(1, (progress - 0.25) / 0.10));
-          const phaseOffset = isTop ? 0 : Math.PI * (1 - localProgress); // Approaches 0 offset as user scrolls down
+          // 4A/5A: Read the latest state straight from the store without causing re-renders
+          const ancPhase = useCtrlFreakStore.getState().anc.phase;
+          const targetPhaseOffset = (Math.PI / 180) * (ancPhase - 180);
+          const errorMagnitude = Math.min(1, Math.abs(ancPhase - 180) / 180);
           
-          // Add sine wave height to Y
-          y += Math.sin(x * 1.5 + t * 2 + phaseOffset) * 0.8 * sineWeight;
+          const currentPhaseOffset = isTop ? 0 : targetPhaseOffset;
+          
+          // 5B: Physical Response (Amplitude Instability & Turbulence)
+          const amplitudeJitter = (Math.random() - 0.5) * errorMagnitude * 2.0;
+          const amplitude = 2.0 + amplitudeJitter;
+          
+          const scatterX = (Math.random() - 0.5) * errorMagnitude * 0.5;
+          const scatterY = (Math.random() - 0.5) * errorMagnitude * 0.5;
+          const scatterZ = (Math.random() - 0.5) * errorMagnitude * 1.5;
+
+          x += scatterX * sineWeight;
+          y += (Math.sin(x * 1.5 + t * 2 + currentPhaseOffset) * amplitude + scatterY) * sineWeight;
+          z += (Math.sin(x * 2 + t) * 1.5 + scatterZ) * sineWeight;
         }
       }
 
