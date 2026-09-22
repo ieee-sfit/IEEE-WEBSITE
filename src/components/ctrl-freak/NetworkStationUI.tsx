@@ -27,9 +27,10 @@ export const NetworkStationUI = () => {
   const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
     if (activeNode === null) return;
     const rect = e.currentTarget.getBoundingClientRect();
+    // Scale DOM coordinates to the 300x300 SVG viewBox
     setMousePos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
+      x: (e.clientX - rect.left) * (300 / rect.width),
+      y: (e.clientY - rect.top) * (300 / rect.height)
     });
   };
 
@@ -70,8 +71,12 @@ export const NetworkStationUI = () => {
       </div>
       
       <div className="font-mono text-xs space-y-4">
-        <div className="text-gray-400 mb-6 uppercase tracking-widest leading-relaxed">
+        <div className="text-gray-400 mb-4 uppercase tracking-widest leading-relaxed">
           OBSERVATION:<br/>Node overload detected. Traffic stalled at RLY-2.
+        </div>
+        
+        <div className="text-[#FF3333] mb-6 uppercase tracking-widest leading-relaxed border border-[#FF3333]/30 bg-[#FF3333]/5 p-3 text-[10px]">
+          [!] ACTION REQUIRED:<br/>Draw routes from SRC to DST.<br/>Bypass corrupted node RLY-2.
         </div>
         
         {/* TELEMETRY */}

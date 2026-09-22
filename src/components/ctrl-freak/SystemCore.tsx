@@ -129,8 +129,8 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       [5, -2, -5]    // 4: RLY-3
     ];
     
-    // 45 minor background hubs
-    const minorHubs = Array.from({ length: 45 }).map(() => [
+    // 5 minor background hubs
+    const minorHubs = Array.from({ length: 5 }).map(() => [
       (Math.random() - 0.5) * 40,
       (Math.random() - 0.5) * 30 + 5,
       (Math.random() - 0.5) * 20
