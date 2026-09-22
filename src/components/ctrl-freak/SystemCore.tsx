@@ -109,20 +109,42 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       grid[i3 + 1] = (gY / size3D - 0.5) * 10;
       grid[i3 + 2] = (gZ / size3D - 0.5) * 10;
 
-      // 5. LOCK MECHANISM (Logic gates/lockdown)
-      // Represented as segmented, nested concentric rings of a vault door
-      const layer = Math.floor(Math.random() * 5); // 5 concentric rings
-      const lockRadius = 2 + layer * 1.5;
-      const rawAngle = Math.random() * Math.PI * 2;
-      const lockDepth = (Math.random() - 0.5) * 4;
+      // 5. DIRECTED SIGNAL FLOW (Logic / Facility Lockdown)
+      // A vertical structure representing inputs, mechanical gates, and output.
+      const branch = Math.floor(Math.random() * 3);
+      const verticalPos = 6 - Math.random() * 12; // +6 to -6
+      let hPos = 0;
+      let depthPos = (Math.random() - 0.5) * 0.5;
       
-      // Snap angles to rigid chunks to look like an interlocking mechanical puzzle
-      const snapSize = Math.PI / 4;
-      const snappedAngle = Math.floor(rawAngle / snapSize) * snapSize + (rawAngle % (Math.PI / 16));
+      // Top section: 3 inputs
+      if (verticalPos > 2) {
+        hPos = (branch - 1) * 4; 
+      } 
+      // Middle section: converging into 2 parallel streams
+      else if (verticalPos > -2) {
+        hPos = branch === 0 ? -2 : 2;
+      } 
+      // Bottom section: converging to 1 output
+      else {
+        hPos = 0;
+      }
       
-      circuit[i3] = Math.cos(snappedAngle) * lockRadius;
-      circuit[i3 + 1] = Math.sin(snappedAngle) * lockRadius;
-      circuit[i3 + 2] = lockDepth;
+      // Mechanical Diverters (Gates) at the intersections
+      if (Math.abs(verticalPos - 2) < 0.8) {
+        // Top Gates
+        hPos = (branch === 0 ? -2 : 2) + (Math.random() - 0.5) * 2;
+        depthPos = (Math.random() - 0.5) * 2;
+      } else if (Math.abs(verticalPos + 2) < 0.8) {
+        // Bottom Gate
+        hPos = (Math.random() - 0.5) * 2;
+        depthPos = (Math.random() - 0.5) * 2;
+      } else {
+        hPos += (Math.random() - 0.5) * 0.5;
+      }
+      
+      circuit[i3] = hPos;
+      circuit[i3 + 1] = verticalPos;
+      circuit[i3 + 2] = depthPos;
 
       // 6. RING (The Clock / 12:00)
       const angle = Math.random() * Math.PI * 2;
@@ -344,6 +366,7 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
         size={0.035}
         sizeAttenuation={true}
         depthWrite={false}
+        depthTest={false}
         blending={THREE.AdditiveBlending}
       />
     </Points>
