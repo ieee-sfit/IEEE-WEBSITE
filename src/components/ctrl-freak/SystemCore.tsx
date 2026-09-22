@@ -120,9 +120,22 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
     const circuit = new Float32Array(count * 3);
     const ring = new Float32Array(count * 3);
 
-    const nodes = [
-      [-3, 2, 0], [3, 1.5, 0], [0, -2, 0], [-2, -1, 0], [2, -1.5, 0]
+    // 5 Primary Hubs (matching the UI)
+    const primaryHubs = [
+      [-15, 5, 0],   // 0: SRC
+      [15, 5, 0],    // 1: DST
+      [-5, 12, -5],  // 2: RLY-1
+      [0, 5, 5],     // 3: RLY-2 (Corrupted)
+      [5, -2, -5]    // 4: RLY-3
     ];
+    
+    // 45 minor background hubs
+    const minorHubs = Array.from({ length: 45 }).map(() => [
+      (Math.random() - 0.5) * 40,
+      (Math.random() - 0.5) * 30 + 5,
+      (Math.random() - 0.5) * 20
+    ]);
+    const allHubs = [...primaryHubs, ...minorHubs];
 
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
@@ -142,21 +155,30 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       wave[i3 + 1] = waveY;
       wave[i3 + 2] = 0;
 
-      // 3. NETWORK TOPOLOGY
-      if (Math.random() < 0.75) {
-        // Cluster at nodes
-        const node = nodes[i % nodes.length];
-        network[i3] = node[0] + (Math.random() - 0.5) * 1.0;
-        network[i3 + 1] = node[1] + (Math.random() - 0.5) * 1.0;
-        network[i3 + 2] = node[2] + (Math.random() - 0.5) * 1.0;
+      // --- SHAPE 3 (NETWORK TOPOLOGY) ---
+      if (Math.random() < 0.2) {
+        // Form the hubs
+        const hubIdx = Math.floor(Math.random() * allHubs.length);
+        const hub = allHubs[hubIdx];
+        const isPrimary = hubIdx < 5;
+        const radius = isPrimary ? 3.0 : 0.5; // Primary hubs are massive
+        
+        const u = Math.random();
+        const v = Math.random();
+        const theta = u * 2.0 * Math.PI;
+        const phi = Math.acos(2.0 * v - 1.0);
+        
+        network[i3] = hub[0] + radius * Math.sin(phi) * Math.cos(theta);
+        network[i3 + 1] = hub[1] + radius * Math.sin(phi) * Math.sin(theta);
+        network[i3 + 2] = hub[2] + radius * Math.cos(phi);
       } else {
-        // Lines between nodes
-        const n1 = nodes[Math.floor(Math.random() * nodes.length)];
-        const n2 = nodes[Math.floor(Math.random() * nodes.length)];
+        // Form random background connections for the SATURATED state
+        const h1 = allHubs[Math.floor(Math.random() * allHubs.length)];
+        const h2 = allHubs[Math.floor(Math.random() * allHubs.length)];
         const t = Math.random();
-        network[i3] = n1[0] + (n2[0] - n1[0]) * t + (Math.random() - 0.5) * 0.1;
-        network[i3 + 1] = n1[1] + (n2[1] - n1[1]) * t + (Math.random() - 0.5) * 0.1;
-        network[i3 + 2] = n1[2] + (n2[2] - n1[2]) * t + (Math.random() - 0.5) * 0.1;
+        network[i3] = h1[0] + (h2[0] - h1[0]) * t + (Math.random() - 0.5) * 0.2;
+        network[i3 + 1] = h1[1] + (h2[1] - h1[1]) * t + (Math.random() - 0.5) * 0.2;
+        network[i3 + 2] = h1[2] + (h2[2] - h1[2]) * t + (Math.random() - 0.5) * 0.2;
       }
 
       // 4. VOXEL GRID (Vision Binarization)
@@ -311,7 +333,57 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       let y = shape1[i3 + 1] + (shape2[i3 + 1] - shape1[i3 + 1]) * lerpFactor;
       let z = shape1[i3 + 2] + (shape2[i3 + 2] - shape1[i3 + 2]) * lerpFactor;
 
-      // Add specific shape animations based on which shape we are currently at
+      // NETWORK ANIMATION (Active when shape1 or shape2 is network)
+      if (shape1 === shapes.network || shape2 === shapes.network) {
+        const netWeight = shape1 === shapes.network ? (1 - lerpFactor) : lerpFactor;
+        if (netWeight > 0) {
+          const networkState = useCtrlFreakStore.getState().network;
+          const isCorrupted = networkState.routes.some(r => r.includes('3'));
+          const errorMagnitude = networkState.solved ? 0 : (isCorrupted ? 2.0 : 0.5);
+          
+          // 20% of particles are reserved for drawing active routes
+          if (i % 5 === 0 && networkState.routes.length > 0) {
+            // Pick a route to draw
+            const routeIdx = (i % networkState.routes.length);
+            const route = networkState.routes[routeIdx];
+            const [id1, id2] = route.split('-').map(Number);
+            
+            const primaryHubs = [
+              [-15, 5, 0], [15, 5, 0], [-5, 12, -5], [0, 5, 5], [5, -2, -5]
+            ];
+            
+            const p1 = primaryHubs[id1];
+            const p2 = primaryHubs[id2];
+            
+            if (p1 && p2) {
+              // Time-based flow along the connection
+              const flowSpeed = networkState.solved ? 2.0 : 0.5;
+              const tFlow = (t * flowSpeed + (i / count) * 10) % 1.0;
+              
+              // Jitter connections heavily if corrupted
+              const jitter = (Math.random() - 0.5) * errorMagnitude;
+              
+              x = (p1[0] + (p2[0] - p1[0]) * tFlow + jitter) * netWeight + x * (1 - netWeight);
+              y = (p1[1] + (p2[1] - p1[1]) * tFlow + jitter) * netWeight + y * (1 - netWeight);
+              z = (p1[2] + (p2[2] - p1[2]) * tFlow + jitter) * netWeight + z * (1 - netWeight);
+            }
+          } else {
+            // Background saturation jitter
+            x += (Math.random() - 0.5) * errorMagnitude * netWeight;
+            y += (Math.random() - 0.5) * errorMagnitude * netWeight;
+            z += (Math.random() - 0.5) * errorMagnitude * netWeight;
+            
+            // Slowly rotate the entire network cluster
+            const angle = t * 0.1;
+            const s = Math.sin(angle * netWeight);
+            const c = Math.cos(angle * netWeight);
+            const nx = x * c - z * s;
+            const nz = x * s + z * c;
+            x = nx;
+            z = nz;
+          }
+        }
+      }
       
       // SINE WAVE ANIMATION (Active when shape1 or shape2 is wave)
       if (shape1 === shapes.wave || shape2 === shapes.wave) {

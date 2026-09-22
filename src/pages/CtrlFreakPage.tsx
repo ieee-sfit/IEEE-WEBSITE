@@ -3,6 +3,7 @@ import { useScroll } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { SystemCore } from '../components/ctrl-freak/SystemCore';
 import { AncStationUI } from '../components/ctrl-freak/AncStationUI';
+import { NetworkStationUI } from '../components/ctrl-freak/NetworkStationUI';
 
 
 
@@ -91,22 +92,8 @@ const CtrlFreakPage = () => {
         </section>
 
         {/* 03 - NETWORK */}
-        <section className="min-h-screen py-32 flex flex-col justify-end items-end w-full">
-          <div className="w-full md:w-1/2 space-y-12 bg-black/40 backdrop-blur-md p-8 border-r border-[#FF3333]">
-            <div className="text-right">
-              <div className="text-[10px] text-[#FF3333] tracking-[0.2em] mb-4">02 // F1 0-LAG STREAM</div>
-              <h2 className="text-2xl font-sans tracking-tight uppercase text-white">Network Saturation</h2>
-            </div>
-            
-            <div className="font-mono text-xs w-full space-y-4">
-              <div className="text-gray-400 mb-6 uppercase tracking-widest leading-relaxed text-right">
-                OBSERVATION:<br/>Node overload detected.
-              </div>
-              <div className="flex justify-between text-[#FF3333] pt-4 border-t border-gray-800/80">
-                <span>LATENCY</span><span className="animate-pulse">2.84 s</span>
-              </div>
-            </div>
-          </div>
+        <section className="min-h-screen py-32 flex flex-col justify-center items-end w-full md:w-[60%] ml-auto pointer-events-auto relative z-20">
+          <NetworkStationUI />
         </section>
 
         {/* 04 - VISION */}
