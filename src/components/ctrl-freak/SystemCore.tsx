@@ -7,6 +7,11 @@ import { MotionValue } from 'framer-motion';
 import { ControlChamber } from './ControlChamber';
 import { useCtrlFreakStore } from '../../store/useCtrlFreakStore';
 
+const PRIMARY_HUBS = [
+  [-15, 5, 0], [15, 5, 0], [-5, 12, -5], [0, 5, 5], [5, -2, -5]
+];
+const CORRUPTED_IDX = 3;
+
 const generateTextPoints = (text: string, count: number): Float32Array => {
   const canvas = document.createElement('canvas');
   canvas.width = 256;
@@ -120,22 +125,7 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
     const circuit = new Float32Array(count * 3);
     const ring = new Float32Array(count * 3);
 
-    // 5 Primary Hubs (matching the UI)
-    const primaryHubs = [
-      [-15, 5, 0],   // 0: SRC
-      [15, 5, 0],    // 1: DST
-      [-5, 12, -5],  // 2: RLY-1
-      [0, 5, 5],     // 3: RLY-2 (Corrupted)
-      [5, -2, -5]    // 4: RLY-3
-    ];
-    
-    // 5 minor background hubs
-    const minorHubs = Array.from({ length: 5 }).map(() => [
-      (Math.random() - 0.5) * 40,
-      (Math.random() - 0.5) * 30 + 5,
-      (Math.random() - 0.5) * 20
-    ]);
-    const allHubs = [...primaryHubs, ...minorHubs];
+    // Primary Hubs are globally defined as PRIMARY_HUBS
 
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
@@ -155,30 +145,37 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       wave[i3 + 1] = waveY;
       wave[i3 + 2] = 0;
 
-      // --- SHAPE 3 (NETWORK TOPOLOGY) ---
-      if (Math.random() < 0.2) {
-        // Form the hubs
-        const hubIdx = Math.floor(Math.random() * allHubs.length);
-        const hub = allHubs[hubIdx];
-        const isPrimary = hubIdx < 5;
-        const radius = isPrimary ? 3.0 : 0.5; // Primary hubs are massive
-        
-        const u = Math.random();
-        const v = Math.random();
-        const theta = u * 2.0 * Math.PI;
-        const phi = Math.acos(2.0 * v - 1.0);
-        
-        network[i3] = hub[0] + radius * Math.sin(phi) * Math.cos(theta);
+      // --- SHAPE 3 (NETWORK TOPOLOGY) — rewritten allocation ---
+      const roll = i / count; // deterministic, not Math.random — stable across renders
+
+      if (roll < 0.55) {
+        // HUB MEMBERSHIP — 55% of all particles anchor to a primary hub.
+        // Corrupted hub gets a 2x share and a bigger radius so it visually
+        // dominates before the user does anything.
+        const weights = [1, 1, 1, 2, 1];
+        const totalW = weights.reduce((a, b) => a + b, 0);
+        let r = (i * 2654435761 % 1000) / 1000 * totalW; // deterministic pseudo-random
+        let hubIdx = 0;
+        for (; hubIdx < weights.length; hubIdx++) {
+          if (r < weights[hubIdx]) break;
+          r -= weights[hubIdx];
+        }
+        const hub = PRIMARY_HUBS[hubIdx];
+        const radius = hubIdx === CORRUPTED_IDX ? 3.2 : 1.8;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(Math.random() * 2 - 1);
+        network[i3]     = hub[0] + radius * Math.sin(phi) * Math.cos(theta);
         network[i3 + 1] = hub[1] + radius * Math.sin(phi) * Math.sin(theta);
         network[i3 + 2] = hub[2] + radius * Math.cos(phi);
       } else {
-        // Form random background connections for the SATURATED state
-        const h1 = allHubs[Math.floor(Math.random() * allHubs.length)];
-        const h2 = allHubs[Math.floor(Math.random() * allHubs.length)];
-        const t = Math.random();
-        network[i3] = h1[0] + (h2[0] - h1[0]) * t + (Math.random() - 0.5) * 0.2;
-        network[i3 + 1] = h1[1] + (h2[1] - h1[1]) * t + (Math.random() - 0.5) * 0.2;
-        network[i3 + 2] = h1[2] + (h2[2] - h1[2]) * t + (Math.random() - 0.5) * 0.2;
+        // FLOW POOL — 45%, reserved for route-streaming in useFrame.
+        // Idle default: loosely orbiting the corrupted hub (the "congestion").
+        const hub = PRIMARY_HUBS[CORRUPTED_IDX];
+        const r = 5 + Math.random() * 4;
+        const theta = Math.random() * Math.PI * 2;
+        network[i3]     = hub[0] + Math.cos(theta) * r;
+        network[i3 + 1] = hub[1] + Math.sin(theta) * r * 0.6;
+        network[i3 + 2] = hub[2] + (Math.random() - 0.5) * 3;
       }
 
       // 4. VOXEL GRID (Vision Binarization)
@@ -333,54 +330,34 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       let y = shape1[i3 + 1] + (shape2[i3 + 1] - shape1[i3 + 1]) * lerpFactor;
       let z = shape1[i3 + 2] + (shape2[i3 + 2] - shape1[i3 + 2]) * lerpFactor;
 
-      // NETWORK ANIMATION (Active when shape1 or shape2 is network)
+      // --- useFrame network branch — rewritten flow gate ---
       if (shape1 === shapes.network || shape2 === shapes.network) {
         const netWeight = shape1 === shapes.network ? (1 - lerpFactor) : lerpFactor;
         if (netWeight > 0) {
           const networkState = useCtrlFreakStore.getState().network;
-          const isCorrupted = networkState.routes.some(r => r.includes('3'));
-          const errorMagnitude = networkState.solved ? 0 : (isCorrupted ? 2.0 : 0.5);
-          
-          // 20% of particles are reserved for drawing active routes
-          if (i % 5 === 0 && networkState.routes.length > 0) {
-            // Pick a route to draw
-            const routeIdx = (i % networkState.routes.length);
+          const isFlowParticle = (i / count) >= 0.55; // matches the 55/45 split above
+
+          if (isFlowParticle && networkState.routes.length > 0) {
+            // Full flow-pool commitment to whichever routes are live
+            const routeIdx = i % networkState.routes.length;
             const route = networkState.routes[routeIdx];
             const [id1, id2] = route.split('-').map(Number);
-            
-            const primaryHubs = [
-              [-15, 5, 0], [15, 5, 0], [-5, 12, -5], [0, 5, 5], [5, -2, -5]
-            ];
-            
-            const p1 = primaryHubs[id1];
-            const p2 = primaryHubs[id2];
-            
-            if (p1 && p2) {
-              // Time-based flow along the connection
-              const flowSpeed = networkState.solved ? 2.0 : 0.5;
-              const tFlow = (t * flowSpeed + (i / count) * 10) % 1.0;
-              
-              // Jitter connections heavily if corrupted
-              const jitter = (Math.random() - 0.5) * errorMagnitude;
-              
-              x = (p1[0] + (p2[0] - p1[0]) * tFlow + jitter) * netWeight + x * (1 - netWeight);
-              y = (p1[1] + (p2[1] - p1[1]) * tFlow + jitter) * netWeight + y * (1 - netWeight);
-              z = (p1[2] + (p2[2] - p1[2]) * tFlow + jitter) * netWeight + z * (1 - netWeight);
-            }
+            const p1 = PRIMARY_HUBS[id1], p2 = PRIMARY_HUBS[id2];
+            const bad = route.includes('3');
+            const flowSpeed = networkState.solved ? 2.0 : bad ? 0.3 : 0.8;
+            const tFlow = (t * flowSpeed + (i / count) * 6) % 1.0;
+            const jitter = bad && !networkState.solved ? (Math.random() - 0.5) * 1.5 : 0;
+
+            x = (p1[0] + (p2[0] - p1[0]) * tFlow + jitter) * netWeight + x * (1 - netWeight);
+            y = (p1[1] + (p2[1] - p1[1]) * tFlow + jitter) * netWeight + y * (1 - netWeight);
+            z = (p1[2] + (p2[2] - p1[2]) * tFlow + jitter) * netWeight + z * (1 - netWeight);
           } else {
-            // Background saturation jitter
-            x += (Math.random() - 0.5) * errorMagnitude * netWeight;
-            y += (Math.random() - 0.5) * errorMagnitude * netWeight;
-            z += (Math.random() - 0.5) * errorMagnitude * netWeight;
-            
-            // Slowly rotate the entire network cluster
-            const angle = t * 0.1;
-            const s = Math.sin(angle * netWeight);
-            const c = Math.cos(angle * netWeight);
-            const nx = x * c - z * s;
-            const nz = x * s + z * c;
-            x = nx;
-            z = nz;
+            // Ambient behavior
+            const isCorruptedNeighborhood = Math.hypot(x - PRIMARY_HUBS[3][0], y - PRIMARY_HUBS[3][1], z - PRIMARY_HUBS[3][2]) < 4;
+            const pulse = isCorruptedNeighborhood ? (Math.sin(t * 3 + i) * 0.4 + 0.4) : 0.1;
+            x += (Math.random() - 0.5) * pulse * netWeight;
+            y += (Math.random() - 0.5) * pulse * netWeight;
+            z += (Math.random() - 0.5) * pulse * netWeight;
           }
         }
       }

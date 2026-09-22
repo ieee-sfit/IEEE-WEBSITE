@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useCtrlFreakStore } from '../../store/useCtrlFreakStore';
 
-// Fixed 2D layout for the tactical routing display
+import { HUB_LABELS, CORRUPTED_HUB } from '../../config/networkHubs';
+
 const NODES = [
-  { id: 0, x: 20, y: 150, label: 'SRC', type: 'source' },
-  { id: 1, x: 280, y: 150, label: 'DST', type: 'dest' },
-  { id: 2, x: 100, y: 40, label: 'RLY-1', type: 'relay' },
-  { id: 3, x: 150, y: 150, label: 'RLY-2', type: 'corrupted' },
-  { id: 4, x: 200, y: 260, label: 'RLY-3', type: 'relay' }
+  { id: 0, x: 20,  y: 150, label: HUB_LABELS[0], type: 'source' },
+  { id: 1, x: 280, y: 150, label: HUB_LABELS[1], type: 'dest' },
+  { id: 2, x: 100, y: 40,  label: HUB_LABELS[2], type: 'relay' },
+  { id: 3, x: 150, y: 150, label: HUB_LABELS[3], type: CORRUPTED_HUB === 3 ? 'corrupted' : 'relay' },
+  { id: 4, x: 200, y: 260, label: HUB_LABELS[4], type: 'relay' },
 ];
 
 export const NetworkStationUI = () => {
