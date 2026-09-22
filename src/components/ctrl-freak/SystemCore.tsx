@@ -65,8 +65,6 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       [-3, 2, 0], [3, 1.5, 0], [0, -2, 0], [-2, -1, 0], [2, -1.5, 0]
     ];
 
-    const gridSize = Math.ceil(Math.sqrt(count));
-
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
 
