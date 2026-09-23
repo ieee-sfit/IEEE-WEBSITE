@@ -137,22 +137,22 @@ export const useCtrlFreakStore = create<CtrlFreakState>((set) => ({
     const { slot1, slot2 } = state.logic;
     
     // Inputs
-    const keycard: boolean = true;     // 1
-    const pressure: boolean = false;   // 0
-    const manualSwitch: boolean = true;// 1
+    let keycard = true;     // 1
+    let pressure = false;   // 0
+    let manualSwitch = true;// 1
     
     // Evaluate Gate 1 (Keycard [Gate1] Pressure)
     let gate1Output = false;
     if (slot1 === 'AND') gate1Output = keycard && pressure;
     else if (slot1 === 'OR') gate1Output = keycard || pressure;
-    else if (slot1 === 'XOR') gate1Output = keycard !== pressure;
+    else if (slot1 === 'XOR') gate1Output = (keycard as boolean) !== (pressure as boolean);
     else if (slot1 === 'NOT') gate1Output = !keycard; // Ignored pressure for NOT
     
     // Evaluate Gate 2 (Gate1 [Gate2] ManualSwitch)
     let finalOutput = false;
     if (slot2 === 'AND') finalOutput = gate1Output && manualSwitch;
     else if (slot2 === 'OR') finalOutput = gate1Output || manualSwitch;
-    else if (slot2 === 'XOR') finalOutput = gate1Output !== manualSwitch;
+    else if (slot2 === 'XOR') finalOutput = (gate1Output as boolean) !== (manualSwitch as boolean);
     else if (slot2 === 'NOT') finalOutput = !gate1Output;
     
     // It's solved if finalOutput is true AND both slots are filled.
