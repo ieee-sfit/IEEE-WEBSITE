@@ -14,21 +14,20 @@ export const LogicStationUI = () => {
     checkSolved();
   }, [slot1, slot2, checkSolved]);
 
-  const handleDragEnd = (gate: GateType, _event: any, info: any) => {
-    const { point } = info;
-    const checkDrop = (ref: React.RefObject<HTMLDivElement>, slotNum: 1 | 2) => {
-      if (!ref.current) return false;
-      const rect = ref.current.getBoundingClientRect();
-      if (point.x >= rect.left && point.x <= rect.right &&
-          point.y >= rect.top && point.y <= rect.bottom) {
-        setSlot(slotNum, gate);
-        return true;
-      }
-      return false;
-    };
+  const handleDragStart = (e: React.DragEvent, gate: GateType) => {
+    e.dataTransfer.setData('gate', gate || '');
+  };
 
-    if (checkDrop(slot1Ref, 1)) return;
-    if (checkDrop(slot2Ref, 2)) return;
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault(); // Necessary to allow dropping
+  };
+
+  const handleDrop = (e: React.DragEvent, slotNum: 1 | 2) => {
+    e.preventDefault();
+    const gate = e.dataTransfer.getData('gate') as GateType;
+    if (gate && ['AND', 'OR', 'NOT', 'XOR'].includes(gate)) {
+      setSlot(slotNum, gate);
+    }
   };
 
   const gates: GateType[] = ['AND', 'OR', 'NOT', 'XOR'];
@@ -55,75 +54,81 @@ export const LogicStationUI = () => {
         </div>
 
         {/* SLOTS & BREADBOARD */}
-        <div className="pt-8 border border-gray-800 p-4 bg-gray-900/50 relative overflow-hidden">
-          {/* Decorative Breadboard grid */}
-          <div className="absolute inset-0 opacity-10" 
-               style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '10px 10px' }} 
-          />
-          
-          <div className="relative z-10 flex flex-col gap-6">
-            {/* Input Layer */}
-            <div className="flex justify-between px-4 text-[9px] text-gray-500 tracking-widest uppercase">
-              <div className="flex flex-col items-center">
-                <span className="text-[#33FF33]">SIG_1</span>
-                <span>(KEYCARD)</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <span className="text-[#FF3333]">SIG_0</span>
-                <span>(PRESSURE)</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <span className="text-[#33FF33]">SIG_1</span>
-                <span>(SWITCH)</span>
+        <div className="pt-8">
+          <div className="relative w-full h-[320px] border border-gray-800 bg-gray-900/50 overflow-hidden">
+            {/* Decorative Breadboard grid */}
+            <div className="absolute inset-0 opacity-10" 
+                 style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '10px 10px' }} 
+            />
+
+            {/* SVG WIRING OVERLAY */}
+            <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none">
+              {/* Keycard -> Gate 1 L-input */}
+              <path d="M 16.6 15 L 16.6 35 L 28 35 L 28 42" stroke="#555" strokeWidth={3} fill="none" vectorEffect="non-scaling-stroke"/>
+              {/* Pressure -> Gate 1 R-input */}
+              <path d="M 50 15 L 50 30 L 38 30 L 38 42" stroke="#555" strokeWidth={3} fill="none" vectorEffect="non-scaling-stroke"/>
+              {/* Gate 1 -> Gate 2 (Left Center to Left Center) */}
+              <path d="M 43.3 50 L 56.6 50" stroke="#555" strokeWidth={3} fill="none" vectorEffect="non-scaling-stroke"/>
+              {/* Switch -> Gate 2 (Top to Top Center) */}
+              <path d="M 83.3 15 L 83.3 35 L 66.6 35 L 66.6 42" stroke="#555" strokeWidth={3} fill="none" vectorEffect="non-scaling-stroke"/>
+              {/* Gate 2 -> Output */}
+              <path d="M 66.6 58 L 66.6 80" stroke="#555" strokeWidth={3} fill="none" vectorEffect="non-scaling-stroke"/>
+            </svg>
+
+            {/* HTML OVERLAY (Inputs, Gates, Output) */}
+            
+            {/* INPUTS */}
+            <div className="absolute top-[8%] left-[16.6%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center text-[9px] tracking-widest uppercase text-gray-500 whitespace-nowrap">
+              <span className="text-[#33FF33] font-bold">SIG_1</span>
+              <span>(KEYCARD)</span>
+            </div>
+            
+            <div className="absolute top-[8%] left-[50%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center text-[9px] tracking-widest uppercase text-gray-500 whitespace-nowrap">
+              <span className="text-[#FF3333] font-bold">SIG_0</span>
+              <span>(PRESSURE)</span>
+            </div>
+
+            <div className="absolute top-[8%] left-[83.3%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center text-[9px] tracking-widest uppercase text-gray-500 whitespace-nowrap">
+              <span className="text-[#33FF33] font-bold">SIG_1</span>
+              <span>(SWITCH)</span>
+            </div>
+
+            {/* GATES */}
+            <div className="absolute top-[50%] left-[33.3%] -translate-x-1/2 -translate-y-1/2 space-y-2 text-center pointer-events-auto">
+              <div className="text-[10px] text-gray-400 tracking-[0.2em] uppercase">GATE 1</div>
+              <div 
+                ref={slot1Ref}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, 1)}
+                className={`w-20 h-12 border-2 flex items-center justify-center transition-colors text-sm font-bold bg-gray-900 cursor-pointer
+                  ${slot1 ? 'border-[#33FF33] text-[#33FF33]' : 'border-dashed border-gray-600 text-gray-600'}`}
+                onClick={() => slot1 && setSlot(1, null)}
+              >
+                {slot1 || 'EMPTY'}
               </div>
             </div>
 
-            {/* Wires down to Slot 1 */}
-            <div className="flex justify-start px-12 opacity-30">
-              <div className="w-px h-8 bg-white" />
-              <div className="w-24 border-t border-r border-white h-8" />
-            </div>
-
-            {/* Gate Layer */}
-            <div className="flex justify-center gap-12 items-center">
-              <div className="space-y-2 text-center relative">
-                <div className="absolute -left-12 top-1/2 w-12 h-px bg-white opacity-30" />
-                <div className="text-[10px] text-gray-400 tracking-[0.2em] uppercase">GATE 1</div>
-                <div 
-                  ref={slot1Ref}
-                  className={`w-20 h-12 border-2 border-dashed flex items-center justify-center transition-colors text-sm font-bold
-                    ${slot1 ? 'border-white text-black bg-white' : 'border-gray-700 text-gray-600'}`}
-                  onClick={() => slot1 && setSlot(1, null)}
-                >
-                  {slot1 || 'EMPTY'}
-                </div>
-              </div>
-              
-              <div className="w-12 h-px bg-white opacity-30" />
-
-              <div className="space-y-2 text-center relative">
-                <div className="absolute -top-12 right-1/2 w-px h-12 bg-white opacity-30" />
-                <div className="text-[10px] text-gray-400 tracking-[0.2em] uppercase">GATE 2</div>
-                <div 
-                  ref={slot2Ref}
-                  className={`w-20 h-12 border-2 border-dashed flex items-center justify-center transition-colors text-sm font-bold
-                    ${slot2 ? 'border-white text-black bg-white' : 'border-gray-700 text-gray-600'}`}
-                  onClick={() => slot2 && setSlot(2, null)}
-                >
-                  {slot2 || 'EMPTY'}
-                </div>
+            <div className="absolute top-[50%] left-[66.6%] -translate-x-1/2 -translate-y-1/2 space-y-2 text-center pointer-events-auto">
+              <div className="text-[10px] text-gray-400 tracking-[0.2em] uppercase">GATE 2</div>
+              <div 
+                ref={slot2Ref}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, 2)}
+                className={`w-20 h-12 border-2 flex items-center justify-center transition-colors text-sm font-bold bg-gray-900 cursor-pointer
+                  ${slot2 ? 'border-[#33FF33] text-[#33FF33]' : 'border-dashed border-gray-600 text-gray-600'}`}
+                onClick={() => slot2 && setSlot(2, null)}
+              >
+                {slot2 || 'EMPTY'}
               </div>
             </div>
 
-            {/* Output Layer */}
-            <div className="flex justify-end px-16 opacity-30">
-              <div className="w-px h-8 bg-white" />
-            </div>
-            <div className="flex justify-end px-12 text-center">
-              <div className={`px-4 py-2 text-[10px] tracking-widest font-bold uppercase border ${solved ? 'border-[#33FF33] text-[#33FF33] bg-[#33FF33]/10' : 'border-[#FF3333] text-[#FF3333] bg-[#FF3333]/10'}`}>
+            {/* OUTPUT */}
+            <div className="absolute top-[85%] left-[66.6%] -translate-x-1/2 -translate-y-1/2 whitespace-nowrap">
+              <div className={`px-4 py-2 text-[10px] tracking-widest font-bold uppercase border bg-gray-900 ${solved ? 'border-[#33FF33] text-[#33FF33]' : 'border-[#FF3333] text-[#FF3333]'}`}>
                 {solved ? 'OUTPUT: 1 (OPEN)' : 'OUTPUT: 0 (LOCKED)'}
               </div>
             </div>
+
           </div>
         </div>
 
@@ -134,10 +139,8 @@ export const LogicStationUI = () => {
             {gates.map((gate) => (
               <motion.div
                 key={gate}
-                drag
-                dragSnapToOrigin
-                onDragEnd={(e, info) => handleDragEnd(gate, e, info)}
-                whileDrag={{ scale: 1.1, zIndex: 10 }}
+                draggable
+                onDragStart={(e) => handleDragStart(e as unknown as React.DragEvent, gate)}
                 className="w-16 h-12 border border-[#FF3333] bg-[#FF3333]/10 flex items-center justify-center text-[#FF3333] cursor-grab active:cursor-grabbing hover:bg-[#FF3333]/20"
               >
                 {gate}

@@ -7,7 +7,7 @@ import { MotionValue } from 'framer-motion';
 import { NetworkGraph } from './NetworkGraph';
 import { ControlChamber } from './ControlChamber';
 import { useCtrlFreakStore } from '../../store/useCtrlFreakStore';
-import { HUB_POSITIONS_3D, CORRUPTED_HUB } from '../../config/networkHubs';
+import { HUB_POSITIONS_3D } from '../../config/networkHubs';
 
 const generateTextPoints = (text: string, count: number): Float32Array => {
   const canvas = document.createElement('canvas');
@@ -200,81 +200,38 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       wave[i3 + 1] = waveY;
       wave[i3 + 2] = 0;
 
-      // --- SHAPE 3 (NETWORK TOPOLOGY) — rewritten allocation ---
-      const roll = i / count; // deterministic, not Math.random — stable across renders
-
-      if (roll < 0.55) {
-        // HUB MEMBERSHIP — 55% of all particles anchor to a primary hub.
-        // Corrupted hub gets a 2x share and a bigger radius so it visually
-        // dominates before the user does anything.
-        const weights = [1, 1, 1, 2, 1];
-        const totalW = weights.reduce((a, b) => a + b, 0);
-        let r = (i * 2654435761 % 1000) / 1000 * totalW; // deterministic pseudo-random
-        let hubIdx = 0;
-        for (; hubIdx < weights.length; hubIdx++) {
-          if (r < weights[hubIdx]) break;
-          r -= weights[hubIdx];
-        }
-        const hub = HUB_POSITIONS_3D[hubIdx as keyof typeof HUB_POSITIONS_3D];
-        const radius = hubIdx === CORRUPTED_HUB ? 3.2 : 1.8;
-        // Volumetric filling instead of a hollow shell
-        const rVol = radius * Math.cbrt(Math.random());
-        const theta = Math.random() * Math.PI * 2;
+      // --- SHAPE 3 (NETWORK GLOBE) ---
+      // A hollow sphere representing global data routes
+      if (i / count < 0.45) {
+        // Ambient globe shell
+        const theta = Math.random() * 2 * Math.PI;
         const phi = Math.acos(Math.random() * 2 - 1);
-        network[i3]     = hub[0] + rVol * Math.sin(phi) * Math.cos(theta);
-        network[i3 + 1] = hub[1] + rVol * Math.sin(phi) * Math.sin(theta);
-        network[i3 + 2] = hub[2] + rVol * Math.cos(phi);
+        const r = 4.0 + (Math.random() - 0.5) * 0.2; // Shell thickness
+        network[i3]     = r * Math.sin(phi) * Math.cos(theta);
+        network[i3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+        network[i3 + 2] = r * Math.cos(phi);
       } else {
-        // FLOW POOL — 45%, reserved for route-streaming in useFrame.
-        // Idle default: loosely orbiting the corrupted hub (the "congestion").
-        const hub = HUB_POSITIONS_3D[CORRUPTED_HUB as keyof typeof HUB_POSITIONS_3D];
-        const rVol = (3 + Math.random() * 5) * Math.cbrt(Math.random());
-        const theta = Math.random() * Math.PI * 2;
-        network[i3]     = hub[0] + Math.cos(theta) * rVol;
-        network[i3 + 1] = hub[1] + Math.sin(theta) * rVol * 0.6;
-        network[i3 + 2] = hub[2] + (Math.random() - 0.5) * 4;
+        // Flow pool (dynamically routed in useFrame)
+        // Park them at origin initially
+        network[i3] = 0; network[i3+1] = 0; network[i3+2] = 0;
       }
 
       // 4. VISION (Anamorphic Shape)
       // Vision will be populated dynamically via useEffect
       vision[i3] = 0; vision[i3+1] = 0; vision[i3+2] = 0;
 
-      // 5. DIRECTED SIGNAL FLOW (Logic / Facility Lockdown)
-      // A vertical structure representing inputs, mechanical gates, and output.
-      const branch = Math.floor(Math.random() * 3);
-      const verticalPos = 6 - Math.random() * 12; // +6 to -6
-      let hPos = 0;
-      let depthPos = (Math.random() - 0.5) * 0.5;
-      
-      // Top section: 3 inputs
-      if (verticalPos > 2) {
-        hPos = (branch - 1) * 4; 
-      } 
-      // Middle section: converging into 2 parallel streams
-      else if (verticalPos > -2) {
-        hPos = branch === 0 ? -2 : 2;
-      } 
-      // Bottom section: converging to 1 output
-      else {
-        hPos = 0;
-      }
-      
-      // Mechanical Diverters (Gates) at the intersections
-      if (Math.abs(verticalPos - 2) < 0.8) {
-        // Top Gates
-        hPos = (branch === 0 ? -2 : 2) + (Math.random() - 0.5) * 2;
-        depthPos = (Math.random() - 0.5) * 2;
-      } else if (Math.abs(verticalPos + 2) < 0.8) {
-        // Bottom Gate
-        hPos = (Math.random() - 0.5) * 2;
-        depthPos = (Math.random() - 0.5) * 2;
-      } else {
-        hPos += (Math.random() - 0.5) * 0.5;
-      }
-      
-      circuit[i3] = hPos;
-      circuit[i3 + 1] = verticalPos;
-      circuit[i3 + 2] = depthPos;
+      // 5. THE VAULT (Logic / Facility Lockdown)
+      // A massive concentric cylinder mechanism. We will assign particles to 4 distinct rings.
+      // We encode the ring ID into the radius so we can rotate them individually in useFrame.
+      const ringIds = [1.2, 1.8, 2.4, 3.0];
+      const ringChoice = Math.floor(Math.random() * 4);
+      const ringR = ringIds[ringChoice] + (Math.random() - 0.5) * 0.15; // thickness
+      const ringTheta = Math.random() * 2 * Math.PI;
+      const ringY = (Math.random() - 0.5) * 4; // Height of cylinder
+
+      circuit[i3] = ringR * Math.cos(ringTheta);
+      circuit[i3 + 1] = ringY;
+      circuit[i3 + 2] = ringR * Math.sin(ringTheta);
 
       // 6. RING (The Clock / 12:00)
       const angle = Math.random() * Math.PI * 2;
@@ -365,43 +322,40 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
     const posAttribute = pointsRef.current.geometry.attributes.position;
     const posArray = posAttribute.array as Float32Array;
 
-    // Define transition zones based on the 8 sections (approx 12.5% each)
-    // 0.00 - 0.20: Sphere (Arrival)
-    // 0.20 - 0.25: Transition -> Wave
-    // 0.25 - 0.35: Wave (ANC)
-    // 0.35 - 0.40: Transition -> Network
-    // 0.40 - 0.50: Network (Network Saturation)
-    // 0.50 - 0.55: Transition -> Grid
-    // 0.55 - 0.65: Grid (Vision)
-    // 0.65 - 0.70: Transition -> Circuit
-    // 0.70 - 0.80: Circuit (Logic)
-    // 0.80 - 0.85: Transition -> Ring
-    // 0.85 - 1.00: Ring (Clock)
+    // Define exact transition zones based on 8 equal h-screen sections (700vh scroll space)
+    // Each section is 1/7th (0.1428) apart.
+    // 0.000: Arrival (Sphere) -> Stable: 0.00 to 0.05
+    // 0.142: Observe -> Transition zone: 0.05 to 0.24
+    // 0.285: ANC (Wave) -> Stable: 0.24 to 0.33
+    // 0.428: Network (Globe) -> Stable: 0.38 to 0.47
+    // 0.571: Vision (Grid) -> Stable: 0.52 to 0.61
+    // 0.714: Logic (Vault) -> Stable: 0.66 to 0.76
+    // 0.857: Clock (Ring) -> Stable: 0.81 to 1.00
 
     let shape1 = shapes.sphere;
     let shape2 = shapes.sphere;
     let lerpFactor = 0;
 
-    if (progress < 0.20) {
+    if (progress < 0.05) {
       shape1 = shapes.sphere; shape2 = shapes.sphere; lerpFactor = 0;
-    } else if (progress < 0.25) {
-      shape1 = shapes.sphere; shape2 = shapes.wave; lerpFactor = smoothstep(0.20, 0.25, progress);
-    } else if (progress < 0.35) {
+    } else if (progress < 0.24) {
+      shape1 = shapes.sphere; shape2 = shapes.wave; lerpFactor = smoothstep(0.05, 0.24, progress);
+    } else if (progress < 0.33) {
       shape1 = shapes.wave; shape2 = shapes.wave; lerpFactor = 0;
-    } else if (progress < 0.40) {
-      shape1 = shapes.wave; shape2 = shapes.network; lerpFactor = smoothstep(0.35, 0.40, progress);
-    } else if (progress < 0.50) {
+    } else if (progress < 0.38) {
+      shape1 = shapes.wave; shape2 = shapes.network; lerpFactor = smoothstep(0.33, 0.38, progress);
+    } else if (progress < 0.47) {
       shape1 = shapes.network; shape2 = shapes.network; lerpFactor = 0;
-    } else if (progress < 0.55) {
-      shape1 = shapes.network; shape2 = shapes.vision; lerpFactor = smoothstep(0.50, 0.55, progress);
-    } else if (progress < 0.65) {
+    } else if (progress < 0.52) {
+      shape1 = shapes.network; shape2 = shapes.vision; lerpFactor = smoothstep(0.47, 0.52, progress);
+    } else if (progress < 0.61) {
       shape1 = shapes.vision; shape2 = shapes.vision; lerpFactor = 0;
-    } else if (progress < 0.70) {
-      shape1 = shapes.vision; shape2 = shapes.circuit; lerpFactor = smoothstep(0.65, 0.70, progress);
-    } else if (progress < 0.80) {
+    } else if (progress < 0.66) {
+      shape1 = shapes.vision; shape2 = shapes.circuit; lerpFactor = smoothstep(0.61, 0.66, progress);
+    } else if (progress < 0.76) {
       shape1 = shapes.circuit; shape2 = shapes.circuit; lerpFactor = 0;
-    } else if (progress < 0.85) {
-      shape1 = shapes.circuit; shape2 = shapes.ring; lerpFactor = smoothstep(0.80, 0.85, progress);
+    } else if (progress < 0.81) {
+      shape1 = shapes.circuit; shape2 = shapes.ring; lerpFactor = smoothstep(0.76, 0.81, progress);
     } else {
       shape1 = shapes.ring; shape2 = shapes.ring; lerpFactor = 0;
     }
@@ -416,12 +370,12 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       let y = shape1[i3 + 1] + (shape2[i3 + 1] - shape1[i3 + 1]) * lerpFactor;
       let z = shape1[i3 + 2] + (shape2[i3 + 2] - shape1[i3 + 2]) * lerpFactor;
 
-      // --- useFrame network branch — rewritten flow gate ---
+      // --- useFrame network branch ---
       if (shape1 === shapes.network || shape2 === shapes.network) {
         const netWeight = shape1 === shapes.network ? (1 - lerpFactor) : lerpFactor;
         if (netWeight > 0) {
           const networkState = useCtrlFreakStore.getState().network;
-          const isFlowParticle = (i / count) >= 0.55; // matches the 55/45 split above
+          const isFlowParticle = (i / count) >= 0.45;
 
           if (isFlowParticle) {
             // Flow from SRC (0) to DST (1) via relays based on load.
@@ -438,7 +392,6 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
             const relayPos = HUB_POSITIONS_3D[relayHubId];
             const isCorrupted = relayHubId === 3;
             
-            // If load is 0, park the particle
             if (load > 0) {
               const flowSpeed = networkState.solved ? 2.0 : (isCorrupted && load > 40) ? 0.3 : 0.8;
               const tFlow = (t * flowSpeed + (i / count) * 6) % 1.0;
@@ -451,31 +404,38 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
                 localT -= 1;
               }
               
-              const thickness = 0.4;
+              const thickness = 0.15;
               const jitterMagnitude = (isCorrupted && load > 40 && !networkState.solved) ? 3.0 : thickness;
               const jitterX = (Math.random() - 0.5) * jitterMagnitude;
               const jitterY = (Math.random() - 0.5) * jitterMagnitude;
               const jitterZ = (Math.random() - 0.5) * jitterMagnitude;
   
-              const bulge = Math.sin(localT * Math.PI) * 1.5; 
+              // Create an arc over the globe
+              const bulge = Math.sin(localT * Math.PI) * 2.0; 
               
               x = (startP[0] + (endP[0] - startP[0]) * localT + jitterX) * netWeight + x * (1 - netWeight);
-              y = (startP[1] + (endP[1] - startP[1]) * localT + jitterY) * netWeight + y * (1 - netWeight);
+              y = (startP[1] + (endP[1] - startP[1]) * localT + jitterY + bulge) * netWeight + y * (1 - netWeight);
               z = (startP[2] + (endP[2] - startP[2]) * localT + jitterZ + bulge) * netWeight + z * (1 - netWeight);
             } else {
-              // Park if load is 0
-              x += (Math.random() - 0.5) * 0.1 * netWeight;
-              y += (Math.random() - 0.5) * 0.1 * netWeight;
-              z += (Math.random() - 0.5) * 0.1 * netWeight;
+              // Park at origin
+              x = x * (1 - netWeight);
+              y = y * (1 - netWeight);
+              z = z * (1 - netWeight);
             }
           } else {
-            // Ambient behavior
-            const corruptedHub = HUB_POSITIONS_3D[CORRUPTED_HUB];
-            const isCorruptedNeighborhood = Math.hypot(x - corruptedHub[0], y - corruptedHub[1], z - corruptedHub[2]) < 6;
-            const pulse = isCorruptedNeighborhood ? (Math.sin(t * 3 + i) * 0.5 + 0.5) : 0.1;
-            x += (Math.random() - 0.5) * pulse * netWeight;
-            y += (Math.random() - 0.5) * pulse * netWeight;
-            z += (Math.random() - 0.5) * pulse * netWeight;
+            // Ambient globe shell rotation
+            const globalRotY = t * 0.1;
+            const cosRY = Math.cos(globalRotY);
+            const sinRY = Math.sin(globalRotY);
+            const nx = x * cosRY - z * sinRY;
+            const nz = x * sinRY + z * cosRY;
+            
+            // Apply slight turbulence if unsolved
+            const turbulence = networkState.solved ? 0 : (Math.random() - 0.5) * 0.05;
+            
+            x = (nx + turbulence) * netWeight + x * (1 - netWeight);
+            y = (y + turbulence) * netWeight + y * (1 - netWeight);
+            z = (nz + turbulence) * netWeight + z * (1 - netWeight);
           }
         }
       }
@@ -512,6 +472,47 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
         const chaos = Math.max(0, 1 - (progress * 4));
         const glitch = chaos > 0.1 && Math.random() > 0.95 ? 1.2 : 1;
         x *= glitch; y *= glitch; z *= glitch;
+      }
+
+      // VAULT ANIMATION (Logic)
+      if (shape1 === shapes.circuit || shape2 === shapes.circuit) {
+        const circuitWeight = shape1 === shapes.circuit ? (1 - lerpFactor) : lerpFactor;
+        if (circuitWeight > 0) {
+          const logicSolved = useCtrlFreakStore.getState().logic.solved;
+          
+          // Approximate ring identification from current radius
+          const r = Math.sqrt(x*x + z*z);
+          // Ring IDs were [1.2, 1.8, 2.4, 3.0]. Determine which ring this is closest to:
+          let ringIndex = 0;
+          if (r > 2.7) ringIndex = 3;
+          else if (r > 2.1) ringIndex = 2;
+          else if (r > 1.5) ringIndex = 1;
+
+          // Different rings rotate at different speeds/directions
+          const speeds = [0.5, -0.7, 0.4, -0.3];
+          let ringRot = speeds[ringIndex] * t;
+
+          // If solved, gracefully align them back to 0 rotation
+          if (logicSolved) {
+            // Wrap rotation to nearest multiple of 2PI, or just smoothstep to 0
+            ringRot = 0; // Simple snap for now, or we can just let it sit at 0
+          }
+
+          const cosR = Math.cos(ringRot);
+          const sinR = Math.sin(ringRot);
+          const nx = x * cosR - z * sinR;
+          const nz = x * sinR + z * cosR;
+
+          x = nx * circuitWeight + x * (1 - circuitWeight);
+          z = nz * circuitWeight + z * (1 - circuitWeight);
+          
+          // Glow or expand if solved
+          if (logicSolved) {
+             const pulse = Math.sin(t * 5 - ringIndex) * 0.1;
+             x += (x / r) * pulse * circuitWeight;
+             z += (z / r) * pulse * circuitWeight;
+          }
+        }
       }
 
       // 720 COUNTDOWN (Clock)

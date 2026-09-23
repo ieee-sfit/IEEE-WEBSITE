@@ -17,7 +17,7 @@ const CtrlFreakPage = () => {
   });
 
   return (
-    <div ref={containerRef} className="relative bg-[#050505] text-white min-h-[800vh] font-mono selection:bg-[#FF3333] selection:text-white overflow-x-hidden">
+    <div ref={containerRef} className="relative bg-[#050505] text-white h-[800vh] font-mono selection:bg-[#FF3333] selection:text-white overflow-x-hidden">
       
       {/* HEADER NAV */}
       <div className="fixed top-0 left-0 w-full z-50 p-6 flex justify-between items-start pointer-events-none">
@@ -78,7 +78,7 @@ const CtrlFreakPage = () => {
         </section>
 
         {/* 01 - WHAT ARE YOU LOOKING AT? */}
-        <section className="min-h-screen py-32 flex flex-col justify-center items-center w-full">
+        <section className="h-screen flex flex-col justify-center items-center w-full">
           <div className="text-center mix-blend-difference">
             <h2 className="text-4xl md:text-6xl font-sans font-bold tracking-tight uppercase mb-8">
               OBSERVE. IDENTIFY.<br/>INTERVENE. VERIFY.
@@ -87,27 +87,27 @@ const CtrlFreakPage = () => {
         </section>
 
         {/* 02 - ANC (LEFT) */}
-        <section className="min-h-screen py-32 flex flex-col justify-center items-start w-full pointer-events-none relative z-20">
+        <section className="h-screen flex flex-col justify-center items-start w-full pointer-events-none relative z-20">
           <AncStationUI />
         </section>
 
         {/* 03 - NETWORK (RIGHT) */}
-        <section className="min-h-screen py-32 flex flex-col justify-center items-end w-full pointer-events-none relative z-20">
+        <section className="h-screen flex flex-col justify-center items-end w-full pointer-events-none relative z-20">
           <NetworkStationUI />
         </section>
 
         {/* 04 - VISION (LEFT) */}
-        <section className="min-h-screen py-32 flex flex-col justify-center items-start w-full pointer-events-none relative z-20">
+        <section className="h-screen flex flex-col justify-center items-start w-full pointer-events-none relative z-20">
           <VisionStationUI />
         </section>
 
         {/* 05 - LOGIC (RIGHT) */}
-        <section className="min-h-screen py-32 flex flex-col justify-center items-end w-full pointer-events-none relative z-20">
+        <section className="h-screen flex flex-col justify-center items-end w-full pointer-events-none relative z-20">
           <LogicStationUI />
         </section>
 
         {/* 06 - THE CLOCK */}
-        <section className="min-h-screen py-32 flex flex-col justify-center items-center text-center w-full z-20 relative pointer-events-auto">
+        <section className="h-screen flex flex-col justify-center items-center text-center w-full z-20 relative pointer-events-auto">
           <div className="bg-black/90 backdrop-blur-lg p-12 md:p-24 border border-[#FF3333]/20 w-full max-w-3xl mx-auto">
             <div className="text-6xl md:text-8xl font-sans font-bold text-[#FF3333] mb-4">
               12:00
@@ -123,6 +123,9 @@ const CtrlFreakPage = () => {
             </Link>
           </div>
         </section>
+
+        {/* 07 - THE VOID (To let the 3D Clock stand alone) */}
+        <section className="h-screen w-full pointer-events-none relative z-20"></section>
 
       </div>
     </div>
