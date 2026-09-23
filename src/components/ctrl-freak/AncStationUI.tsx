@@ -17,7 +17,7 @@ export const AncStationUI = () => {
   else if (error < 45) status = 'ALIGNING';
 
   return (
-    <div className="space-y-12 bg-black/40 backdrop-blur-md p-8 border-l border-[#FF3333]">
+    <div className="space-y-12 bg-black/40 backdrop-blur-md p-8 border-l border-[#FF3333] pointer-events-auto">
       <div>
         <div className="text-[10px] text-[#FF3333] tracking-[0.2em] mb-4">01 // GoAT ANC</div>
         <h2 className="text-2xl font-sans tracking-tight uppercase text-white">Signal Integrity</h2>

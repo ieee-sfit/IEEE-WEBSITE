@@ -4,8 +4,8 @@ import { Link } from 'react-router-dom';
 import { SystemCore } from '../components/ctrl-freak/SystemCore';
 import { AncStationUI } from '../components/ctrl-freak/AncStationUI';
 import { NetworkStationUI } from '../components/ctrl-freak/NetworkStationUI';
-
-
+import { VisionStationUI } from '../components/ctrl-freak/VisionStationUI';
+import { LogicStationUI } from '../components/ctrl-freak/LogicStationUI';
 
 const CtrlFreakPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -40,12 +40,12 @@ const CtrlFreakPage = () => {
         This is now the unified System Core that evolves over the 8 scroll beats.
         It sits fixed under the scrolling narrative HTML.
       */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
+      <div className="fixed inset-0 z-0">
         <SystemCore scrollProgress={scrollYProgress} />
       </div>
 
       {/* NARRATIVE HTML OVERLAYS (Heads Up Display) */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12 pointer-events-none">
+      <div className="relative z-10 w-full px-8 md:px-24 pointer-events-none">
         
         {/* 00 - ARRIVAL (Hero) */}
         <section className="h-screen flex flex-col justify-center items-start w-full md:w-1/2 pointer-events-auto">
@@ -86,52 +86,24 @@ const CtrlFreakPage = () => {
           </div>
         </section>
 
-        {/* 02 - ANC */}
-        <section className="min-h-screen py-32 flex flex-col justify-center w-full md:w-1/2 pointer-events-auto relative z-20">
+        {/* 02 - ANC (LEFT) */}
+        <section className="min-h-screen py-32 flex flex-col justify-center items-start w-full pointer-events-none relative z-20">
           <AncStationUI />
         </section>
 
-        {/* 03 - NETWORK */}
-        <section className="min-h-screen py-32 flex flex-col justify-center items-end w-full md:w-[60%] ml-auto pointer-events-auto relative z-20">
+        {/* 03 - NETWORK (RIGHT) */}
+        <section className="min-h-screen py-32 flex flex-col justify-center items-end w-full pointer-events-none relative z-20">
           <NetworkStationUI />
         </section>
 
-        {/* 04 - VISION */}
-        <section className="min-h-screen py-32 flex flex-col justify-center w-full md:w-1/2">
-          <div className="space-y-12 bg-black/40 backdrop-blur-md p-8 border-l border-[#FF3333]">
-            <div>
-              <div className="text-[10px] text-[#FF3333] tracking-[0.2em] mb-4">03 // eCHALLAN POLICE</div>
-              <h2 className="text-2xl font-sans tracking-tight uppercase text-white">Optical Recognition</h2>
-            </div>
-            
-            <div className="font-mono text-xs max-w-sm space-y-4">
-              <div className="text-gray-400 mb-6 uppercase tracking-widest leading-relaxed">
-                OBSERVATION:<br/>Vision threshold impaired.
-              </div>
-              <div className="flex justify-between text-[#FF3333] pt-4 border-t border-gray-800/80">
-                <span>CONFIDENCE</span><span className="animate-pulse">34.1%</span>
-              </div>
-            </div>
-          </div>
+        {/* 04 - VISION (LEFT) */}
+        <section className="min-h-screen py-32 flex flex-col justify-center items-start w-full pointer-events-none relative z-20">
+          <VisionStationUI />
         </section>
 
-        {/* 05 - LOGIC */}
-        <section className="min-h-screen py-32 flex flex-col justify-end items-end w-full">
-          <div className="w-full md:w-1/2 space-y-12 bg-black/40 backdrop-blur-md p-8 border-r border-[#FF3333]">
-            <div className="text-right">
-              <div className="text-[10px] text-[#FF3333] tracking-[0.2em] mb-4">04 // AREA 51</div>
-              <h2 className="text-2xl font-sans tracking-tight uppercase text-white">Facility Lockdown</h2>
-            </div>
-            
-            <div className="font-mono text-xs w-full space-y-4">
-              <div className="text-gray-400 mb-6 uppercase tracking-widest leading-relaxed text-right">
-                OBSERVATION:<br/>Emergency lockdown active.
-              </div>
-              <div className="flex justify-between text-[#FF3333] pt-4 border-t border-gray-800/80">
-                <span>OUTPUT</span><span className="animate-pulse">0 (LOCKED)</span>
-              </div>
-            </div>
-          </div>
+        {/* 05 - LOGIC (RIGHT) */}
+        <section className="min-h-screen py-32 flex flex-col justify-center items-end w-full pointer-events-none relative z-20">
+          <LogicStationUI />
         </section>
 
         {/* 06 - THE CLOCK */}

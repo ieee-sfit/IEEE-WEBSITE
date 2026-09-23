@@ -1,102 +1,101 @@
-// src/components/ctrl-freak/NetworkGraph.tsx
-import { useMemo, useRef } from 'react';
+import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { useCtrlFreakStore } from '../../store/useCtrlFreakStore';
-import { HUB_POSITIONS_3D, CORRUPTED_HUB, ALL_EDGES, edgeId, HubId } from '../../config/networkHubs';
+import { HUB_POSITIONS_3D } from '../../config/networkHubs';
+import { MotionValue } from 'framer-motion';
 
-const HUB_ARRAY = (Object.entries(HUB_POSITIONS_3D) as [string, [number, number, number]][])
-  .map(([id, pos]) => ({ id: Number(id) as HubId, pos }));
+function smoothstep(min: number, max: number, value: number) {
+  const x = Math.max(0, Math.min(1, (value - min) / (max - min)));
+  return x * x * (3 - 2 * x);
+}
 
-const SPARK_COUNT = 90;
-
-export function NetworkGraph({ visible }: { visible: boolean }) {
+export function NetworkGraph({ scrollProgress }: { scrollProgress: MotionValue<number> }) {
   const groupRef = useRef<THREE.Group>(null);
-  const sparksRef = useRef<THREE.Points>(null);
-  const routes = useCtrlFreakStore((s) => s.network.routes);
-  const solved = useCtrlFreakStore((s) => s.network.solved);
-  const sparkPositions = useMemo(() => new Float32Array(SPARK_COUNT * 3), []);
+  
+  const { frankfurt, london, mumbai, solved } = useCtrlFreakStore((s) => s.network);
+
+  const frankfurtRef = useRef<THREE.Mesh>(null);
+  const londonRef = useRef<THREE.Mesh>(null);
+  const mumbaiRef = useRef<THREE.Mesh>(null);
 
   useFrame((state) => {
-    if (!visible || !groupRef.current) return;
-    const t = state.clock.getElapsedTime();
-    groupRef.current.position.y = Math.sin(t * 0.3) * 0.3; // gentle life, not static
+    if (!groupRef.current) return;
+    const progress = scrollProgress.get();
+    const isVisible = progress > 0.35 && progress <= 0.50;
+    
+    groupRef.current.visible = isVisible;
+    if (!isVisible) return;
 
-    if (sparksRef.current) {
-      const arr = sparksRef.current.geometry.attributes.position.array as Float32Array;
-      if (routes.length === 0) {
-        arr.fill(9999); // park off-screen when nothing to show
+    // Shift group dynamically to the left to match the UI gap
+    const t = smoothstep(0.35, 0.40, progress);
+    const targetOffsetX = 9 - 18 * t; // Ends up at -9 (Left side)
+    
+    const rightVec = new THREE.Vector3(1, 0, 0).applyQuaternion(state.camera.quaternion);
+    const targetPos = new THREE.Vector3(0, 0, 0).add(rightVec.multiplyScalar(targetOffsetX));
+    
+    // Add Gentle bob
+    const time = state.clock.getElapsedTime();
+    targetPos.y += Math.sin(time * 0.3) * 0.3;
+    
+    groupRef.current.position.lerp(targetPos, 0.1);
+    groupRef.current.scale.setScalar(0.9);
+
+    // Animate individual nodes based on load
+    const updateNode = (mesh: THREE.Mesh | null, load: number, maxLoad: number, isMumbai: boolean) => {
+      if (!mesh) return;
+      const material = mesh.material as THREE.MeshBasicMaterial;
+      
+      const overloaded = load > maxLoad;
+      const scale = 1 + (load / 100) * 1.5;
+      
+      mesh.scale.lerp(new THREE.Vector3(scale, scale, scale), 0.1);
+      
+      if (solved) {
+        material.color.lerp(new THREE.Color('#33ff33'), 0.1);
+      } else if (overloaded || (isMumbai && load > 40)) {
+        material.color.lerp(new THREE.Color('#ff3333'), 0.2);
+        // Shake if overloaded
+        mesh.position.x += (Math.random() - 0.5) * 0.2;
+        mesh.position.y += (Math.random() - 0.5) * 0.2;
+        mesh.position.z += (Math.random() - 0.5) * 0.2;
       } else {
-        for (let i = 0; i < SPARK_COUNT; i++) {
-          const route = routes[i % routes.length];
-          const [a, b] = route.split('-').map(Number) as [HubId, HubId];
-          const p1 = HUB_POSITIONS_3D[a];
-          const p2 = HUB_POSITIONS_3D[b];
-          const bad = route.includes(String(CORRUPTED_HUB));
-          const speed = solved ? 1.4 : bad ? 0.25 : 0.6;
-          const tFlow = (t * speed + i / SPARK_COUNT) % 1;
-          const jitter = bad && !solved ? (Math.random() - 0.5) * 0.6 : 0;
-          arr[i * 3]     = p1[0] + (p2[0] - p1[0]) * tFlow + jitter;
-          arr[i * 3 + 1] = p1[1] + (p2[1] - p1[1]) * tFlow + jitter;
-          arr[i * 3 + 2] = p1[2] + (p2[2] - p1[2]) * tFlow + jitter;
-        }
+        material.color.lerp(new THREE.Color('#3388ff'), 0.1);
       }
-      sparksRef.current.geometry.attributes.position.needsUpdate = true;
-    }
-  });
+    };
 
-  if (!visible) return null;
+    updateNode(frankfurtRef.current, frankfurt, 100, false);
+    updateNode(londonRef.current, london, 70, false);
+    updateNode(mumbaiRef.current, mumbai, 40, true);
+  });
 
   return (
     <group ref={groupRef}>
-      {HUB_ARRAY.map(({ id, pos }) => {
-        const corrupted = id === CORRUPTED_HUB;
-        return (
-          <group key={id} position={pos}>
-            <mesh>
-              <sphereGeometry args={[corrupted ? 1.1 : 0.85, 16, 16]} />
-              <meshBasicMaterial color={corrupted ? '#ff3333' : '#ffffff'} transparent opacity={0.9} />
-            </mesh>
-            <mesh>
-              <sphereGeometry args={[corrupted ? 2.2 : 1.6, 16, 16]} />
-              <meshBasicMaterial
-                color={corrupted ? '#ff3333' : '#3388ff'}
-                transparent opacity={0.12} depthWrite={false}
-              />
-            </mesh>
-          </group>
-        );
-      })}
+      
+      {/* Frankfurt */}
+      <group position={HUB_POSITIONS_3D[2]}>
+        <mesh ref={frankfurtRef}>
+          <sphereGeometry args={[0.8, 16, 16]} />
+          <meshBasicMaterial color="#3388ff" transparent opacity={0.6} depthWrite={false} />
+        </mesh>
+      </group>
 
-      {ALL_EDGES.map(([a, b]) => {
-        const id = edgeId(a, b);
-        const active = routes.includes(id);
-        const bad = active && id.includes(String(CORRUPTED_HUB));
-        return (
-          <Line
-            key={id}
-            points={[HUB_POSITIONS_3D[a], HUB_POSITIONS_3D[b]]}
-            color={solved && active ? '#33ff33' : bad ? '#ff3333' : active ? '#ffffff' : '#333333'}
-            lineWidth={active ? 2.5 : 1}
-            transparent
-            opacity={active ? 0.9 : 0.25}
-          />
-        );
-      })}
+      {/* London */}
+      <group position={HUB_POSITIONS_3D[4]}>
+        <mesh ref={londonRef}>
+          <sphereGeometry args={[0.8, 16, 16]} />
+          <meshBasicMaterial color="#3388ff" transparent opacity={0.6} depthWrite={false} />
+        </mesh>
+      </group>
 
-      <points ref={sparksRef}>
-        <bufferGeometry>
-          <bufferAttribute attach="attributes-position" count={SPARK_COUNT} array={sparkPositions} itemSize={3} />
-        </bufferGeometry>
-        <pointsMaterial
-          size={0.25}
-          color={solved ? '#33ff33' : '#ff3333'}
-          transparent opacity={0.9} sizeAttenuation
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-        />
-      </points>
+      {/* Mumbai */}
+      <group position={HUB_POSITIONS_3D[3]}>
+        <mesh ref={mumbaiRef}>
+          <sphereGeometry args={[0.8, 16, 16]} />
+          <meshBasicMaterial color="#ff3333" transparent opacity={0.6} depthWrite={false} />
+        </mesh>
+      </group>
+
     </group>
   );
 }

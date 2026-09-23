@@ -1,20 +1,13 @@
-import { useRef, useMemo, useState, useEffect } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Points, PointMaterial, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { GLTFExporter } from 'three-stdlib';
 import { MotionValue } from 'framer-motion';
+import { NetworkGraph } from './NetworkGraph';
 import { ControlChamber } from './ControlChamber';
 import { useCtrlFreakStore } from '../../store/useCtrlFreakStore';
-
-const PRIMARY_HUBS = [
-  [-12, 0, 0],   // 0: SRC (Left)
-  [-2, 0, 0],    // 1: DST (Right)
-  [-7, 6, -2],   // 2: RLY-1 (Top)
-  [-7, 0, 3],    // 3: RLY-2 (Center / Corrupted)
-  [-7, -6, -2]   // 4: RLY-3 (Bottom)
-];
-const CORRUPTED_IDX = 3;
+import { HUB_POSITIONS_3D, CORRUPTED_HUB } from '../../config/networkHubs';
 
 const generateTextPoints = (text: string, count: number): Float32Array => {
   const canvas = document.createElement('canvas');
@@ -39,21 +32,79 @@ const generateTextPoints = (text: string, count: number): Float32Array => {
   for (let y = 0; y < 128; y++) {
     for (let x = 0; x < 256; x++) {
       const index = (y * 256 + x) * 4;
-      if (data[index] > 128) { // If pixel is bright
-        // Invert X because the billboarding orientation (lookAt) makes us look at the "back" of the XY plane
+      if (data[index] > 128) {
         validPoints.push([-(x - 128) / 10, -(y - 64) / 10]);
       }
     }
   }
   
-  // Map particles to the valid pixels
   for (let i = 0; i < count; i++) {
     const pt = validPoints[i % validPoints.length];
     if (pt) {
-      result[i*3] = pt[0] + (Math.random() - 0.5) * 0.3; // Slight jitter
-      result[i*3+1] = pt[1] + (Math.random() - 0.5) * 0.3;
-      result[i*3+2] = (Math.random() - 0.5) * 1.5; // Depth jitter
+      result[i*3] = pt[0] + (Math.random() - 0.5) * 0.3; // X
+      result[i*3+1] = pt[1] + (Math.random() - 0.5) * 0.3; // Y
+      result[i*3+2] = (Math.random() - 0.5) * 1.5; // Z depth jitter
     }
+  }
+  return result;
+};
+
+const generateHollowBlock = (text: string, count: number): Float32Array => {
+  const result = new Float32Array(count * 3);
+  
+  // Create a canvas to get text pixels
+  const W = 80;
+  const H = 32;
+  const D = 6;
+  
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  
+  const solidVoxels: [number, number, number][] = [];
+  
+  if (ctx) {
+    ctx.fillStyle = 'white'; // Solid block
+    ctx.fillRect(0, 0, W, H);
+    
+    ctx.fillStyle = 'black'; // Text to hollow out
+    ctx.font = 'bold 14px monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    // Split text into two lines
+    const lines = text.split('\n');
+    ctx.fillText(lines[0], W/2, H/3 + 2);
+    if (lines[1]) ctx.fillText(lines[1], W/2, (H/3)*2 + 2);
+    
+    const data = ctx.getImageData(0, 0, W, H).data;
+    
+    // Find all valid (solid) voxel coordinates
+    for (let z = 0; z < D; z++) {
+      for (let y = 0; y < H; y++) {
+        for (let x = 0; x < W; x++) {
+          const index = (y * W + x) * 4;
+          // If it's white (color > 128), it's solid. If black, it's text (hollow).
+          if (data[index] > 128) {
+            solidVoxels.push([x, y, z]);
+          }
+        }
+      }
+    }
+  } else {
+    // Fallback if no canvas
+    solidVoxels.push([0, 0, 0]);
+  }
+  
+  // Fill the result array with solid voxels, looping if necessary
+  for (let i = 0; i < count; i++) {
+    const v = solidVoxels[i % solidVoxels.length];
+    const i3 = i * 3;
+    // Scale and center the block
+    result[i3] = -(v[0] - W/2) / 3; // INVERT X to fix mirroring
+    result[i3+1] = -(v[1] - H/2) / 3; // INVERT Y
+    result[i3+2] = (v[2] - D/2) / 3;
   }
   return result;
 };
@@ -125,7 +176,7 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
     const sphere = new Float32Array(count * 3);
     const wave = new Float32Array(count * 3);
     const network = new Float32Array(count * 3);
-    const grid = new Float32Array(count * 3);
+    const vision = new Float32Array(count * 3);
     const circuit = new Float32Array(count * 3);
     const ring = new Float32Array(count * 3);
 
@@ -164,8 +215,8 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
           if (r < weights[hubIdx]) break;
           r -= weights[hubIdx];
         }
-        const hub = PRIMARY_HUBS[hubIdx];
-        const radius = hubIdx === CORRUPTED_IDX ? 3.2 : 1.8;
+        const hub = HUB_POSITIONS_3D[hubIdx as keyof typeof HUB_POSITIONS_3D];
+        const radius = hubIdx === CORRUPTED_HUB ? 3.2 : 1.8;
         // Volumetric filling instead of a hollow shell
         const rVol = radius * Math.cbrt(Math.random());
         const theta = Math.random() * Math.PI * 2;
@@ -176,7 +227,7 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       } else {
         // FLOW POOL — 45%, reserved for route-streaming in useFrame.
         // Idle default: loosely orbiting the corrupted hub (the "congestion").
-        const hub = PRIMARY_HUBS[CORRUPTED_IDX];
+        const hub = HUB_POSITIONS_3D[CORRUPTED_HUB as keyof typeof HUB_POSITIONS_3D];
         const rVol = (3 + Math.random() * 5) * Math.cbrt(Math.random());
         const theta = Math.random() * Math.PI * 2;
         network[i3]     = hub[0] + Math.cos(theta) * rVol;
@@ -184,14 +235,9 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
         network[i3 + 2] = hub[2] + (Math.random() - 0.5) * 4;
       }
 
-      // 4. VOXEL GRID (Vision Binarization)
-      const size3D = Math.ceil(Math.cbrt(count));
-      const gX = i % size3D;
-      const gY = Math.floor(i / size3D) % size3D;
-      const gZ = Math.floor(i / (size3D * size3D));
-      grid[i3] = (gX / size3D - 0.5) * 10;
-      grid[i3 + 1] = (gY / size3D - 0.5) * 10;
-      grid[i3 + 2] = (gZ / size3D - 0.5) * 10;
+      // 4. VISION (Anamorphic Shape)
+      // Vision will be populated dynamically via useEffect
+      vision[i3] = 0; vision[i3+1] = 0; vision[i3+2] = 0;
 
       // 5. DIRECTED SIGNAL FLOW (Logic / Facility Lockdown)
       // A vertical structure representing inputs, mechanical gates, and output.
@@ -238,8 +284,42 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       ring[i3 + 2] = (Math.random() - 0.5) * 1.5;
     }
 
-    return { sphere, wave, network, grid, circuit, ring };
+    return { sphere, wave, network, vision, circuit, ring };
   }, [count]);
+
+  // ANAMORPHIC ILLUSION: Hollow Block Rotation
+  const visionPitch = useCtrlFreakStore(s => s.vision.pitch);
+  const visionYaw = useCtrlFreakStore(s => s.vision.yaw);
+  
+  // Base points remain static (Hollow Block)
+  const baseVision = useMemo(() => generateHollowBlock('HR 98\nAA 0000', count), [count]);
+
+  // Apply rotation natively inside useEffect to avoid thrashing useFrame
+  useEffect(() => {
+    const cosP = Math.cos(visionPitch);
+    const sinP = Math.sin(visionPitch);
+    const cosY = Math.cos(visionYaw);
+    const sinY = Math.sin(visionYaw);
+
+    for (let i = 0; i < count; i++) {
+      const i3 = i * 3;
+      const x = baseVision[i3];
+      const y = baseVision[i3 + 1];
+      const z = baseVision[i3 + 2];
+
+      // Pitch (Rotate X)
+      const y1 = y * cosP - z * sinP;
+      const z1 = y * sinP + z * cosP;
+
+      // Yaw (Rotate Y)
+      const x2 = x * cosY + z1 * sinY;
+      const z2 = -x * sinY + z1 * cosY;
+
+      shapes.vision[i3] = x2;
+      shapes.vision[i3 + 1] = y1;
+      shapes.vision[i3 + 2] = z2;
+    }
+  }, [visionPitch, visionYaw, count, baseVision, shapes]);
 
   // Initial render buffer
   const [positions] = useState(() => new Float32Array(count * 3));
@@ -313,11 +393,11 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
     } else if (progress < 0.50) {
       shape1 = shapes.network; shape2 = shapes.network; lerpFactor = 0;
     } else if (progress < 0.55) {
-      shape1 = shapes.network; shape2 = shapes.grid; lerpFactor = smoothstep(0.50, 0.55, progress);
+      shape1 = shapes.network; shape2 = shapes.vision; lerpFactor = smoothstep(0.50, 0.55, progress);
     } else if (progress < 0.65) {
-      shape1 = shapes.grid; shape2 = shapes.grid; lerpFactor = 0;
+      shape1 = shapes.vision; shape2 = shapes.vision; lerpFactor = 0;
     } else if (progress < 0.70) {
-      shape1 = shapes.grid; shape2 = shapes.circuit; lerpFactor = smoothstep(0.65, 0.70, progress);
+      shape1 = shapes.vision; shape2 = shapes.circuit; lerpFactor = smoothstep(0.65, 0.70, progress);
     } else if (progress < 0.80) {
       shape1 = shapes.circuit; shape2 = shapes.circuit; lerpFactor = 0;
     } else if (progress < 0.85) {
@@ -343,34 +423,55 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
           const networkState = useCtrlFreakStore.getState().network;
           const isFlowParticle = (i / count) >= 0.55; // matches the 55/45 split above
 
-          if (isFlowParticle && networkState.routes.length > 0) {
-            // Full flow-pool commitment to whichever routes are live
-            const routeIdx = i % networkState.routes.length;
-            const route = networkState.routes[routeIdx];
-            const [id1, id2] = route.split('-').map(Number);
-            const p1 = PRIMARY_HUBS[id1], p2 = PRIMARY_HUBS[id2];
-            const bad = route.includes('3');
-            const flowSpeed = networkState.solved ? 2.0 : bad ? 0.3 : 0.8;
-            const tFlow = (t * flowSpeed + (i / count) * 6) % 1.0;
+          if (isFlowParticle) {
+            // Flow from SRC (0) to DST (1) via relays based on load.
+            const p1 = HUB_POSITIONS_3D[0]; // SRC
+            const p2 = HUB_POSITIONS_3D[1]; // DST
             
-            // Add baseline jitter so the streams have thickness, increase heavily if corrupted
-            const thickness = 0.4;
-            const jitterX = (Math.random() - 0.5) * (bad && !networkState.solved ? 3.0 : thickness);
-            const jitterY = (Math.random() - 0.5) * (bad && !networkState.solved ? 3.0 : thickness);
-            const jitterZ = (Math.random() - 0.5) * (bad && !networkState.solved ? 3.0 : thickness);
-
-            // Add an arc / bulge to the routes so they aren't perfectly straight lines
-            const bulge = Math.sin(tFlow * Math.PI) * 1.5; 
-            // Push outwards from the center (X=-7, Z=0)
-            const midX = (p1[0] + p2[0]) / 2;
-            const dirX = midX > -7 ? 1 : -1;
-
-            x = (p1[0] + (p2[0] - p1[0]) * tFlow + jitterX + (dirX * bulge)) * netWeight + x * (1 - netWeight);
-            y = (p1[1] + (p2[1] - p1[1]) * tFlow + jitterY) * netWeight + y * (1 - netWeight);
-            z = (p1[2] + (p2[2] - p1[2]) * tFlow + jitterZ + bulge) * netWeight + z * (1 - netWeight);
+            // Choose a relay based on particle index
+            const relayChoice = i % 3;
+            let relayHubId: keyof typeof HUB_POSITIONS_3D = 2; // Frankfurt
+            let load = networkState.frankfurt;
+            if (relayChoice === 1) { relayHubId = 4; load = networkState.london; }
+            if (relayChoice === 2) { relayHubId = 3; load = networkState.mumbai; }
+            
+            const relayPos = HUB_POSITIONS_3D[relayHubId];
+            const isCorrupted = relayHubId === 3;
+            
+            // If load is 0, park the particle
+            if (load > 0) {
+              const flowSpeed = networkState.solved ? 2.0 : (isCorrupted && load > 40) ? 0.3 : 0.8;
+              const tFlow = (t * flowSpeed + (i / count) * 6) % 1.0;
+              
+              // Two-part journey: SRC -> Relay, Relay -> DST
+              let startP = p1, endP = relayPos;
+              let localT = tFlow * 2;
+              if (localT > 1) {
+                startP = relayPos; endP = p2;
+                localT -= 1;
+              }
+              
+              const thickness = 0.4;
+              const jitterMagnitude = (isCorrupted && load > 40 && !networkState.solved) ? 3.0 : thickness;
+              const jitterX = (Math.random() - 0.5) * jitterMagnitude;
+              const jitterY = (Math.random() - 0.5) * jitterMagnitude;
+              const jitterZ = (Math.random() - 0.5) * jitterMagnitude;
+  
+              const bulge = Math.sin(localT * Math.PI) * 1.5; 
+              
+              x = (startP[0] + (endP[0] - startP[0]) * localT + jitterX) * netWeight + x * (1 - netWeight);
+              y = (startP[1] + (endP[1] - startP[1]) * localT + jitterY) * netWeight + y * (1 - netWeight);
+              z = (startP[2] + (endP[2] - startP[2]) * localT + jitterZ + bulge) * netWeight + z * (1 - netWeight);
+            } else {
+              // Park if load is 0
+              x += (Math.random() - 0.5) * 0.1 * netWeight;
+              y += (Math.random() - 0.5) * 0.1 * netWeight;
+              z += (Math.random() - 0.5) * 0.1 * netWeight;
+            }
           } else {
             // Ambient behavior
-            const isCorruptedNeighborhood = Math.hypot(x - PRIMARY_HUBS[3][0], y - PRIMARY_HUBS[3][1], z - PRIMARY_HUBS[3][2]) < 6;
+            const corruptedHub = HUB_POSITIONS_3D[CORRUPTED_HUB];
+            const isCorruptedNeighborhood = Math.hypot(x - corruptedHub[0], y - corruptedHub[1], z - corruptedHub[2]) < 6;
             const pulse = isCorruptedNeighborhood ? (Math.sin(t * 3 + i) * 0.5 + 0.5) : 0.1;
             x += (Math.random() - 0.5) * pulse * netWeight;
             y += (Math.random() - 0.5) * pulse * netWeight;
@@ -434,12 +535,7 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
     );
     const targetQuaternion = new THREE.Quaternion().setFromRotationMatrix(targetMatrix);
     
-    // Add a slight wobble for life
-    const wobble = new THREE.Quaternion().setFromEuler(
-      new THREE.Euler(Math.cos(t * 0.1) * 0.05, Math.sin(t * 0.2) * 0.1, 0)
-    );
-    targetQuaternion.multiply(wobble);
-    
+    // Removed idle wobble to keep the UI stations and alignment puzzles rock solid
     pointsRef.current.quaternion.copy(targetQuaternion);
 
     // --- COLOR LOGIC ---
@@ -448,9 +544,20 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       // Solid Emergency Red when counting up
       material.color.setRGB(1, 0, 0);
     } else {
-      const r = Math.max(0.1, 1.0 - progress * 1.5);
-      const g = Math.min(1.0, 0.2 + (progress * 1.2));
-      const b = Math.min(1.0, 0.2 + (progress * 1.2));
+      let r = Math.max(0.1, 1.0 - progress * 1.5);
+      let g = Math.min(1.0, 0.2 + (progress * 1.2));
+      let b = Math.min(1.0, 0.2 + (progress * 1.2));
+      
+      // If we're in the Logic section, highlight the boolean states
+      if (progress > 0.65 && progress < 0.85) {
+        const logicSolved = useCtrlFreakStore.getState().logic.solved;
+        if (logicSolved) {
+          r = 0.2; g = 1.0; b = 0.2; // Solid Green
+        } else {
+          r = 1.0; g = 0.2; b = 0.2; // Solid Red
+        }
+      }
+      
       material.color.setRGB(r, g, b);
     }
 
@@ -464,27 +571,27 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
     if (progress > 0.20 && progress <= 0.35) {
       // Station 01: UI Left, Core Right
       const t = smoothstep(0.20, 0.25, progress);
-      targetOffsetX = 6 * t; 
+      targetOffsetX = 6 * t; // Ends at +6
       targetScale = 0.6 + 0.3 * t;
     } else if (progress > 0.35 && progress <= 0.50) {
       // Station 02: UI Right, Core Left
       const t = smoothstep(0.35, 0.40, progress);
-      targetOffsetX = 6 - 12 * t;
+      targetOffsetX = 9 - 18 * t; // Ends at -9
       targetScale = 0.9;
     } else if (progress > 0.50 && progress <= 0.65) {
       // Station 03: UI Left, Core Right
       const t = smoothstep(0.50, 0.55, progress);
-      targetOffsetX = -6 + 12 * t;
+      targetOffsetX = -9 + 18 * t; // Ends at +9
       targetScale = 0.9;
     } else if (progress > 0.65 && progress <= 0.80) {
       // Station 04: UI Right, Core Left
       const t = smoothstep(0.65, 0.70, progress);
-      targetOffsetX = 6 - 12 * t;
+      targetOffsetX = 9 - 18 * t; // Ends at -9
       targetScale = 0.9;
     } else if (progress > 0.80 && progress <= 0.85) {
       // Return to Center
       const t = smoothstep(0.80, 0.85, progress);
-      targetOffsetX = -6 * (1 - t);
+      targetOffsetX = -9 * (1 - t);
       targetScale = 0.9 - 0.3 * t;
     }
 
@@ -554,6 +661,8 @@ export const SystemCore = ({ scrollProgress }: { scrollProgress: MotionValue<num
         
         {/* Phase 1: The Field (6,000 particles) */}
         <ParticleSystem scrollProgress={scrollProgress} />
+        
+        <NetworkGraph scrollProgress={scrollProgress} />
 
         {/* Phase 2: Camera Choreography */}
         <CameraRig scrollProgress={scrollProgress} />
