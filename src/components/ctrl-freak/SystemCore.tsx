@@ -4,7 +4,6 @@ import { Points, PointMaterial, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { GLTFExporter } from 'three-stdlib';
 import { MotionValue } from 'framer-motion';
-import { NetworkGraph } from './NetworkGraph';
 import { ControlChamber } from './ControlChamber';
 import { useCtrlFreakStore } from '../../store/useCtrlFreakStore';
 import { HUB_POSITIONS_3D } from '../../config/networkHubs';
@@ -47,6 +46,67 @@ const generateTextPoints = (text: string, count: number): Float32Array => {
     }
   }
   return result;
+};
+
+const generateDishPoints = () => {
+  const canvas = document.createElement('canvas');
+  canvas.width = 160; canvas.height = 120;
+  const ctx = canvas.getContext('2d');
+  if(!ctx) return [[0,0,0]];
+  ctx.strokeStyle = 'white'; ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.ellipse(80, 50, 55, 22, 0, Math.PI, Math.PI * 2); // dish bowl arc
+  ctx.moveTo(80, 50); ctx.lineTo(80, 100); // support pole
+  ctx.moveTo(80, 30); ctx.lineTo(80, 10); // receiver arm
+  ctx.stroke();
+  const data = ctx.getImageData(0, 0, 160, 120).data;
+  const pts = [];
+  for (let y = 0; y < 120; y++) {
+    for (let x = 0; x < 160; x++) {
+      if (data[(y * 160 + x) * 4] > 128) {
+        pts.push([(x - 80) / 10, -(y - 60) / 10, (Math.random() - 0.5) * 0.6]);
+      }
+    }
+  }
+  return pts.length ? pts : [[0,0,0]];
+};
+
+const generatePadlockPoints = () => {
+  const canvas = document.createElement('canvas');
+  canvas.width = 160; canvas.height = 160;
+  const ctx = canvas.getContext('2d');
+  if(!ctx) return [[0,0,0]];
+  ctx.strokeStyle = 'white'; ctx.lineWidth = 4;
+  ctx.lineCap = 'round';
+  
+  // Padlock body (square)
+  ctx.strokeRect(50, 80, 60, 50);
+  
+  // Padlock open shackle (arch)
+  ctx.beginPath();
+  ctx.arc(80, 70, 20, Math.PI, 0); // left to right arch
+  ctx.lineTo(100, 80); // down into body on right side
+  // left side stays open
+  ctx.stroke();
+
+  // Keyhole
+  ctx.fillStyle = 'white';
+  ctx.beginPath();
+  ctx.arc(80, 100, 4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillRect(78, 100, 4, 10);
+
+  const data = ctx.getImageData(0, 0, 160, 160).data;
+  const pts = [];
+  for (let y = 0; y < 160; y++) {
+    for (let x = 0; x < 160; x++) {
+      // Check alpha or color
+      if (data[(y * 160 + x) * 4 + 3] > 128) {
+        pts.push([(x - 80) / 10, -(y - 80) / 10, (Math.random() - 0.5) * 0.4]);
+      }
+    }
+  }
+  return pts.length ? pts : [[0,0,0]];
 };
 
 const generateHollowBlock = (text: string, count: number): Float32Array => {
@@ -179,8 +239,14 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
     const vision = new Float32Array(count * 3);
     const circuit = new Float32Array(count * 3);
     const ring = new Float32Array(count * 3);
+    
+    const dishOutlinePoints = generateDishPoints();
+    const padlockOpenPoints = generatePadlockPoints();
 
     // Primary Hubs are globally defined as PRIMARY_HUBS
+
+    // SHAPE 5 (LOGIC): Tesseract (Cube)
+    const cW = Math.ceil(Math.cbrt(count));
 
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
@@ -200,38 +266,27 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       wave[i3 + 1] = waveY;
       wave[i3 + 2] = 0;
 
-      // --- SHAPE 3 (NETWORK GLOBE) ---
-      // A hollow sphere representing global data routes
-      if (i / count < 0.45) {
-        // Ambient globe shell
-        const theta = Math.random() * 2 * Math.PI;
-        const phi = Math.acos(Math.random() * 2 - 1);
-        const r = 4.0 + (Math.random() - 0.5) * 0.2; // Shell thickness
-        network[i3]     = r * Math.sin(phi) * Math.cos(theta);
-        network[i3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-        network[i3 + 2] = r * Math.cos(phi);
-      } else {
-        // Flow pool (dynamically routed in useFrame)
-        // Park them at origin initially
-        network[i3] = 0; network[i3+1] = 0; network[i3+2] = 0;
-      }
+      // --- SHAPE 3 (NETWORK) Topographical Data Grid ---
+      const gridW = Math.ceil(Math.sqrt(count));
+      const gx = i % gridW;
+      const gy = Math.floor(i / gridW);
+      // Map to [-8, 8] range on X and Y
+      network[i3]     = (gx / gridW) * 16 - 8;
+      network[i3 + 1] = (gy / gridW) * 16 - 8;
+      network[i3 + 2] = 0; // Base depth is 0
 
       // 4. VISION (Anamorphic Shape)
       // Vision will be populated dynamically via useEffect
       vision[i3] = 0; vision[i3+1] = 0; vision[i3+2] = 0;
 
-      // 5. THE VAULT (Logic / Facility Lockdown)
-      // A massive concentric cylinder mechanism. We will assign particles to 4 distinct rings.
-      // We encode the ring ID into the radius so we can rotate them individually in useFrame.
-      const ringIds = [1.2, 1.8, 2.4, 3.0];
-      const ringChoice = Math.floor(Math.random() * 4);
-      const ringR = ringIds[ringChoice] + (Math.random() - 0.5) * 0.15; // thickness
-      const ringTheta = Math.random() * 2 * Math.PI;
-      const ringY = (Math.random() - 0.5) * 4; // Height of cylinder
-
-      circuit[i3] = ringR * Math.cos(ringTheta);
-      circuit[i3 + 1] = ringY;
-      circuit[i3 + 2] = ringR * Math.sin(ringTheta);
+      // 5. THE VAULT (Logic) -> The Scrambled Tesseract
+      const cx = i % cW;
+      const cy = Math.floor(i / cW) % cW;
+      const cz = Math.floor(i / (cW * cW));
+      // Map to [-6, 6] range to make it massive
+      circuit[i3]     = (cx / cW) * 12 - 6;
+      circuit[i3 + 1] = (cy / cW) * 12 - 6;
+      circuit[i3 + 2] = (cz / cW) * 12 - 6;
 
       // 6. RING (The Clock / 12:00)
       const angle = Math.random() * Math.PI * 2;
@@ -241,7 +296,7 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       ring[i3 + 2] = (Math.random() - 0.5) * 1.5;
     }
 
-    return { sphere, wave, network, vision, circuit, ring };
+    return { sphere, wave, network, vision, circuit, ring, dishOutlinePoints, padlockOpenPoints };
   }, [count]);
 
   // ANAMORPHIC ILLUSION: Hollow Block Rotation
@@ -374,68 +429,60 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       if (shape1 === shapes.network || shape2 === shapes.network) {
         const netWeight = shape1 === shapes.network ? (1 - lerpFactor) : lerpFactor;
         if (netWeight > 0) {
-          const networkState = useCtrlFreakStore.getState().network;
-          const isFlowParticle = (i / count) >= 0.45;
-
-          if (isFlowParticle) {
-            // Flow from SRC (0) to DST (1) via relays based on load.
-            const p1 = HUB_POSITIONS_3D[0]; // SRC
-            const p2 = HUB_POSITIONS_3D[1]; // DST
+          const net = useCtrlFreakStore.getState().network;
+          
+          const applyNetworkMods = (px: number, py: number, pz: number) => {
+            let finalDepth = pz;
             
-            // Choose a relay based on particle index
-            const relayChoice = i % 3;
-            let relayHubId: keyof typeof HUB_POSITIONS_3D = 2; // Frankfurt
-            let load = networkState.frankfurt;
-            if (relayChoice === 1) { relayHubId = 4; load = networkState.london; }
-            if (relayChoice === 2) { relayHubId = 3; load = networkState.mumbai; }
-            
-            const relayPos = HUB_POSITIONS_3D[relayHubId];
-            const isCorrupted = relayHubId === 3;
-            
-            if (load > 0) {
-              const flowSpeed = networkState.solved ? 2.0 : (isCorrupted && load > 40) ? 0.3 : 0.8;
-              const tFlow = (t * flowSpeed + (i / count) * 6) % 1.0;
-              
-              // Two-part journey: SRC -> Relay, Relay -> DST
-              let startP = p1, endP = relayPos;
-              let localT = tFlow * 2;
-              if (localT > 1) {
-                startP = relayPos; endP = p2;
-                localT -= 1;
-              }
-              
-              const thickness = 0.15;
-              const jitterMagnitude = (isCorrupted && load > 40 && !networkState.solved) ? 3.0 : thickness;
-              const jitterX = (Math.random() - 0.5) * jitterMagnitude;
-              const jitterY = (Math.random() - 0.5) * jitterMagnitude;
-              const jitterZ = (Math.random() - 0.5) * jitterMagnitude;
-  
-              // Create an arc over the globe
-              const bulge = Math.sin(localT * Math.PI) * 2.0; 
-              
-              x = (startP[0] + (endP[0] - startP[0]) * localT + jitterX) * netWeight + x * (1 - netWeight);
-              y = (startP[1] + (endP[1] - startP[1]) * localT + jitterY + bulge) * netWeight + y * (1 - netWeight);
-              z = (startP[2] + (endP[2] - startP[2]) * localT + jitterZ + bulge) * netWeight + z * (1 - netWeight);
+            if (net.solved) {
+              // Unified smooth sine wave rippling across the grid
+              const d = Math.sqrt(px*px + py*py);
+              finalDepth += Math.sin(d * 2 - t * 4) * 0.5;
             } else {
-              // Park at origin
-              x = x * (1 - netWeight);
-              y = y * (1 - netWeight);
-              z = z * (1 - netWeight);
+              // 3 Epicenters on the grid
+              const d1 = Math.sqrt(Math.pow(px - (-3), 2) + Math.pow(py - (-2), 2)); // Frankfurt
+              const d2 = Math.sqrt(Math.pow(px - 0, 2) + Math.pow(py - 2, 2));      // London
+              const d3 = Math.sqrt(Math.pow(px - 3, 2) + Math.pow(py - (-2), 2));   // Mumbai
+              
+              // Gaussian influence hills mapped to load slider (divided by 10 for reasonable depth)
+              const h1 = (net.frankfurt / 10) * Math.exp(-d1*d1 / 2.0);
+              const h2 = (net.london / 10) * Math.exp(-d2*d2 / 2.0);
+              const h3 = (net.mumbai / 10) * Math.exp(-d3*d3 / 2.0);
+              
+              let totalDepth = h1 + h2 + h3;
+              
+              // Overload chaos: jagged mountain spikes
+              if (net.frankfurt > 70 && d1 < 2.5) totalDepth += (Math.random() - 0.5) * 3;
+              if (net.london > 70 && d2 < 2.5) totalDepth += (Math.random() - 0.5) * 3;
+              if (net.mumbai > 70 && d3 < 2.5) totalDepth += (Math.random() - 0.5) * 3;
+              
+              // Underload sinkhole: invert the curve
+              if (net.frankfurt < 10 && d1 < 2.5) totalDepth -= 2 * Math.exp(-d1*d1 / 1.5);
+              if (net.london < 10 && d2 < 2.5) totalDepth -= 2 * Math.exp(-d2*d2 / 1.5);
+              if (net.mumbai < 10 && d3 < 2.5) totalDepth -= 2 * Math.exp(-d3*d3 / 1.5);
+              
+              finalDepth += totalDepth;
             }
-          } else {
-            // Ambient globe shell rotation
-            const globalRotY = t * 0.1;
-            const cosRY = Math.cos(globalRotY);
-            const sinRY = Math.sin(globalRotY);
-            const nx = x * cosRY - z * sinRY;
-            const nz = x * sinRY + z * cosRY;
             
-            // Apply slight turbulence if unsolved
-            const turbulence = networkState.solved ? 0 : (Math.random() - 0.5) * 0.05;
+            // Apply a 50-degree downward tilt around the X axis so the depth is visible as height to the camera
+            const tilt = Math.PI / 3.6; // 50 degrees
+            const tiltedY = py * Math.cos(tilt) - finalDepth * Math.sin(tilt);
+            const tiltedZ = py * Math.sin(tilt) + finalDepth * Math.cos(tilt);
             
-            x = (nx + turbulence) * netWeight + x * (1 - netWeight);
-            y = (y + turbulence) * netWeight + y * (1 - netWeight);
-            z = (nz + turbulence) * netWeight + z * (1 - netWeight);
+            return [px, tiltedY, tiltedZ];
+          };
+
+          if (shape1 === shapes.network) {
+            const [nx, ny, nz] = applyNetworkMods(shape1[i3], shape1[i3+1], shape1[i3+2]);
+            x = nx * (1 - lerpFactor) + shape2[i3] * lerpFactor;
+            y = ny * (1 - lerpFactor) + shape2[i3+1] * lerpFactor;
+            z = nz * (1 - lerpFactor) + shape2[i3+2] * lerpFactor;
+          }
+          if (shape2 === shapes.network) {
+            const [nx, ny, nz] = applyNetworkMods(shape2[i3], shape2[i3+1], shape2[i3+2]);
+            x = shape1[i3] * (1 - lerpFactor) + nx * lerpFactor;
+            y = shape1[i3+1] * (1 - lerpFactor) + ny * lerpFactor;
+            z = shape1[i3+2] * (1 - lerpFactor) + nz * lerpFactor;
           }
         }
       }
@@ -478,39 +525,51 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       if (shape1 === shapes.circuit || shape2 === shapes.circuit) {
         const circuitWeight = shape1 === shapes.circuit ? (1 - lerpFactor) : lerpFactor;
         if (circuitWeight > 0) {
-          const logicSolved = useCtrlFreakStore.getState().logic.solved;
+          const logic = useCtrlFreakStore.getState().logic;
           
-          // Approximate ring identification from current radius
-          const r = Math.sqrt(x*x + z*z);
-          // Ring IDs were [1.2, 1.8, 2.4, 3.0]. Determine which ring this is closest to:
-          let ringIndex = 0;
-          if (r > 2.7) ringIndex = 3;
-          else if (r > 2.1) ringIndex = 2;
-          else if (r > 1.5) ringIndex = 1;
+          const applyCircuitMods = (px: number, py: number, pz: number) => {
+            if (logic.solved) {
+               // Compress into a hyper-dense glowing core block that gently pulses
+               const scale = 0.6 + Math.sin(t * 3) * 0.05;
+               return [px * scale, py * scale, pz * scale];
+            }
+            
+            // Slicing logic for the Tesseract
+            const sliceX = Math.floor(px * 2);
+            const sliceZ = Math.floor(pz * 2);
+            
+            let nx = px;
+            let ny = py;
+            let nz = pz;
+            
+            // Slot 1 (X-axis slices slide if wrong)
+            if (!logic.slot1Correct) {
+              const slide = Math.sin(t * 3 + sliceX) * 0.8;
+              ny += slide;
+              nz += Math.cos(t * 2 + sliceX) * 0.5;
+            }
+            
+            // Slot 2 (Z-axis slices slide if wrong)
+            if (!logic.slot2Correct) {
+              const slide = Math.sin(t * 2.5 + sliceZ) * 0.8;
+              nx += slide;
+              ny += Math.cos(t * 3.5 + sliceZ) * 0.5;
+            }
+            
+            return [nx, ny, nz];
+          };
 
-          // Different rings rotate at different speeds/directions
-          const speeds = [0.5, -0.7, 0.4, -0.3];
-          let ringRot = speeds[ringIndex] * t;
-
-          // If solved, gracefully align them back to 0 rotation
-          if (logicSolved) {
-            // Wrap rotation to nearest multiple of 2PI, or just smoothstep to 0
-            ringRot = 0; // Simple snap for now, or we can just let it sit at 0
+          if (shape1 === shapes.circuit) {
+            const [nx, ny, nz] = applyCircuitMods(shape1[i3], shape1[i3+1], shape1[i3+2]);
+            x = nx * (1 - lerpFactor) + shape2[i3] * lerpFactor;
+            y = ny * (1 - lerpFactor) + shape2[i3+1] * lerpFactor;
+            z = nz * (1 - lerpFactor) + shape2[i3+2] * lerpFactor;
           }
-
-          const cosR = Math.cos(ringRot);
-          const sinR = Math.sin(ringRot);
-          const nx = x * cosR - z * sinR;
-          const nz = x * sinR + z * cosR;
-
-          x = nx * circuitWeight + x * (1 - circuitWeight);
-          z = nz * circuitWeight + z * (1 - circuitWeight);
-          
-          // Glow or expand if solved
-          if (logicSolved) {
-             const pulse = Math.sin(t * 5 - ringIndex) * 0.1;
-             x += (x / r) * pulse * circuitWeight;
-             z += (z / r) * pulse * circuitWeight;
+          if (shape2 === shapes.circuit) {
+            const [nx, ny, nz] = applyCircuitMods(shape2[i3], shape2[i3+1], shape2[i3+2]);
+            x = shape1[i3] * (1 - lerpFactor) + nx * lerpFactor;
+            y = shape1[i3+1] * (1 - lerpFactor) + ny * lerpFactor;
+            z = shape1[i3+2] * (1 - lerpFactor) + nz * lerpFactor;
           }
         }
       }
@@ -663,7 +722,7 @@ export const SystemCore = ({ scrollProgress }: { scrollProgress: MotionValue<num
         {/* Phase 1: The Field (6,000 particles) */}
         <ParticleSystem scrollProgress={scrollProgress} />
         
-        <NetworkGraph scrollProgress={scrollProgress} />
+        {/* NetworkGraph removed: system core carries all visuals */}
 
         {/* Phase 2: Camera Choreography */}
         <CameraRig scrollProgress={scrollProgress} />

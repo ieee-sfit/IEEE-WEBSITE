@@ -24,6 +24,8 @@ export interface CtrlFreakState {
     slot1: GateType;
     slot2: GateType;
     solved: boolean;
+    slot1Correct: boolean;
+    slot2Correct: boolean;
   };
   
   // ANC ACTIONS
@@ -65,7 +67,9 @@ export const useCtrlFreakStore = create<CtrlFreakState>((set) => ({
   logic: {
     slot1: null,
     slot2: null,
-    solved: false
+    solved: false,
+    slot1Correct: false,
+    slot2Correct: false,
   },
   
   // ANC ACTIONS
@@ -141,6 +145,9 @@ export const useCtrlFreakStore = create<CtrlFreakState>((set) => ({
     let pressure = false;   // 0
     let manualSwitch = true;// 1
     
+    let slot1Correct = false;
+    let slot2Correct = false;
+    
     // Evaluate Gate 1 (Keycard [Gate1] Pressure)
     let gate1Output = false;
     if (slot1 === 'AND') gate1Output = keycard && pressure;
@@ -158,6 +165,15 @@ export const useCtrlFreakStore = create<CtrlFreakState>((set) => ({
     // It's solved if finalOutput is true AND both slots are filled.
     const solved = finalOutput === true && slot1 !== null && slot2 !== null;
     
-    return { logic: { ...state.logic, solved } };
+    if (solved) {
+      slot1Correct = true;
+      slot2Correct = true;
+    } else {
+      // Guide the user towards intermediate 1 output
+      slot1Correct = (slot1 !== null && gate1Output === true);
+      slot2Correct = false;
+    }
+    
+    return { logic: { ...state.logic, solved, slot1Correct, slot2Correct } };
   })
 }));
