@@ -25,12 +25,12 @@ export const LogicStationUI = () => {
   const handleDrop = (e: React.DragEvent, slotNum: 1 | 2) => {
     e.preventDefault();
     const gate = e.dataTransfer.getData('gate') as GateType;
-    if (gate && ['AND', 'OR', 'NOT', 'XOR'].includes(gate)) {
+    if (gate && ['AND', 'OR', 'NAND', 'XOR'].includes(gate)) {
       setSlot(slotNum, gate);
     }
   };
 
-  const gates: GateType[] = ['AND', 'OR', 'NOT', 'XOR'];
+  const gates: GateType[] = ['AND', 'OR', 'NAND', 'XOR'];
 
   return (
     <div className="space-y-8 bg-black/60 backdrop-blur-md p-8 border-l border-[#FF3333] w-full max-w-lg pointer-events-auto">

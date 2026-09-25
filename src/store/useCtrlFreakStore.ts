@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type GateType = 'AND' | 'OR' | 'NOT' | 'XOR' | null;
+export type GateType = 'AND' | 'OR' | 'NAND' | 'XOR' | null;
 
 export interface CtrlFreakState {
   anc: {
@@ -153,14 +153,14 @@ export const useCtrlFreakStore = create<CtrlFreakState>((set) => ({
     if (slot1 === 'AND') gate1Output = keycard && pressure;
     else if (slot1 === 'OR') gate1Output = keycard || pressure;
     else if (slot1 === 'XOR') gate1Output = (keycard as boolean) !== (pressure as boolean);
-    else if (slot1 === 'NOT') gate1Output = !keycard; // Ignored pressure for NOT
+    else if (slot1 === 'NAND') gate1Output = !(keycard && pressure);
     
     // Evaluate Gate 2 (Gate1 [Gate2] ManualSwitch)
     let finalOutput = false;
     if (slot2 === 'AND') finalOutput = gate1Output && manualSwitch;
     else if (slot2 === 'OR') finalOutput = gate1Output || manualSwitch;
     else if (slot2 === 'XOR') finalOutput = (gate1Output as boolean) !== (manualSwitch as boolean);
-    else if (slot2 === 'NOT') finalOutput = !gate1Output;
+    else if (slot2 === 'NAND') finalOutput = !(gate1Output && manualSwitch);
     
     // It's solved if finalOutput is true AND both slots are filled.
     const solved = finalOutput === true && slot1 !== null && slot2 !== null;
