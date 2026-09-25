@@ -62,41 +62,44 @@ export function ControlChamber() {
       dummyC.updateMatrix();
       pillars.chaotic.push(dummyC.matrix.clone());
 
-      // Canonical: Two Colossal Robotic Hands Cupping the Core
+      // Canonical: Two Colossal Mechanical Claws Reaching Down
       const isLeft = i < 12;
-      const fingerIdx = Math.floor((i % 12) / 4); // 0, 1, 2 (Three fingers per hand)
-      const jointIdx = i % 4; // 0, 1, 2, 3 (Base to Tip)
+      const fingerIdx = Math.floor((i % 12) / 4); // 3 prongs per claw
+      const jointIdx = i % 4; // 4 segments per prong
 
       const sign = isLeft ? -1 : 1;
       
       const rig = new THREE.Object3D();
-      // Hand base position (Palms)
-      rig.position.set(sign * 55, -45, 0);
+      // Claw base position (High up in the ceiling)
+      rig.position.set(sign * 45, 95, 0);
       
-      // Splay the fingers (Spread them along the Z axis)
-      const splayAngle = (fingerIdx - 1) * 0.45; 
-      
-      // Base rotation of the hand (pointing up and slightly towards core)
-      rig.rotation.set(splayAngle, 0, sign * Math.PI / 6); 
+      // Point the base straight down, then tilt inward 22.5 degrees
+      rig.rotation.set(Math.PI, 0, -sign * Math.PI / 8); 
+
+      // Splay the 3 prongs evenly (120 degrees apart) around the Y axis
+      // Offset the right claw by 60 degrees so the fingers interlock perfectly like gears
+      const prongOffset = isLeft ? 0 : Math.PI / 3;
+      const splay = prongOffset + (fingerIdx / 3) * Math.PI * 2;
+      rig.rotateY(splay);
 
       let currentJoint = rig;
-      const jointLength = 26; // Physical length of each segment
-      const curl = sign * 0.32; // How much it curls inward per joint
+      const jointLength = 32; 
+      const curl = 0.28; // Curl inward (pitch around local X)
 
-      // Build the kinematic chain up to the current joint
+      // Build the kinematic chain
       for (let j = 0; j <= jointIdx; j++) {
         const nextJoint = new THREE.Object3D();
-        if (j > 0) {
-          nextJoint.position.set(0, jointLength, 0); // Move to end of previous
-        }
-        // Increase curl sharply on the fingertips to cage the core
-        const extraCurl = j === 3 ? sign * 0.45 : 0;
-        nextJoint.rotation.set(0, 0, curl + extraCurl);
+        if (j > 0) nextJoint.position.set(0, jointLength, 0);
+        
+        // Snapping the final segment inward sharply to form a cage
+        const extraCurl = j === 3 ? 0.45 : 0;
+        nextJoint.rotation.set(curl + extraCurl, 0, 0);
+        
         currentJoint.add(nextJoint);
         currentJoint = nextJoint;
       }
 
-      // Add visual offset to center the geometry on the joint
+      // Visual offset
       const visual = new THREE.Object3D();
       visual.position.set(0, jointLength / 2, 0);
       currentJoint.add(visual);
@@ -104,20 +107,19 @@ export function ControlChamber() {
       rig.updateMatrixWorld(true);
       
       dummyK.matrix.copy(visual.matrixWorld);
-      // We manually apply the scale since matrix copy overwrote it
-      const baseScale = new THREE.Vector3(2.5, jointLength / 80, 2.5);
-      // Taper the fingers (thinner at the tips for a claw-like look)
-      const taper = 1 - (jointIdx * 0.18); 
+      
+      // Scale and taper
+      const baseScale = new THREE.Vector3(3.0, jointLength / 80, 3.0);
+      const taper = 1 - (jointIdx * 0.15); 
       baseScale.x *= taper;
       baseScale.z *= taper;
       
-      const scaleMatrix = new THREE.Matrix4().makeScale(baseScale.x, baseScale.y, baseScale.z);
-      dummyK.matrix.multiply(scaleMatrix);
+      dummyK.matrix.multiply(new THREE.Matrix4().makeScale(baseScale.x, baseScale.y, baseScale.z));
       
       pillars.canonical.push(dummyK.matrix.clone());
     }
 
-    // 2. BEAMS (36) -> The Forearms / Floating Armor plates
+    // 2. BEAMS (36) -> The Massive Mechanical Arms Extending Upward
     for (let i = 0; i < beamCount; i++) {
       // Chaotic: Sheared and frozen mid-air far away
       const angle = (i / beamCount) * Math.PI * 2;
@@ -128,26 +130,26 @@ export function ControlChamber() {
       dummyC.updateMatrix();
       beams.chaotic.push(dummyC.matrix.clone());
 
-      // Canonical: Wrap them in a cylinder extending downward from the palm
+      // Canonical: Heavy armored cylinders extending up out of frame
       const isLeft = i < 18;
       const sign = isLeft ? -1 : 1;
       const beamIdx = i % 18;
 
       const armAngle = (beamIdx / 18) * Math.PI * 2;
-      const radius = 28;
-      const height = -65 - (beamIdx % 4) * 20; // Extending deep into the void
+      const radius = 16;
+      const height = 110 + (beamIdx % 6) * 35; // Stretching infinitely upwards
 
-      dummyK.position.set(sign * 75 + Math.cos(armAngle) * radius, height, Math.sin(armAngle) * radius);
+      dummyK.position.set(sign * 45 + Math.cos(armAngle) * radius, height, Math.sin(armAngle) * radius);
       
-      // Point them vertically but angled slightly inward to form an armored arm
-      dummyK.rotation.set(0, armAngle, sign * Math.PI / 12);
-      dummyK.scale.set(1.5, 3.5, 1.5);
+      // Point them vertically, tilt slightly inward to match arm trajectory
+      dummyK.rotation.set(0, armAngle, sign * Math.PI / 16);
+      dummyK.scale.set(1.5, 4.5, 1.5);
       
       dummyK.updateMatrix();
       beams.canonical.push(dummyK.matrix.clone());
     }
 
-    // 3. PLATFORMS (8) -> The Heavy Palms
+    // 3. PLATFORMS (8) -> The Heavy Wrist Joints
     for (let i = 0; i < platformCount; i++) {
       // Chaotic: Pushed to the ground layer far out
       const angle = (i / platformCount) * Math.PI * 2;
@@ -158,25 +160,20 @@ export function ControlChamber() {
       dummyC.updateMatrix();
       platforms.chaotic.push(dummyC.matrix.clone());
 
-      // Canonical: Palms (4 platforms stacked and curved per hand)
+      // Canonical: Stacked octagonal plates acting as the wrist joint connecting arm to claw
       const isLeft = i < 4;
       const sign = isLeft ? -1 : 1;
       const palmIdx = i % 4;
 
-      dummyK.position.set(sign * 62, -55 + palmIdx * 6, (palmIdx - 1.5) * 12);
-      // Curve them to form a bowl holding the fingers
-      dummyK.rotation.set(
-         (palmIdx - 1.5) * 0.25, 
-         0, 
-         sign * Math.PI / 5
-      );
-      dummyK.scale.set(3, 2, 4.5); // Massive thick base slabs
+      dummyK.position.set(sign * 45, 100 - (palmIdx * 4), 0);
+      dummyK.rotation.set(0, palmIdx * Math.PI / 4, -sign * Math.PI / 8); 
+      dummyK.scale.set(3.8, 1.5, 3.8); 
       
       dummyK.updateMatrix();
       platforms.canonical.push(dummyK.matrix.clone());
     }
 
-    // 4. STAIRCASES (12) -> The Claws (Split fingertips)
+    // 4. STAIRCASES (12) -> The Razor Sharp Pincer Tips
     for (let i = 0; i < stairCount; i++) {
       const angle = (i / stairCount) * Math.PI * 2;
       
@@ -188,44 +185,44 @@ export function ControlChamber() {
       dummyC.updateMatrix();
       stairs.chaotic.push(dummyC.matrix.clone());
 
-      // Canonical: 2 Claws per finger tip (6 fingers total)
+      // Canonical: 2 Pincers per claw tip
       const isLeft = i < 6;
       const sign = isLeft ? -1 : 1;
-      const fingerIdx = Math.floor((i % 6) / 2); // 0, 1, 2
+      const fingerIdx = Math.floor((i % 6) / 2); 
       const clawSide = i % 2 === 0 ? 1 : -1;
 
-      // Re-run the FK chain to the very tip (jointIdx = 3)
+      // Re-run the exact FK chain to the 4th joint
       const rig = new THREE.Object3D();
-      rig.position.set(sign * 55, -45, 0);
-      const splayAngle = (fingerIdx - 1) * 0.45; 
-      rig.rotation.set(splayAngle, 0, sign * Math.PI / 6); 
+      rig.position.set(sign * 45, 95, 0);
+      rig.rotation.set(Math.PI, 0, -sign * Math.PI / 8); 
+      
+      const prongOffset = isLeft ? 0 : Math.PI / 3;
+      rig.rotateY(prongOffset + (fingerIdx / 3) * Math.PI * 2);
 
       let currentJoint = rig;
-      const jointLength = 26; 
-      const curl = sign * 0.32; 
+      const jointLength = 32; 
+      const curl = 0.28; 
 
       for (let j = 0; j <= 3; j++) {
         const nextJoint = new THREE.Object3D();
         if (j > 0) nextJoint.position.set(0, jointLength, 0);
-        const extraCurl = j === 3 ? sign * 0.45 : 0;
-        nextJoint.rotation.set(0, 0, curl + extraCurl);
+        const extraCurl = j === 3 ? 0.45 : 0;
+        nextJoint.rotation.set(curl + extraCurl, 0, 0);
         currentJoint.add(nextJoint);
         currentJoint = nextJoint;
       }
 
-      // At the tip, add the claw visual offset
       const claw = new THREE.Object3D();
-      // Attach at very end, spread sideways to form a pincer
-      claw.position.set(0, jointLength, clawSide * 3.5); 
-      // Point the claw sharply inward towards the core
-      claw.rotation.set(0, 0, sign * Math.PI / 3); 
+      // Spread them left and right along local X axis
+      claw.position.set(clawSide * 3.5, jointLength, 0); 
+      // Pitch down, and roll inward to pinch together
+      claw.rotation.set(Math.PI / 4, 0, clawSide * Math.PI / 4); 
       currentJoint.add(claw);
 
       rig.updateMatrixWorld(true);
       
       dummyK.matrix.copy(claw.matrixWorld);
-      // stair size is 4x0.5x15. Scale Z heavily to make it a long sharp claw.
-      dummyK.matrix.multiply(new THREE.Matrix4().makeScale(1, 2, 1.2));
+      dummyK.matrix.multiply(new THREE.Matrix4().makeScale(0.8, 2.5, 1.5));
       
       stairs.canonical.push(dummyK.matrix.clone());
     }
