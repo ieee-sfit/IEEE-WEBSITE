@@ -263,36 +263,69 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       wave[i3 + 1] = waveY;
       wave[i3 + 2] = 0;
 
-      // --- SHAPE 3 (NETWORK) Pulse Field ---
-      // Central core + 3 tendrils at 120° (Frankfurt, London, Mumbai)
-      const tendrilIdx = Math.floor(i / (count / 3));
-      const tendrilAngles = [Math.PI / 3, Math.PI, Math.PI * 5 / 3]; // 60°, 180°, 300°
-      const tAngle = tendrilAngles[tendrilIdx];
-      const tProgress = Math.pow(Math.random(), 0.7); // Bias density toward center
-      const tR = tProgress * 8;
-      const baseNetX = Math.cos(tAngle) * tR;
-      const baseNetY = Math.sin(tAngle) * tR;
-      const crossAngle = Math.random() * Math.PI * 2;
-      const crossR = Math.random() * 0.5 * (1 - tProgress * 0.3);
-      network[i3]     = baseNetX + (-Math.sin(tAngle)) * Math.cos(crossAngle) * crossR;
-      network[i3 + 1] = baseNetY + Math.cos(tAngle) * Math.cos(crossAngle) * crossR;
-      network[i3 + 2] = Math.sin(crossAngle) * crossR;
+      // --- SHAPE 3 (NETWORK) Orbital Relay ---
+      // Central sphere (10%) + 3 massive orbital rings (30% each)
+      const netType = i < count * 0.1 ? 0 : Math.floor(((i - count * 0.1) / (count * 0.9)) * 3) + 1;
+      let nxBase = 0, nyBase = 0, nzBase = 0;
+      
+      if (netType === 0) {
+        // Central Core
+        const cTheta = Math.random() * 2 * Math.PI;
+        const cPhi = Math.acos(Math.random() * 2 - 1);
+        const cR = Math.random() * 1.5;
+        nxBase = cR * Math.sin(cPhi) * Math.cos(cTheta);
+        nyBase = cR * Math.sin(cPhi) * Math.sin(cTheta);
+        nzBase = cR * Math.cos(cPhi);
+      } else {
+        // Rings: 1=Frankfurt(YZ plane), 2=London(XZ plane), 3=Mumbai(XY plane)
+        const ringAngle = Math.random() * 2 * Math.PI;
+        const ringRadius = 5.0 + Math.random() * 1.0;
+        const ringThickness = Math.random() * 0.5;
+        const tx = Math.cos(ringAngle) * ringRadius;
+        const ty = Math.sin(ringAngle) * ringRadius;
+        const perp = (Math.random() - 0.5) * ringThickness;
+        
+        if (netType === 1) { // Frankfurt (YZ plane orbit) -> X is perpendicular
+          nxBase = perp; nyBase = tx; nzBase = ty;
+        } else if (netType === 2) { // London (XZ plane orbit) -> Y is perpendicular
+          nxBase = tx; nyBase = perp; nzBase = ty;
+        } else { // Mumbai (XY plane orbit) -> Z is perpendicular
+          nxBase = tx; nyBase = ty; nzBase = perp;
+        }
+      }
+      network[i3]     = nxBase;
+      network[i3 + 1] = nyBase;
+      network[i3 + 2] = nzBase;
 
       // 4. VISION (Anamorphic Shape)
       vision[i3] = 0; vision[i3+1] = 0; vision[i3+2] = 0;
 
-      // 5. THE VAULT (Logic) -> Scrambled Matrix
-      // Cubic lattice — slices slide based on gate correctness
-      const gridSize = 23; // 23^3 = 12167, enough for all particles
-      const gi = i % (gridSize * gridSize * gridSize);
-      const gx = gi % gridSize;
-      const gy = Math.floor(gi / gridSize) % gridSize;
-      const gz = Math.floor(gi / (gridSize * gridSize));
-      const gridSpacing = 0.45;
-      const halfGrid = (gridSize - 1) / 2;
-      circuit[i3]     = (gx - halfGrid) * gridSpacing + (Math.random() - 0.5) * 0.05;
-      circuit[i3 + 1] = (gy - halfGrid) * gridSpacing + (Math.random() - 0.5) * 0.05;
-      circuit[i3 + 2] = (gz - halfGrid) * gridSpacing + (Math.random() - 0.5) * 0.05;
+      // 5. THE VAULT (Logic) -> Vault Cryptex Tumblers
+      // A massive cylindrical lock mechanism with 3 depth rings
+      const vaultType = Math.floor((i / count) * 3); // 0: Outer, 1: Gate1, 2: Gate2
+      const vTheta = Math.random() * 2 * Math.PI;
+      // Introduce geometric "teeth" to the radius
+      const teeth = (Math.sin(vTheta * 12) > 0.5 ? 0.3 : 0);
+      
+      let vR = 0;
+      let vZ = 0;
+      if (vaultType === 0) {
+        // Outer static housing
+        vR = 6.0 + Math.random() * 1.0 + teeth;
+        vZ = -3.0 + Math.random() * 2.0;
+      } else if (vaultType === 1) {
+        // Middle tumbler (Gate 1)
+        vR = 4.5 + Math.random() * 1.0 + teeth;
+        vZ = -0.5 + Math.random() * 2.0;
+      } else {
+        // Inner tumbler (Gate 2)
+        vR = 3.0 + Math.random() * 1.0 + teeth;
+        vZ = 2.0 + Math.random() * 2.0;
+      }
+      
+      circuit[i3]     = Math.cos(vTheta) * vR;
+      circuit[i3 + 1] = Math.sin(vTheta) * vR;
+      circuit[i3 + 2] = vZ;
 
       // 6. RING (The Clock / 12:00)
       const angle = Math.random() * Math.PI * 2;
@@ -438,55 +471,54 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
           const net = useCtrlFreakStore.getState().network;
           
           const applyNetworkMods = (idx: number) => {
-            const tendrilIdx = Math.floor(idx / (count / 3));
-            const load = tendrilIdx === 0 ? net.frankfurt : tendrilIdx === 1 ? net.london : net.mumbai;
+            const netType = idx < count * 0.1 ? 0 : Math.floor(((idx - count * 0.1) / (count * 0.9)) * 3) + 1;
             
-            const tendrilAngles = [Math.PI / 3, Math.PI, Math.PI * 5 / 3];
-            const tAngle = tendrilAngles[tendrilIdx];
-            
-            // Stable per-particle seed
-            const rand = Math.abs(Math.sin(idx * 12.9898 + 78.233)) * 43758.5453;
-            const seed = rand - Math.floor(rand);
-            
-            // Tendril LENGTH depends directly on load — THE key visible change
-            const maxLen = (load / 100) * 8;
-            const tProgress = seed;
-            let tR = tProgress * maxLen;
-            
-            // PULSE: visible compression wave traveling outward
-            const pulseSpeed = 3.0 + (load / 30);
-            const pulseAmp = 0.8 + (load / 100) * 0.5;
-            tR += Math.sin(tProgress * 8 - t * pulseSpeed) * pulseAmp * tProgress;
-            tR = Math.max(0, tR);
-            
-            let nx = Math.cos(tAngle) * tR;
-            let ny = Math.sin(tAngle) * tR;
-            
-            // Cross-section THICKNESS scales with load
-            const crossR = net.solved ? 0.15 : (0.1 + (load / 100) * 0.8);
-            const crossSeed = ((seed * 137.5) % 1.0) * Math.PI * 2;
-            const crossDist = ((seed * 271.3) % 1.0);
-            const perpX = -Math.sin(tAngle);
-            const perpY = Math.cos(tAngle);
-            
-            nx += perpX * Math.cos(crossSeed) * crossR * crossDist;
-            ny += perpY * Math.cos(crossSeed) * crossR * crossDist;
-            let nz = Math.sin(crossSeed) * crossR * crossDist;
-            
-            // Overloaded (>70): perpendicular burst — pipe under pressure
-            if (load > 70 && !net.solved) {
-              const burst = (load - 70) / 30;
-              nx += perpX * (Math.random() - 0.5) * burst * 3.0;
-              ny += perpY * (Math.random() - 0.5) * burst * 3.0;
-              nz += (Math.random() - 0.5) * burst * 2.0;
+            // Recompute base position identically to the generator
+            let nx = 0, ny = 0, nz = 0;
+            if (netType === 0) {
+              const cTheta = Math.abs(Math.sin(idx * 12.9898)) * Math.PI * 2;
+              const cPhi = Math.acos((Math.abs(Math.sin(idx * 78.233)) * 2) - 1);
+              const cR = Math.abs(Math.sin(idx * 43.111)) * 1.5;
+              nx = cR * Math.sin(cPhi) * Math.cos(cTheta);
+              ny = cR * Math.sin(cPhi) * Math.sin(cTheta);
+              nz = cR * Math.cos(cPhi);
+            } else {
+              const load = netType === 1 ? net.frankfurt : netType === 2 ? net.london : net.mumbai;
+              const ringAngle = Math.abs(Math.sin(idx * 12.9898)) * Math.PI * 2;
+              const ringRadius = 5.0 + Math.abs(Math.sin(idx * 78.233)) * 1.0;
+              const ringThickness = Math.abs(Math.sin(idx * 43.111)) * 0.5;
+              
+              // ANIMATION: Spin the ring based on load
+              const spinSpeed = net.solved ? 2.0 : (0.2 + (load / 100) * 1.5);
+              const currentAngle = ringAngle + t * spinSpeed;
+              
+              let rMod = ringRadius;
+              let tMod = ringThickness;
+              
+              // Structural Integrity based on Load
+              if (!net.solved) {
+                if (load > 70) {
+                  // Overload: ring warps and wobbles, particles scatter
+                  rMod += Math.sin(currentAngle * 3 + t * 5) * ((load - 70) / 15);
+                  tMod += (Math.abs(Math.sin(idx * 12.9898 + t)) - 0.5) * ((load - 70) / 5);
+                } else if (load < 15) {
+                  // Underload: ring shrinks
+                  rMod *= 0.6;
+                }
+              }
+              
+              const tx = Math.cos(currentAngle) * rMod;
+              const ty = Math.sin(currentAngle) * rMod;
+              const perp = (Math.abs(Math.sin(idx * 99.999)) - 0.5) * tMod;
+              
+              if (netType === 1) { 
+                nx = perp; ny = tx; nz = ty;
+              } else if (netType === 2) { 
+                nx = tx; ny = perp; nz = ty;
+              } else { 
+                nx = tx; ny = ty; nz = perp;
+              }
             }
-            
-            // Underloaded (<15): particles cluster near center
-            if (load < 15 && !net.solved) {
-              nx *= 0.3;
-              ny *= 0.3;
-            }
-            
             return [nx, ny, nz];
           };
 
@@ -545,51 +577,71 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
           const logic = useCtrlFreakStore.getState().logic;
           
           const applyCircuitMods = (idx: number) => {
-            const gridSize = 23;
-            const gi = idx % (gridSize * gridSize * gridSize);
-            const gx = gi % gridSize;
-            const gy = Math.floor(gi / gridSize) % gridSize;
-            const gz = Math.floor(gi / (gridSize * gridSize));
-            const spacing = 0.45;
-            const halfGrid = (gridSize - 1) / 2;
+            const vaultType = Math.floor((idx / count) * 3);
+            const vTheta = Math.abs(Math.sin(idx * 12.9898)) * Math.PI * 2;
+            const teeth = (Math.sin(vTheta * 12) > 0.5 ? 0.3 : 0);
             
-            let nx = (gx - halfGrid) * spacing;
-            let ny = (gy - halfGrid) * spacing;
-            let nz = (gz - halfGrid) * spacing;
+            let vR = 0;
+            let vZ = 0;
             
-            // X-axis slices controlled by Gate 1
-            if (!logic.slot1Correct) {
-              if (logic.slot1 !== null) {
-                // Wrong gate: violent high-frequency shudder
-                const shudder = Math.sin(gx * 3.7 + t * 8) * 1.5 + (Math.random() - 0.5) * 1.0;
-                ny += shudder;
+            if (vaultType === 0) {
+              // Outer static housing
+              vR = 6.0 + Math.abs(Math.sin(idx * 78.233)) * 1.0 + teeth;
+              vZ = -3.0 + Math.abs(Math.sin(idx * 43.111)) * 2.0;
+            } else if (vaultType === 1) {
+              // Middle tumbler (Gate 1)
+              vR = 4.5 + Math.abs(Math.sin(idx * 78.233)) * 1.0 + teeth;
+              vZ = -0.5 + Math.abs(Math.sin(idx * 43.111)) * 2.0;
+            } else {
+              // Inner tumbler (Gate 2)
+              vR = 3.0 + Math.abs(Math.sin(idx * 78.233)) * 1.0 + teeth;
+              vZ = 2.0 + Math.abs(Math.sin(idx * 43.111)) * 2.0;
+            }
+            
+            let rotOffset = 0;
+            let zOffset = 0;
+            
+            // ANIMATION LOGIC
+            if (vaultType === 1) {
+              if (logic.solved) {
+                rotOffset = 0; // locked
+                zOffset = -3.0; // pull apart
+              } else if (logic.slot1Correct) {
+                rotOffset = 0; // locked perfectly
+              } else if (logic.slot1 !== null) {
+                // Wrong gate: violently jamming
+                rotOffset = (t * 0.5) + (Math.sin(t * 30) * 0.05); 
+                vR += (Math.abs(Math.sin(idx * 12.9898 + t)) - 0.5) * 0.3; // slight radius jitter from grinding
               } else {
-                // No gate: gentle sliding oscillation
-                const slide = Math.sin(gx * 0.8 + t * 2.0) * 1.8;
-                ny += slide;
+                // No gate: searching
+                rotOffset = t * 0.8;
               }
             }
             
-            // Y-axis slices controlled by Gate 2
-            if (!logic.slot2Correct) {
-              if (logic.slot2 !== null) {
-                // Wrong gate: violent shudder on perpendicular axis
-                const shudder = Math.sin(gy * 2.9 + t * 7) * 1.5 + (Math.random() - 0.5) * 1.0;
-                nx += shudder;
+            if (vaultType === 2) {
+              if (logic.solved) {
+                rotOffset = 0; // locked
+                zOffset = 3.0; // pull apart
+              } else if (logic.slot2Correct) {
+                rotOffset = 0; // locked perfectly
+              } else if (logic.slot2 !== null) {
+                // Wrong gate: violently jamming
+                rotOffset = -(t * 0.6) + (Math.sin(t * 35) * 0.05); 
+                vR += (Math.abs(Math.sin(idx * 78.233 + t)) - 0.5) * 0.3;
               } else {
-                // No gate: gentle sliding oscillation
-                const slide = Math.sin(gy * 0.6 + t * 2.5) * 1.8;
-                nx += slide;
+                // No gate: searching in opposite direction
+                rotOffset = -t * 0.7;
               }
             }
             
-            // Solved: compress into dense glowing core with a breathing pulse
-            if (logic.solved) {
-              const pulse = 0.4 + Math.sin(t * 3) * 0.1;
-              nx *= pulse;
-              ny *= pulse;
-              nz *= pulse;
+            if (vaultType === 0 && logic.solved) {
+               zOffset = -6.0; // Outer shell moves back too
             }
+            
+            const finalTheta = vTheta + rotOffset;
+            const nx = Math.cos(finalTheta) * vR;
+            const ny = Math.sin(finalTheta) * vR;
+            const nz = vZ + zOffset;
             
             return [nx, ny, nz];
           };
