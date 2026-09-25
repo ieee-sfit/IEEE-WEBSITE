@@ -74,28 +74,33 @@ export function ControlChamber() {
       
       if (fingerIdx === 0) {
         // Thumb (comes from the bottom/front of palm to wrap around the back)
-        rig.position.set(sign * 8, -6, 5);
-        rig.rotation.set(0, sign * Math.PI / 2, 0); 
-        rig.rotateZ(-1.0); // Angle up heavily
-        rig.rotateY(sign * 0.6); // Point backwards towards the core
+        rig.position.set(sign * 7, -6, 2);
+        // Base points UP and INWARD
+        rig.rotation.set(0, 0, sign * Math.PI / 4); 
+        // Angle thumb to point backward towards camera (yaw)
+        rig.rotateY(sign * Math.PI / 4);
       } else {
-        // Top, Mid, Bottom fingers wrapping from the back to the front
-        rig.position.set(sign * 11, (fingerIdx - 2) * 7, -6);
-        rig.rotation.set(0, sign * Math.PI / 2, 0);
+        // 3 Fingers wrapping from the top back to the front
+        const zSpread = (fingerIdx - 2) * 5.5; // Spread along Z axis (depth)
+        rig.position.set(sign * 10, 9, zSpread - 3);
         
-        // Spread vertically to grip the top and bottom of the core like a burger
-        const splay = (fingerIdx - 2) * 0.55;
+        // Base points DOWN and INWARD towards the core
+        rig.rotation.set(0, 0, sign * 3 * Math.PI / 4);
+        
+        // Splay them slightly like a fan
+        const splay = (fingerIdx - 2) * 0.15;
         rig.rotateZ(splay);
       }
 
       let currentJoint = rig;
       const jointLength = 12; // massive thick fingers
-      const curl = fingerIdx === 0 ? 0.45 : 0.65; // heavy inward curl
+      const curl = fingerIdx === 0 ? 0.45 : 0.55; 
 
       for (let j = 0; j <= jointIdx; j++) {
         const nextJoint = new THREE.Object3D();
         if (j > 0) nextJoint.position.set(0, jointLength, 0);
-        nextJoint.rotation.set(curl, 0, 0); 
+        // Curl inwards towards the core (bend around local Z axis)
+        nextJoint.rotation.set(0, 0, sign * curl); 
         currentJoint.add(nextJoint);
         currentJoint = nextJoint;
       }
@@ -149,8 +154,6 @@ export function ControlChamber() {
       const bundleRadius = THREE.MathUtils.lerp(18, 5, tStart);
       const bAngle = (bundleIdx / 6) * Math.PI * 2;
       
-      dummyK.position.copy(mid);
-      
       const tempRig = new THREE.Object3D();
       tempRig.position.copy(mid);
       tempRig.lookAt(pEnd);
@@ -161,12 +164,12 @@ export function ControlChamber() {
       
       dummyK.position.copy(tempRig.position);
       
-      // Align the cylinder along the arm path
-      tempRig.rotateX(Math.PI / 2);
+      // Re-target to align exactly with the path flow
+      tempRig.lookAt(pEnd);
+      // Beam base geometry is long along X (40x2x2). We must rotate Y by 90deg to align X to Z.
+      tempRig.rotateY(Math.PI / 2);
       
       dummyK.rotation.copy(tempRig.rotation);
-      // Scale based on the segment length. Distance between pStart and pEnd is ~55. 
-      // Beam native length is 40. Scale Y by 55/40 = 1.37
       dummyK.scale.set(1.5, 1.4, 1.5); 
       
       dummyK.updateMatrix();
@@ -189,24 +192,20 @@ export function ControlChamber() {
       const sign = isLeft ? -1 : 1;
       const plateIdx = i % 4;
       
-      // Central wrist base
-      const rig = new THREE.Object3D();
-      rig.position.set(sign * 16, 0, -10);
-      rig.rotation.set(0, sign * Math.PI / 2, 0); // Faces inward
+      const yOffset = (plateIdx - 1.5) * 4.5;
+      dummyK.position.set(sign * 14, yOffset, -10);
       
-      // Offset and curve the plates to form a cup
-      rig.translateZ((plateIdx - 1.5) * 4); // Spread them vertically
-      rig.translateX(-2); // Push them forward towards the fingers
+      // Base rotation: flat plate normal is Y. We want it to face X (inward towards the core).
+      dummyK.rotation.set(0, 0, sign * Math.PI / 2);
       
-      // Curve them around the X axis to cup the core
-      rig.rotateX((plateIdx - 1.5) * 0.3);
+      // Now tilt them up/down to form a cup. The top plates tilt down, bottom tilt up.
+      const pitch = (plateIdx - 1.5) * 0.25;
+      dummyK.rotateX(pitch);
       
-      // Tilt them forward slightly
-      rig.rotateZ(0.2);
+      // Curve around the core slightly (yaw)
+      dummyK.rotateY(sign * 0.2);
       
-      dummyK.position.copy(rig.position);
-      dummyK.rotation.copy(rig.rotation);
-      dummyK.scale.set(4, 1.5, 4);
+      dummyK.scale.set(3, 1.5, 4);
       
       dummyK.updateMatrix();
       platforms.canonical.push(dummyK.matrix.clone());
@@ -235,45 +234,49 @@ export function ControlChamber() {
         
         const rig = new THREE.Object3D();
         if (fingerIdx === 0) {
-          rig.position.set(sign * 8, -6, 5);
-          rig.rotation.set(0, sign * Math.PI / 2, 0); 
-          rig.rotateZ(-1.0);
-          rig.rotateY(sign * 0.6);
+          rig.position.set(sign * 7, -6, 2);
+          rig.rotation.set(0, 0, sign * Math.PI / 4);
+          rig.rotateY(sign * Math.PI / 4);
         } else {
-          rig.position.set(sign * 11, (fingerIdx - 2) * 7, -6);
-          rig.rotation.set(0, sign * Math.PI / 2, 0);
-          rig.rotateZ((fingerIdx - 2) * 0.55);
+          const zSpread = (fingerIdx - 2) * 5.5; 
+          rig.position.set(sign * 10, 9, zSpread - 3);
+          rig.rotation.set(0, 0, sign * 3 * Math.PI / 4);
+          rig.rotateZ((fingerIdx - 2) * 0.15);
         }
 
         let currentJoint = rig;
         const jointLength = 12;
-        const curl = fingerIdx === 0 ? 0.45 : 0.65;
+        const curl = fingerIdx === 0 ? 0.45 : 0.55;
 
         for (let j = 0; j <= 2; j++) {
           const nextJoint = new THREE.Object3D();
           if (j > 0) nextJoint.position.set(0, jointLength, 0);
-          nextJoint.rotation.set(curl, 0, 0);
+          nextJoint.rotation.set(0, 0, sign * curl);
           currentJoint.add(nextJoint);
           currentJoint = nextJoint;
         }
 
         const claw = new THREE.Object3D();
         claw.position.set(0, jointLength, 0); 
-        claw.rotation.set(0.6, 0, 0); // dig sharply into the core
+        // Snap the claw inward sharply
+        claw.rotation.set(0, 0, sign * 0.75); 
         currentJoint.add(claw);
 
         rig.updateMatrixWorld(true);
-        
         const m = new THREE.Matrix4();
         m.copy(claw.matrixWorld);
-        m.multiply(new THREE.Matrix4().makeScale(0.8, 1.5, 0.8));
+        
+        // Stairs are 4 x 0.5 x 15 (Long along Z). 
+        // Fingers are aligned along Y. We align the stair to point along Y.
+        m.multiply(new THREE.Matrix4().makeRotationX(Math.PI / 2));
+        m.multiply(new THREE.Matrix4().makeScale(0.6, 1.5, 0.6));
         dummyK.matrix.copy(m);
       } else {
         // 2 Knuckle armor plates on the back of the palm
         const knuckleIdx = localI - 4;
         dummyK.position.set(sign * 18, knuckleIdx === 0 ? 6 : -6, -12);
         // Angled to cover the wrist joint
-        dummyK.rotation.set(0, sign * (Math.PI / 2 + 0.3), 0);
+        dummyK.rotation.set(0, 0, sign * Math.PI / 2);
         dummyK.rotateX(knuckleIdx === 0 ? 0.4 : -0.4);
         dummyK.scale.set(1.5, 2.5, 1.5);
         
