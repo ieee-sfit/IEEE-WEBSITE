@@ -25,7 +25,7 @@ export function ControlChamber() {
 
   // Vocabulary limits
   const pillarCount = 24;
-  const conduitCount = Math.floor(pillarCount / 3);
+  const conduitCount = 4; // Drastically reduced for organic rarity
   const beamCount = 36;
   const platformCount = 8;
   const stairCount = 12;
@@ -38,7 +38,7 @@ export function ControlChamber() {
   // Load PCB Texture
   const pcbTexture = useTexture('/textures/pcb_trace.jpg');
   pcbTexture.wrapS = pcbTexture.wrapT = THREE.RepeatWrapping;
-  pcbTexture.repeat.set(1, 10); // Repeat vertically to prevent stretching
+  pcbTexture.repeat.set(1, 3); // Reduced from 10 to 3 to make traces visible and organic
 
   useEffect(() => {
     if (!pillarRef.current || !beamRef.current || !platformRef.current || !stairRef.current) return;
@@ -62,11 +62,11 @@ export function ControlChamber() {
       dummy.rotation.set(0, angle, 0); 
       const pScaleY = 1.5 + Math.random() * 1.5;
       
-      // Make every 3rd pillar a PCB Conduit Pillar
-      if (i % 3 === 0 && conduitRef.current) {
+      // Make a select few pillars into PCB Conduits
+      if (i < conduitCount && conduitRef.current) {
         dummy.scale.set(1, pScaleY, 1);
         dummy.updateMatrix();
-        conduitRef.current.setMatrixAt(Math.floor(i / 3), dummy.matrix);
+        conduitRef.current.setMatrixAt(i, dummy.matrix);
         
         // Hide the normal pillar for this index to prevent Z-fighting
         dummy.scale.set(0, 0, 0);
@@ -215,26 +215,32 @@ export function ControlChamber() {
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
-      {/* LIGHTING: Re-boosted baseline for visibility */}
+      {/* LIGHTING: Restored Bright Baseline */}
       
-      <ambientLight intensity={0.3} />
-      <hemisphereLight groundColor="#000000" color="#222222" intensity={0.3} />
+      {/* Global Illumination */}
+      <ambientLight intensity={0.2} />
+      <hemisphereLight groundColor="#000000" color="#222222" intensity={0.4} />
       
-      {/* A strong directional rim light to give the outer pillars 3D shape */}
+      {/* Global architectural fill lights so background pillars don't vanish entirely */}
       <directionalLight 
-        position={[20, 80, -40]} 
-        intensity={0.8} 
-        color="#88aacc" 
+        position={[-50, 40, -30]} 
+        intensity={0.6} 
+        color="#ffffff" 
+      />
+      <directionalLight 
+        position={[50, -20, 30]} 
+        intensity={0.4} 
+        color="#88ccff" 
       />
       
-      {/* Localized Dramatic Lights (These decay and intensely light up the core) */}
+      {/* Key spotlight shining down and angled slightly */}
       <spotLight 
-        position={[0, 80, 20]} 
-        intensity={ancSolved ? 4000 : 2000} 
+        position={[20, 80, 40]} 
+        intensity={ancSolved ? 4000 : 1500} 
         color="#ffffff" 
-        angle={Math.PI / 4}
-        penumbra={0.8}
-        distance={250}
+        angle={Math.PI / 6}
+        penumbra={0.5}
+        distance={200}
       />
       
       {/* Emergency Lockdown Light: Harsh red pool */}
