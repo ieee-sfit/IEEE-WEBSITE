@@ -42,11 +42,15 @@ export function ControlChamber() {
       const angle = (i / pillarCount) * Math.PI * 2;
       const radius = 70 + Math.random() * 20; // Expanded perimeter
       
-      dummy.position.set(
-        Math.cos(angle) * radius,
-        -20 + Math.random() * 40, 
-        Math.sin(angle) * radius
-      );
+      let px = Math.cos(angle) * radius;
+      let pz = Math.sin(angle) * radius;
+      
+      // Clear the runway for the camera's intro push-through (X near 0, Z > 60)
+      if (Math.abs(px) < 15 && pz > 50) {
+         px += (px >= 0 ? 25 : -25);
+      }
+      
+      dummy.position.set(px, -20 + Math.random() * 40, pz);
       dummy.rotation.set(0, angle, 0); 
       dummy.scale.set(1, 1.5 + Math.random() * 1.5, 1); // Taller pillars
       
@@ -57,11 +61,15 @@ export function ControlChamber() {
 
     // 2. BEAMS (The Structure)
     for (let i = 0; i < beamCount; i++) {
-      dummy.position.set(
-        (Math.random() - 0.5) * 120, // Wider spread
-        -30 + Math.random() * 100, // Higher vertical spread
-        (Math.random() - 0.5) * 120
-      );
+      let bx = (Math.random() - 0.5) * 120; // Wider spread
+      let bz = (Math.random() - 0.5) * 120;
+      
+      // Clear runway
+      if (Math.abs(bx) < 15 && bz > 50) {
+         bx += (bx >= 0 ? 25 : -25);
+      }
+      
+      dummy.position.set(bx, -30 + Math.random() * 100, bz);
       
       // Mostly orthographic rotations (0, 90, 180 deg)
       dummy.rotation.set(
@@ -70,7 +78,7 @@ export function ControlChamber() {
         0
       );
       
-      // ESCHER RULE: 2 impossible beams that cross at strange vertical angles defying gravity/structure
+      // ESCHER RULE: 2 impossible beams that cross at strange vertical angles
       if (i < 2) {
          dummy.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
       }
@@ -86,6 +94,7 @@ export function ControlChamber() {
       const angle = (i / platformCount) * Math.PI * 2;
       const radius = 25 + Math.random() * 10;
       
+      // Platforms are generally closer to center (radius ~25-35), so they shouldn't block Z>50
       dummy.position.set(
         Math.cos(angle) * radius,
         -15 + (i * 8), // Staggered upwards
@@ -105,11 +114,15 @@ export function ControlChamber() {
       const angle = (i / stairCount) * Math.PI * 2;
       const radius = 50 + Math.random() * 10; // Pushed outward
       
-      dummy.position.set(
-        Math.cos(angle) * radius,
-        -20 + (i * 8),
-        Math.sin(angle) * radius
-      );
+      let sx = Math.cos(angle) * radius;
+      let sz = Math.sin(angle) * radius;
+      
+      // Clear runway
+      if (Math.abs(sx) < 15 && sz > 50) {
+         sx += (sx >= 0 ? 25 : -25);
+      }
+      
+      dummy.position.set(sx, -20 + (i * 8), sz);
       
       // Slope the box to look like a staircase silhouette
       const slope = Math.PI / 4; // 45 degrees
