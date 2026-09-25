@@ -6,7 +6,6 @@ import { GLTFExporter } from 'three-stdlib';
 import { MotionValue } from 'framer-motion';
 import { ControlChamber } from './ControlChamber';
 import { useCtrlFreakStore } from '../../store/useCtrlFreakStore';
-import { EffectComposer, Bloom, Vignette, Noise } from '@react-three/postprocessing';
 
 
 const generateTextPoints = (text: string, count: number): Float32Array => {
@@ -805,27 +804,16 @@ export const SystemCore = ({ scrollProgress }: { scrollProgress: MotionValue<num
       <Canvas camera={{ position: [0, 50, 80], fov: 45 }}>
         <SceneExporter />
         <color attach="background" args={['#050505']} />
+        <ambientLight intensity={0.5} />
         
         {/* Phase 0: The Architectural Prototype */}
-        <ControlChamber scrollProgress={scrollProgress} />
+        <ControlChamber />
         
         {/* Phase 1: The Field (6,000 particles) */}
         <ParticleSystem scrollProgress={scrollProgress} />
 
         {/* Phase 2: Camera Choreography */}
         <CameraRig scrollProgress={scrollProgress} />
-        
-        {/* Post-Processing: Cinematic Bloom & Film Grain */}
-        <EffectComposer>
-          <Bloom 
-            intensity={0.6} 
-            luminanceThreshold={0.4}
-            luminanceSmoothing={0.9} 
-            mipmapBlur 
-          />
-          <Vignette eskil={false} offset={0.3} darkness={0.6} />
-          <Noise opacity={0.025} />
-        </EffectComposer>
       </Canvas>
     </div>
   );

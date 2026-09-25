@@ -1,8 +1,6 @@
-import { useRef, useEffect, useMemo } from 'react';
+import { useRef, useEffect } from 'react';
 import * as THREE from 'three';
 import { useCtrlFreakStore } from '../../store/useCtrlFreakStore';
-import { useFrame } from '@react-three/fiber';
-import { MotionValue } from 'framer-motion';
 
 // Procedural Vocabulary Geometry Sizes
 const PILLAR_SIZE: [number, number, number] = [3, 80, 3];
@@ -10,32 +8,14 @@ const BEAM_SIZE: [number, number, number] = [40, 2, 2];
 const PLATFORM_SIZE: [number, number, number] = [12, 1, 12];
 const STAIR_SIZE: [number, number, number] = [4, 0.5, 15]; // Represented as a slanted box for silhouette
 
-// The single, flat, dark concrete material
+// The single, flat, dark concrete material (as requested, no heavy textures yet)
 const brutalistMaterial = new THREE.MeshStandardMaterial({
   color: '#1a1a1a',
   roughness: 0.9,
   metalness: 0.1,
 });
 
-// Thin emissive tube/line meshes tracing a right-angle path up a pillar face
-function CircuitTrace({ color, pathPoints }: { color: string, pathPoints: [number, number, number][] }) {
-  const curve = useMemo(() => new THREE.CatmullRomCurve3(
-    pathPoints.map(p => new THREE.Vector3(...p))
-  ), [pathPoints]);
-  
-  return (
-    <mesh>
-      <tubeGeometry args={[curve, 64, 0.1, 8, false]} />
-      <meshStandardMaterial 
-        color="#111111" 
-        emissive={color} 
-        emissiveIntensity={2.5} 
-      />
-    </mesh>
-  );
-}
-
-export function ControlChamber({ scrollProgress }: { scrollProgress: MotionValue<number> }) {
+export function ControlChamber() {
   const pillarRef = useRef<THREE.InstancedMesh>(null);
   const beamRef = useRef<THREE.InstancedMesh>(null);
   const platformRef = useRef<THREE.InstancedMesh>(null);
@@ -51,30 +31,6 @@ export function ControlChamber({ scrollProgress }: { scrollProgress: MotionValue
   const ancSolved = useCtrlFreakStore(s => s.anc.solved);
   const networkSolved = useCtrlFreakStore(s => s.network.solved);
   const logicSolved = useCtrlFreakStore(s => s.logic.solved);
-
-  const hemiRef = useRef<THREE.HemisphereLight>(null);
-
-  // Color-script the whole environment to the narrative
-  const stationColors = useMemo(() => [
-    new THREE.Color('#ffffff'), // 0: Start/ANC
-    new THREE.Color('#3388ff'), // 1: Network
-    new THREE.Color('#ffaa00'), // 2: Vision
-    new THREE.Color('#ff3333'), // 3: Logic
-  ], []);
-
-  useFrame(() => {
-    if (!hemiRef.current) return;
-    const p = scrollProgress.get();
-    
-    // Determine target color based on scroll segments
-    let targetColor = stationColors[0];
-    if (p > 0.7) targetColor = stationColors[3];
-    else if (p > 0.45) targetColor = stationColors[2];
-    else if (p > 0.25) targetColor = stationColors[1];
-    
-    // Smoothly lerp the hemisphere light color
-    hemiRef.current.color.lerp(targetColor, 0.05);
-  });
 
   useEffect(() => {
     if (!pillarRef.current || !beamRef.current || !platformRef.current || !stairRef.current) return;
@@ -187,15 +143,24 @@ export function ControlChamber({ scrollProgress }: { scrollProgress: MotionValue
 
   return (
     <group>
-      {/* 1. Kill the grid, give the floor real material */}
+      {/* Floor & Deep Void */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -60, 0]}>
-        <planeGeometry args={[400, 400]} />
-        <meshStandardMaterial 
-          color="#0a0a0a" 
-          roughness={0.35} 
-          metalness={0.6} 
-          envMapIntensity={0.4}
-        />
+        <circleGeometry args={[250, 32]} />
+        <meshStandardMaterial color="#050505" roughness={1} />
+      </mesh>
+      
+      {/* Subtle Structural Floor Rings */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -59.9, 0]}>
+        <ringGeometry args={[80, 82, 64]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.03} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -59.9, 0]}>
+        <ringGeometry args={[140, 142, 64]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.02} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -59.9, 0]}>
+        <ringGeometry args={[200, 205, 64]} />
+        <meshBasicMaterial color="#ff3333" transparent opacity={0.02} />
       </mesh>
       
       {/* The Monolith (Initial Camera Occlusion for Intro Reveal) */}
@@ -226,64 +191,44 @@ export function ControlChamber({ scrollProgress }: { scrollProgress: MotionValue
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
-      {/* 4. PCB Traces — sparse, pointing toward the core */}
-      <group>
-        {/* Trace on ANC pillar pointing to center */}
-        <CircuitTrace color="#ffffff" pathPoints={[
-          [-23.5, 40, 13.5],
-          [-23.5, 0, 13.5],
-          [-23.5, 0, 0],
-          [-10, 0, 0]
-        ]} />
-        
-        {/* Trace on Network pillar */}
-        <CircuitTrace color="#3388ff" pathPoints={[
-          [23.5, -40, 18.5],
-          [23.5, -15, 18.5],
-          [23.5, -15, 0],
-          [10, -15, 0]
-        ]} />
-        
-        {/* Trace on Logic pillar */}
-        <CircuitTrace color="#ff3333" pathPoints={[
-          [-18.5, 30, -18.5],
-          [-18.5, 10, -18.5],
-          [-18.5, 10, 0],
-          [-10, 10, 0]
-        ]} />
-      </group>
-
-      {/* 2. Replace ambient wash with motivated light pools */}
-      {/* No ambientLight, allowing shadows to actually be black before rim light hits */}
+      {/* Basic Architecture Lighting (No real-time shadows yet) */}
+      <ambientLight intensity={0.1} />
       
-      {/* Color-scripted Hemisphere for the dark-to-light gradient (replaces ambient) */}
-      <hemisphereLight 
-        ref={hemiRef}
-        groundColor="#000000" 
+      {/* Key spotlight shining down and angled slightly to give the pillars bright faces */}
+      <directionalLight 
+        position={[20, 80, 40]} 
+        intensity={ancSolved ? 3.5 : 2.5} 
         color="#ffffff" 
-        intensity={0.15} 
       />
-
-      {[
-        { pos: [-25, -5, 15], color: '#ffffff', station: 'anc', solved: ancSolved }, 
-        { pos: [25, -10, 20], color: '#3388ff', station: 'network', solved: networkSolved }, 
-        { pos: [30, 15, -5], color: '#ffaa00', station: 'vision', solved: false },   
-        { pos: [-20, 10, -20], color: '#ff3333', station: 'logic', solved: logicSolved }, 
-      ].map((l, i) => (
-        <spotLight
-          key={i}
-          position={l.pos as [number, number, number]}
-          angle={0.45}
-          penumbra={0.6}
-          intensity={l.solved ? 800 : 300} // Increase intensity to match 'physical' PBR falloff
-          color={l.color}
-          distance={100}
-          decay={1.5}
-        />
-      ))}
       
-      {/* 6. FogExp2 for tighter falloff */}
-      <fogExp2 attach="fog" args={['#030303', 0.018]} />
+      {/* Harsh stark rim light from the opposite side (Emergency Lockdown) */}
+      <directionalLight 
+        position={[-50, 20, -50]} 
+        intensity={logicSolved ? 0.2 : 1.0} 
+        color="#ff3333" 
+      />
+      
+      {/* Secondary stark blue/white rim light to create cinematic contrast (Data Infrastructure) */}
+      <directionalLight 
+        position={[60, 0, -20]} 
+        intensity={networkSolved ? 2.5 : 1.5} 
+        color="#88ccff" 
+      />
+      
+      <hemisphereLight groundColor="#000000" color="#222222" intensity={0.3} />
+      
+      {/* Tiny red emissive strips (Floating warning lamps) */}
+      <mesh position={[-25, 15, -15]}>
+         <boxGeometry args={[6, 0.2, 0.2]} />
+         <meshStandardMaterial color="#330000" emissive="#ff1111" emissiveIntensity={5} />
+      </mesh>
+      <mesh position={[35, 5, -25]} rotation={[0, Math.PI/4, 0]}>
+         <boxGeometry args={[4, 0.2, 0.2]} />
+         <meshStandardMaterial color="#002233" emissive="#00ddff" emissiveIntensity={5} />
+      </mesh>
+      
+      {/* Dense fog pushed back to create cinematic atmosphere */}
+      <fog attach="fog" args={['#050505', 40, 180]} />
     </group>
   );
 }
