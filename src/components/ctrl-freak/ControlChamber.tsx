@@ -8,9 +8,9 @@ const BEAM_SIZE: [number, number, number] = [40, 2, 2];
 const PLATFORM_SIZE: [number, number, number] = [12, 1, 12];
 const STAIR_SIZE: [number, number, number] = [4, 0.5, 15]; // Represented as a slanted box for silhouette
 
-// The single, flat, dark concrete material (as requested, no heavy textures yet)
+// The single, flat, dark concrete material
 const brutalistMaterial = new THREE.MeshStandardMaterial({
-  color: '#17191c',
+  color: '#ffffff', // Base white to multiply with instance colors
   roughness: 0.82,
   metalness: 0.05,
   emissive: '#050609',
@@ -140,6 +140,39 @@ export function ControlChamber() {
       stairRef.current.setMatrixAt(i, dummy.matrix);
     }
     stairRef.current.instanceMatrix.needsUpdate = true;
+
+    // 5. Instanced Color Variation (Depth-based Tonal Hierarchy)
+    const applyDepthColor = (ref: React.RefObject<THREE.InstancedMesh>, count: number) => {
+      if (!ref.current) return;
+      const tempMatrix = new THREE.Matrix4();
+      const position = new THREE.Vector3();
+      const cForeground = new THREE.Color('#1d2024');
+      const cMidground = new THREE.Color('#15171a');
+      const cBackground = new THREE.Color('#101113');
+      
+      for (let i = 0; i < count; i++) {
+        ref.current.getMatrixAt(i, tempMatrix);
+        position.setFromMatrixPosition(tempMatrix);
+        
+        // Calculate distance from center (0,0,0)
+        const dist = position.length();
+        
+        let color = cMidground;
+        if (dist < 40) color = cForeground; // Closer objects are slightly brighter
+        else if (dist > 80) color = cBackground; // Far objects fade into the void
+        
+        // Add tiny bit of random variation so no two blocks are perfectly identical (~2% lightness variance)
+        const varColor = color.clone().offsetHSL(0, 0, (Math.random() - 0.5) * 0.02);
+        
+        ref.current.setColorAt(i, varColor);
+      }
+      ref.current.instanceColor!.needsUpdate = true;
+    };
+
+    applyDepthColor(pillarRef, pillarCount);
+    applyDepthColor(beamRef, beamCount);
+    applyDepthColor(platformRef, platformCount);
+    applyDepthColor(stairRef, stairCount);
 
   }, []);
 

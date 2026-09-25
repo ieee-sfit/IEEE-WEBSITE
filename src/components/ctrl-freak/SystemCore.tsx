@@ -8,6 +8,40 @@ import { ControlChamber } from './ControlChamber';
 import { useCtrlFreakStore } from '../../store/useCtrlFreakStore';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 
+const AmbientDust = () => {
+  const pointsRef = useRef<THREE.Points>(null);
+  const count = 400; // Sparse field of dust
+  
+  const positions = useMemo(() => {
+    const arr = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      arr[i * 3] = (Math.random() - 0.5) * 250; // X spread
+      arr[i * 3 + 1] = -40 + Math.random() * 120; // Y spread (mostly lower/mid room)
+      arr[i * 3 + 2] = (Math.random() - 0.5) * 250; // Z spread
+    }
+    return arr;
+  }, []);
+  
+  useFrame((state) => {
+    if (!pointsRef.current) return;
+    pointsRef.current.rotation.y = state.clock.elapsedTime * 0.01;
+    pointsRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.05) * 0.1;
+  });
+  
+  return (
+    <Points ref={pointsRef} positions={positions} stride={3} frustumCulled={false}>
+      <PointMaterial 
+        transparent 
+        color="#ffffff" 
+        size={0.25} 
+        sizeAttenuation={true} 
+        depthWrite={false} 
+        blending={THREE.AdditiveBlending} 
+        opacity={0.3} 
+      />
+    </Points>
+  );
+};
 
 const generateTextPoints = (text: string, count: number): Float32Array => {
   const canvas = document.createElement('canvas');
@@ -812,6 +846,9 @@ export const SystemCore = ({ scrollProgress }: { scrollProgress: MotionValue<num
         
         {/* Phase 1: The Field (6,000 particles) */}
         <ParticleSystem scrollProgress={scrollProgress} />
+
+        {/* Phase 1.5: Ambient Data Motes / Space Dust */}
+        <AmbientDust />
 
         {/* Phase 2: Camera Choreography */}
         <CameraRig scrollProgress={scrollProgress} />
