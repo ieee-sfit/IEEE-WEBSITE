@@ -802,7 +802,7 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
       new THREE.Vector3(35, -5, 20),   // 0.5: Station 2 (Right Lower)
       new THREE.Vector3(30, 25, -20),  // 0.65: Station 3 (Right High)
       new THREE.Vector3(-20, 15, -20), // 0.8: Station 4 (Back Left High)
-      new THREE.Vector3(0, -6, 28),    // 1.0: Final Clock (Dipped Low, looking UP at the massive Boss Entity)
+      new THREE.Vector3(0, 0, 35),     // 1.0: Final Clock (Straight ahead, eye-level with the massive hands)
     ], false, 'catmullrom', 0.5);
   }, []);
 
@@ -826,9 +826,8 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
     // Smoothly lerp the camera towards the target position
     state.camera.position.lerp(targetPosition, 0.05);
     
-    // Adjust lookAt based on scroll progress to reveal the entity behind the core
-    const lookAtY = THREE.MathUtils.lerp(0, 5, progress);
-    state.camera.lookAt(0, lookAtY, 0);
+    // Always look directly at the core (0, 0, 0)
+    state.camera.lookAt(0, 0, 0);
   });
 
   return null;
