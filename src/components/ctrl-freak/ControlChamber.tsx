@@ -1,6 +1,7 @@
 import { useRef, useEffect } from 'react';
 import * as THREE from 'three';
 import { useCtrlFreakStore } from '../../store/useCtrlFreakStore';
+import { useTexture } from '@react-three/drei';
 
 // Procedural Vocabulary Geometry Sizes
 const PILLAR_SIZE: [number, number, number] = [3, 80, 3];
@@ -34,6 +35,11 @@ export function ControlChamber() {
   const networkSolved = useCtrlFreakStore(s => s.network.solved);
   const logicSolved = useCtrlFreakStore(s => s.logic.solved);
 
+  // Load PCB Texture
+  const pcbTexture = useTexture('/textures/pcb_trace.jpg');
+  pcbTexture.wrapS = pcbTexture.wrapT = THREE.RepeatWrapping;
+  pcbTexture.repeat.set(1, 10); // Repeat vertically to prevent stretching
+
   useEffect(() => {
     if (!pillarRef.current || !beamRef.current || !platformRef.current || !stairRef.current) return;
 
@@ -55,17 +61,21 @@ export function ControlChamber() {
       dummy.position.set(px, -20 + Math.random() * 40, pz);
       dummy.rotation.set(0, angle, 0); 
       const pScaleY = 1.5 + Math.random() * 1.5;
-      dummy.scale.set(1, pScaleY, 1); // Taller pillars
       
-      dummy.updateMatrix();
-      pillarRef.current.setMatrixAt(i, dummy.matrix);
-      
-      // Add a neon conduit to every 3rd pillar
+      // Make every 3rd pillar a PCB Conduit Pillar
       if (i % 3 === 0 && conduitRef.current) {
-        dummy.scale.set(0.05, pScaleY * 0.8, 0.05); // Thin strip
-        dummy.position.set(px + 1.6, dummy.position.y, pz + 1.6); // Attach to corner
+        dummy.scale.set(1, pScaleY, 1);
         dummy.updateMatrix();
         conduitRef.current.setMatrixAt(Math.floor(i / 3), dummy.matrix);
+        
+        // Hide the normal pillar for this index to prevent Z-fighting
+        dummy.scale.set(0, 0, 0);
+        dummy.updateMatrix();
+        pillarRef.current.setMatrixAt(i, dummy.matrix);
+      } else {
+        dummy.scale.set(1, pScaleY, 1); // Normal pillar
+        dummy.updateMatrix();
+        pillarRef.current.setMatrixAt(i, dummy.matrix);
       }
     }
     pillarRef.current.instanceMatrix.needsUpdate = true;
@@ -178,10 +188,16 @@ export function ControlChamber() {
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
       
-      {/* 2. Data Conduits (Neon Strips on Pillars) */}
+      {/* 2. Data Conduits (PCB Pillars) */}
       <instancedMesh ref={conduitRef} args={[undefined, undefined, conduitCount]}>
         <boxGeometry args={PILLAR_SIZE} />
-        <meshStandardMaterial color="#00ddff" emissive="#00ddff" emissiveIntensity={2} transparent opacity={0.8} />
+        <meshStandardMaterial 
+          color="#050505" 
+          map={pcbTexture}
+          emissiveMap={pcbTexture}
+          emissive="#00ddff" 
+          emissiveIntensity={2} 
+        />
       </instancedMesh>
 
       <instancedMesh ref={beamRef} args={[undefined, undefined, beamCount]}>
@@ -199,23 +215,22 @@ export function ControlChamber() {
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
-      {/* LIGHTING MIDPOINT: Hybrid of Global Visibility and Dramatic Local Pools */}
+      {/* LIGHTING: Re-boosted baseline for visibility */}
       
-      {/* A faint global baseline so the background pillars don't vanish into pure #000000 */}
-      <ambientLight intensity={0.15} />
-      <hemisphereLight groundColor="#000000" color="#222222" intensity={0.2} />
+      <ambientLight intensity={0.3} />
+      <hemisphereLight groundColor="#000000" color="#222222" intensity={0.3} />
       
-      {/* A soft directional rim light to give the outer pillars 3D shape */}
+      {/* A strong directional rim light to give the outer pillars 3D shape */}
       <directionalLight 
         position={[20, 80, -40]} 
-        intensity={0.4} 
-        color="#445566" 
+        intensity={0.8} 
+        color="#88aacc" 
       />
       
       {/* Localized Dramatic Lights (These decay and intensely light up the core) */}
       <spotLight 
         position={[0, 80, 20]} 
-        intensity={ancSolved ? 4000 : 1500} 
+        intensity={ancSolved ? 4000 : 2000} 
         color="#ffffff" 
         angle={Math.PI / 4}
         penumbra={0.8}
