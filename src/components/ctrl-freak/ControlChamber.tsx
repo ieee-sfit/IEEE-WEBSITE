@@ -1,7 +1,6 @@
 import { useRef, useEffect } from 'react';
 import * as THREE from 'three';
 import { useCtrlFreakStore } from '../../store/useCtrlFreakStore';
-import { useTexture } from '@react-three/drei';
 
 // Procedural Vocabulary Geometry Sizes
 const PILLAR_SIZE: [number, number, number] = [3, 80, 3];
@@ -21,11 +20,9 @@ export function ControlChamber() {
   const beamRef = useRef<THREE.InstancedMesh>(null);
   const platformRef = useRef<THREE.InstancedMesh>(null);
   const stairRef = useRef<THREE.InstancedMesh>(null);
-  const conduitRef = useRef<THREE.InstancedMesh>(null);
 
   // Vocabulary limits
   const pillarCount = 24;
-  const conduitCount = 4; // Drastically reduced for organic rarity
   const beamCount = 36;
   const platformCount = 8;
   const stairCount = 12;
@@ -34,11 +31,6 @@ export function ControlChamber() {
   const ancSolved = useCtrlFreakStore(s => s.anc.solved);
   const networkSolved = useCtrlFreakStore(s => s.network.solved);
   const logicSolved = useCtrlFreakStore(s => s.logic.solved);
-
-  // Load PCB Texture
-  const pcbTexture = useTexture('/textures/pcb_trace.jpg');
-  pcbTexture.wrapS = pcbTexture.wrapT = THREE.RepeatWrapping;
-  pcbTexture.repeat.set(1, 3); // Reduced from 10 to 3 to make traces visible and organic
 
   useEffect(() => {
     if (!pillarRef.current || !beamRef.current || !platformRef.current || !stairRef.current) return;
@@ -60,26 +52,12 @@ export function ControlChamber() {
       
       dummy.position.set(px, -20 + Math.random() * 40, pz);
       dummy.rotation.set(0, angle, 0); 
-      const pScaleY = 1.5 + Math.random() * 1.5;
+      dummy.scale.set(1, 1.5 + Math.random() * 1.5, 1); // Taller pillars
       
-      // Make a select few pillars into PCB Conduits
-      if (i < conduitCount && conduitRef.current) {
-        dummy.scale.set(1, pScaleY, 1);
-        dummy.updateMatrix();
-        conduitRef.current.setMatrixAt(i, dummy.matrix);
-        
-        // Hide the normal pillar for this index to prevent Z-fighting
-        dummy.scale.set(0, 0, 0);
-        dummy.updateMatrix();
-        pillarRef.current.setMatrixAt(i, dummy.matrix);
-      } else {
-        dummy.scale.set(1, pScaleY, 1); // Normal pillar
-        dummy.updateMatrix();
-        pillarRef.current.setMatrixAt(i, dummy.matrix);
-      }
+      dummy.updateMatrix();
+      pillarRef.current.setMatrixAt(i, dummy.matrix);
     }
     pillarRef.current.instanceMatrix.needsUpdate = true;
-    if (conduitRef.current) conduitRef.current.instanceMatrix.needsUpdate = true;
 
     // 2. BEAMS (The Structure)
     for (let i = 0; i < beamCount; i++) {
@@ -187,18 +165,6 @@ export function ControlChamber() {
         <boxGeometry args={PILLAR_SIZE} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
-      
-      {/* 2. Data Conduits (PCB Pillars) */}
-      <instancedMesh ref={conduitRef} args={[undefined, undefined, conduitCount]}>
-        <boxGeometry args={PILLAR_SIZE} />
-        <meshStandardMaterial 
-          color="#050505" 
-          map={pcbTexture}
-          emissiveMap={pcbTexture}
-          emissive="#00ddff" 
-          emissiveIntensity={2} 
-        />
-      </instancedMesh>
 
       <instancedMesh ref={beamRef} args={[undefined, undefined, beamCount]}>
         <boxGeometry args={BEAM_SIZE} />
@@ -215,49 +181,31 @@ export function ControlChamber() {
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
-      {/* LIGHTING: Restored Bright Baseline */}
+      {/* Basic Architecture Lighting (No real-time shadows yet) */}
+      <ambientLight intensity={0.1} />
       
-      {/* Global Illumination */}
-      <ambientLight intensity={0.2} />
-      <hemisphereLight groundColor="#000000" color="#222222" intensity={0.4} />
-      
-      {/* Global architectural fill lights so background pillars don't vanish entirely */}
+      {/* Key spotlight shining down and angled slightly to give the pillars bright faces */}
       <directionalLight 
-        position={[-50, 40, -30]} 
-        intensity={0.6} 
+        position={[20, 80, 40]} 
+        intensity={ancSolved ? 3.5 : 2.5} 
         color="#ffffff" 
       />
+      
+      {/* Harsh stark rim light from the opposite side (Emergency Lockdown) */}
       <directionalLight 
-        position={[50, -20, 30]} 
-        intensity={0.4} 
+        position={[-50, 20, -50]} 
+        intensity={logicSolved ? 0.2 : 1.0} 
+        color="#ff3333" 
+      />
+      
+      {/* Secondary stark blue/white rim light to create cinematic contrast (Data Infrastructure) */}
+      <directionalLight 
+        position={[60, 0, -20]} 
+        intensity={networkSolved ? 2.5 : 1.5} 
         color="#88ccff" 
       />
       
-      {/* Key spotlight shining down and angled slightly */}
-      <spotLight 
-        position={[20, 80, 40]} 
-        intensity={ancSolved ? 4000 : 1500} 
-        color="#ffffff" 
-        angle={Math.PI / 6}
-        penumbra={0.5}
-        distance={200}
-      />
-      
-      {/* Emergency Lockdown Light: Harsh red pool */}
-      <pointLight 
-        position={[-30, 10, -30]} 
-        intensity={logicSolved ? 200 : 2500} 
-        color="#ff1111" 
-        distance={150}
-      />
-      
-      {/* Data Infrastructure Light: Deep cyan pool */}
-      <pointLight 
-        position={[40, -10, -20]} 
-        intensity={networkSolved ? 3000 : 500} 
-        color="#00ddff" 
-        distance={180}
-      />
+      <hemisphereLight groundColor="#000000" color="#222222" intensity={0.3} />
       
       {/* Tiny red emissive strips (Floating warning lamps) */}
       <mesh position={[-25, 15, -15]}>
