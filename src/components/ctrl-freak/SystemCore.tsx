@@ -266,27 +266,37 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       wave[i3 + 1] = waveY;
       wave[i3 + 2] = 0;
 
-      // --- SHAPE 3 (NETWORK) Topographical Data Grid ---
-      const gridW = Math.ceil(Math.sqrt(count));
-      const gx = i % gridW;
-      const gy = Math.floor(i / gridW);
-      // Map to [-8, 8] range on X and Y
-      network[i3]     = (gx / gridW) * 16 - 8;
-      network[i3 + 1] = (gy / gridW) * 16 - 8;
-      network[i3 + 2] = 0; // Base depth is 0
+      // --- SHAPE 3 (NETWORK) Orbital Rings ---
+      // We have 3 rings. Split 12000 particles into 3 groups of 4000.
+      const ringIdx = Math.floor(i / (count / 3)); 
+      const ringBaseRadius = 3 + ringIdx * 2.5; // Radii: 3, 5.5, 8
+      const ringAngle = Math.random() * Math.PI * 2;
+      const ringThickness = (Math.random() - 0.5) * 1.2;
+      const ringHeight = (Math.random() - 0.5) * 0.5;
+      
+      network[i3]     = Math.cos(ringAngle) * (ringBaseRadius + ringThickness);
+      network[i3 + 1] = ringHeight;
+      network[i3 + 2] = Math.sin(ringAngle) * (ringBaseRadius + ringThickness);
 
       // 4. VISION (Anamorphic Shape)
       // Vision will be populated dynamically via useEffect
       vision[i3] = 0; vision[i3+1] = 0; vision[i3+2] = 0;
 
-      // 5. THE VAULT (Logic) -> The Scrambled Tesseract
-      const cx = i % cW;
-      const cy = Math.floor(i / cW) % cW;
-      const cz = Math.floor(i / (cW * cW));
-      // Map to [-6, 6] range to make it massive
-      circuit[i3]     = (cx / cW) * 12 - 6;
-      circuit[i3 + 1] = (cy / cW) * 12 - 6;
-      circuit[i3 + 2] = (cz / cW) * 12 - 6;
+      // 5. THE VAULT (Logic) -> Energy Trace Pipes
+      // We have two distinct paths (Left and Right) merging at the center.
+      // Left path: X goes from -8 to 0. Right path: X goes from 8 to 0.
+      const isLeftPath = i < count / 2;
+      const progressAlongPath = Math.random(); // 0 (start) to 1 (center)
+      const pathX = isLeftPath ? -8 + (progressAlongPath * 8) : 8 - (progressAlongPath * 8);
+      const pathZ = -4 + (progressAlongPath * 4); // Both come forward to Z=0
+      
+      // Add thickness to the pipe
+      const angleInPipe = Math.random() * Math.PI * 2;
+      const pipeRadius = Math.random() * 0.8;
+      
+      circuit[i3]     = pathX + Math.cos(angleInPipe) * pipeRadius;
+      circuit[i3 + 1] = Math.sin(angleInPipe) * pipeRadius;
+      circuit[i3 + 2] = pathZ;
 
       // 6. RING (The Clock / 12:00)
       const angle = Math.random() * Math.PI * 2;
@@ -432,44 +442,49 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
           const net = useCtrlFreakStore.getState().network;
           
           const applyNetworkMods = (px: number, py: number, pz: number) => {
-            let finalDepth = pz;
+            const r = Math.sqrt(px*px + pz*pz);
+            let ringIdx = 0;
+            if (r > 4.2 && r < 6.7) ringIdx = 1;
+            if (r >= 6.7) ringIdx = 2;
+            
+            const load = ringIdx === 0 ? net.mumbai : ringIdx === 1 ? net.london : net.frankfurt;
+            const isOverloaded = load > 70;
+            const isUnderloaded = load < 10;
+            
+            let currentAngle = Math.atan2(pz, px);
+            let currentR = r;
+            let currentY = py;
             
             if (net.solved) {
-              // Unified smooth sine wave rippling across the grid
-              const d = Math.sqrt(px*px + py*py);
-              finalDepth += Math.sin(d * 2 - t * 4) * 0.5;
+              // Smooth, perfectly synchronous spin
+              currentAngle += t * 1.5;
             } else {
-              // 3 Epicenters on the grid
-              const d1 = Math.sqrt(Math.pow(px - (-3), 2) + Math.pow(py - (-2), 2)); // Frankfurt
-              const d2 = Math.sqrt(Math.pow(px - 0, 2) + Math.pow(py - 2, 2));      // London
-              const d3 = Math.sqrt(Math.pow(px - 3, 2) + Math.pow(py - (-2), 2));   // Mumbai
+              // Spin speed based on load
+              const spinSpeed = isOverloaded ? 5.0 : isUnderloaded ? 0.2 : 1.0;
+              currentAngle += t * spinSpeed;
               
-              // Gaussian influence hills mapped to load slider (divided by 10 for reasonable depth)
-              const h1 = (net.frankfurt / 10) * Math.exp(-d1*d1 / 2.0);
-              const h2 = (net.london / 10) * Math.exp(-d2*d2 / 2.0);
-              const h3 = (net.mumbai / 10) * Math.exp(-d3*d3 / 2.0);
-              
-              let totalDepth = h1 + h2 + h3;
-              
-              // Overload chaos: jagged mountain spikes
-              if (net.frankfurt > 70 && d1 < 2.5) totalDepth += (Math.random() - 0.5) * 3;
-              if (net.london > 70 && d2 < 2.5) totalDepth += (Math.random() - 0.5) * 3;
-              if (net.mumbai > 70 && d3 < 2.5) totalDepth += (Math.random() - 0.5) * 3;
-              
-              // Underload sinkhole: invert the curve
-              if (net.frankfurt < 10 && d1 < 2.5) totalDepth -= 2 * Math.exp(-d1*d1 / 1.5);
-              if (net.london < 10 && d2 < 2.5) totalDepth -= 2 * Math.exp(-d2*d2 / 1.5);
-              if (net.mumbai < 10 && d3 < 2.5) totalDepth -= 2 * Math.exp(-d3*d3 / 1.5);
-              
-              finalDepth += totalDepth;
+              if (isOverloaded) {
+                // Ring bulges and vibrates violently
+                currentR += (Math.random() - 0.5) * 2.0;
+                currentY += (Math.random() - 0.5) * 1.5;
+              }
+              if (isUnderloaded) {
+                // Ring shrinks and stutters
+                currentR -= 1.0;
+                currentAngle += (Math.random() - 0.5) * 0.1;
+              }
             }
             
-            // Apply a 50-degree downward tilt around the X axis so the depth is visible as height to the camera
-            const tilt = Math.PI / 3.6; // 50 degrees
-            const tiltedY = py * Math.cos(tilt) - finalDepth * Math.sin(tilt);
-            const tiltedZ = py * Math.sin(tilt) + finalDepth * Math.cos(tilt);
+            // Reconstruct coordinates and apply 30 deg tilt so we can see the rings from above
+            const tilt = Math.PI / 6; 
+            const newX = Math.cos(currentAngle) * currentR;
+            const newZ = Math.sin(currentAngle) * currentR;
+            const newY = currentY;
             
-            return [px, tiltedY, tiltedZ];
+            const tiltedY = newY * Math.cos(tilt) - newZ * Math.sin(tilt);
+            const tiltedZ = newY * Math.sin(tilt) + newZ * Math.cos(tilt);
+            
+            return [newX, tiltedY, tiltedZ];
           };
 
           if (shape1 === shapes.network) {
@@ -529,31 +544,44 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
           
           const applyCircuitMods = (px: number, py: number, pz: number) => {
             if (logic.solved) {
-               // Compress into a hyper-dense glowing core block that gently pulses
-               const scale = 0.6 + Math.sin(t * 3) * 0.05;
-               return [px * scale, py * scale, pz * scale];
+               // Explode into a massive spinning geometric diamond structure
+               const r = Math.sqrt(px*px + py*py + pz*pz);
+               const speed = t * 2.0;
+               const nx = px * Math.cos(speed) - pz * Math.sin(speed);
+               const nz = px * Math.sin(speed) + pz * Math.cos(speed);
+               const scale = 1.5 + Math.sin(t * 5 + r) * 0.2;
+               return [nx * scale, py * scale, nz * scale];
             }
             
-            // Slicing logic for the Tesseract
-            const sliceX = Math.floor(px * 2);
-            const sliceZ = Math.floor(pz * 2);
+            const isLeftPath = px < 0;
+            const slotCorrect = isLeftPath ? logic.slot1Correct : logic.slot2Correct;
+            
+            // Distance from center (0 = center, 1 = far edge)
+            const progressAlongPath = 1.0 - (Math.abs(px) / 8); 
             
             let nx = px;
             let ny = py;
             let nz = pz;
             
-            // Slot 1 (X-axis slices slide if wrong)
-            if (!logic.slot1Correct) {
-              const slide = Math.sin(t * 3 + sliceX) * 0.8;
-              ny += slide;
-              nz += Math.cos(t * 2 + sliceX) * 0.5;
-            }
-            
-            // Slot 2 (Z-axis slices slide if wrong)
-            if (!logic.slot2Correct) {
-              const slide = Math.sin(t * 2.5 + sliceZ) * 0.8;
-              nx += slide;
-              ny += Math.cos(t * 3.5 + sliceZ) * 0.5;
+            if (slotCorrect) {
+              // High speed energy flow towards the center
+              const flowSpeed = t * -15.0; // Negative moves towards 0
+              const offset = (Math.abs(px) + flowSpeed) % 8;
+              const newPx = (offset < 0 ? 8 + offset : offset);
+              
+              nx = isLeftPath ? -newPx : newPx;
+              nz = -4 + ((1.0 - (newPx / 8)) * 4);
+              
+              // Tighten the pipe when solved
+              ny *= 0.3; 
+            } else {
+              // If the path is blocked, particles near the middle (progress > 0.4) swirl chaotically
+              if (progressAlongPath > 0.4) {
+                const chaos = (progressAlongPath - 0.4) * 5.0;
+                nx += (Math.random() - 0.5) * chaos;
+                ny += (Math.random() - 0.5) * chaos;
+                nz += (Math.random() - 0.5) * chaos;
+              }
             }
             
             return [nx, ny, nz];
