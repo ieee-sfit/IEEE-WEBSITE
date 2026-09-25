@@ -448,28 +448,26 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
             let currentAngle = Math.atan2(py, px);
             let currentR = r;
             
-            if (net.solved) {
-              // Smooth, perfectly synchronous spin
-              currentAngle += t * 1.5;
-            } else {
-              // Spin speed based on load
-              const spinSpeed = isOverloaded ? 5.0 : isUnderloaded ? 0.2 : 1.0;
-              currentAngle += t * spinSpeed;
-              
-              if (isOverloaded) {
-                // Ring bulges and vibrates violently
-                currentR += (Math.random() - 0.5) * 2.0;
-              }
-              if (isUnderloaded) {
-                // Ring shrinks and stutters
-                currentR -= 1.0;
-                currentAngle += (Math.random() - 0.5) * 0.1;
-              }
+            // Spin speed based on load
+            const spinSpeed = net.solved ? 1.5 : (isOverloaded ? 4.0 : isUnderloaded ? 0.2 : 1.0);
+            const rotatedAngle = currentAngle + t * spinSpeed;
+            
+            // The magic: A ripple that depends on load!
+            // As the user drags the slider, the ring physically warps more and more.
+            const ripplePeaks = 5 + ringIdx * 2; // 5, 7, 9 bumps
+            const rippleAmp = (load / 100) * 1.5; 
+            currentR += Math.sin(currentAngle * ripplePeaks + t * 5.0) * rippleAmp;
+            
+            if (isOverloaded && !net.solved) {
+              currentR += (Math.random() - 0.5) * 1.0; // Glitchy jitter
+            }
+            if (isUnderloaded && !net.solved) {
+              currentR *= (0.9 + Math.random() * 0.1); // Sputtering shrink
             }
             
-            // Reconstruct coordinates in XY
-            const newX = Math.cos(currentAngle) * currentR;
-            const newY = Math.sin(currentAngle) * currentR;
+            // Reconstruct coordinates in XY using the ROTATED angle
+            const newX = Math.cos(rotatedAngle) * currentR;
+            const newY = Math.sin(rotatedAngle) * currentR;
             
             return [newX, newY, pz];
           };
@@ -538,36 +536,53 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
                // Explode into a massive spinning geometric diamond star!
                const r = Math.sqrt(px*px + py*py);
                const angle = Math.atan2(py, px);
-               const starR = r * (1 + 2 * Math.abs(Math.cos(angle * 2))); // 4-point star shape
+               
+               // Calculate the star shape FIRST
+               const starR = r * (1.0 + 1.5 * Math.abs(Math.cos(angle * 2.0))); // 4-point star
+               const sx = Math.cos(angle) * starR;
+               const sy = Math.sin(angle) * starR;
+               
+               // Rotate the ENTIRE star geometry so the user visually sees it spinning
                const speed = t * 2.0;
-               nx = Math.cos(angle + speed) * starR;
-               ny = Math.sin(angle + speed) * starR;
+               nx = sx * Math.cos(speed) - sy * Math.sin(speed);
+               ny = sx * Math.sin(speed) + sy * Math.cos(speed);
                nz += (Math.random() - 0.5) * 5.0; // Thick explosion depth
-               return [nx, ny, nz];
+               
+               // Add a global pulsing scale effect
+               const scale = 1.0 + Math.sin(t * 5.0 + r) * 0.2;
+               return [nx * scale, ny * scale, nz * scale];
             }
             
             const isLeftPath = px < 0;
             const slotCorrect = isLeftPath ? logic.slot1Correct : logic.slot2Correct;
             
-            // Distance from center (0 = center, 1 = far edge)
-            const progressAlongPath = 1.0 - (Math.abs(px) / 10); 
+            // Use 'pz' as a stable random seed to reconstruct the pipe thickness natively
+            const rand = Math.abs(pz); 
+            const angleInPipe = rand * 100.0;
+            const pipeRadius = (rand % 0.8);
             
-            if (slotCorrect) {
-              // High speed energy flow towards the center
-              const flowSpeed = t * -20.0; // Fast!
-              const offset = (Math.abs(px) + flowSpeed) % 10;
-              const newPx = (offset < 0 ? 10 + offset : offset);
-              
-              nx = isLeftPath ? -newPx : newPx;
-              ny = 6 - ((1.0 - (newPx / 10)) * 6); // Reconstruct Y along the V shape
-            } else {
-              // If the path is blocked, particles near the middle (progress > 0.4) swirl chaotically
-              if (progressAlongPath > 0.4) {
-                const chaos = (progressAlongPath - 0.4) * 15.0; // MASSIVE explosion
-                nx += (Math.random() - 0.5) * chaos;
-                ny += (Math.random() - 0.5) * chaos;
-                nz += (Math.random() - 0.5) * chaos;
-              }
+            // Base flow along the V-shape
+            const flowSpeed = slotCorrect ? (t * -25.0) : (t * -5.0);
+            const offset = (Math.abs(px) + flowSpeed) % 10;
+            const newPx = (offset < 0 ? 10 + offset : offset);
+            
+            nx = isLeftPath ? -newPx : newPx;
+            ny = 0.6 * newPx; // V-shape equation (X: 10->0, Y: 6->0)
+            
+            // Add thickness (Tighten it into a laser beam if solved!)
+            const tighten = slotCorrect ? 0.1 : 1.0;
+            nx += Math.cos(angleInPipe) * pipeRadius * tighten;
+            ny += Math.sin(angleInPipe) * pipeRadius * tighten;
+            
+            // Calculate distance along path (0 = start, 1 = center)
+            const progressAlongPath = 1.0 - (newPx / 10);
+            
+            if (!slotCorrect && progressAlongPath > 0.4) {
+              // HUGE chaotic explosion where the path is blocked
+              const chaos = (progressAlongPath - 0.4) * 20.0; 
+              nx += (Math.random() - 0.5) * chaos;
+              ny += (Math.random() - 0.5) * chaos;
+              nz += (Math.random() - 0.5) * chaos;
             }
             
             return [nx, ny, nz];
