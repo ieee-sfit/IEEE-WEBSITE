@@ -459,23 +459,31 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
             
             const bridgeY = bridgeIdx === 0 ? 5 : bridgeIdx === 1 ? 0 : -5;
             
+            // Determine critical threshold based on relay and resolution
+            let criticalLimit = 100;
+            if (bridgeIdx === 0) criticalLimit = 85; // Frankfurt
+            else if (bridgeIdx === 1) criticalLimit = 70; // London
+            else if (bridgeIdx === 2) criticalLimit = net.resolution === '4K' ? 15 : 40; // Mumbai
+            
             // Stable seed for this particle
             const seed = Math.abs(Math.sin(idx * 12.9898 + 78.233));
             
-            // Flow speed based on load (or fast if solved)
+            // Flow speed based on load
             const speed = net.solved ? 2.0 : (0.2 + (load / 100) * 1.5);
             
             // Calculate flow progress (-12 to 12)
             const rawP = (seed + (t * speed * 0.5)) % 1.0;
             let bx = -12 + rawP * 24;
             
-            // Base thickness with geometric throbbing when overloaded
+            // Warning Pulse (within 10% of critical limit, but not over it)
             let pulse = 1.0;
-            if (!net.solved && load > 70) {
-               // Throbs aggressively 4 times per second (t * 24 roughly)
-               pulse = 1.0 + Math.abs(Math.sin(t * 24)) * 0.8; 
+            const isWarning = !net.solved && load >= criticalLimit - 10 && load <= criticalLimit;
+            if (isWarning) {
+               pulse = 1.0 + Math.abs(Math.sin(t * 15)) * 0.4; 
             }
-            const baseThick = net.solved ? 0.05 : (0.02 + (load / 100) * 0.4) * pulse;
+            
+            // Base thickness with geometric throbbing when in warning state
+            const baseThick = net.solved ? 0.05 : (0.02 + Math.min(load, criticalLimit) / 100 * 0.3) * pulse;
             
             const crossAngle = Math.abs(Math.sin(idx * 43.111)) * Math.PI * 2;
             const dist = Math.abs(Math.sin(idx * 99.999));
@@ -483,25 +491,18 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
             let by = bridgeY + Math.cos(crossAngle) * baseThick * dist;
             let bz = Math.sin(crossAngle) * baseThick * dist;
             
-            // Overload (>70): the pipe swells dangerously in the middle and ruptures
-            if (!net.solved && load > 70) {
-              const ruptureFactor = (load - 70) / 30; // 0 to 1
-              // The middle of the bridge is bx = 0
-              const distFromCenter = Math.abs(bx);
-              if (distFromCenter < 5) {
-                 const bulge = Math.cos((distFromCenter / 5) * (Math.PI / 2));
-                 
-                 // If highly overloaded, particles break out of the pipe and fall as sparks
-                 if (Math.abs(Math.sin(idx * 11.111)) < ruptureFactor * 0.4) {
-                    // Parabolic spark fall
-                    const fallTime = (t * 3 + seed * 10) % 2; // Time active as a spark (0 to 2)
-                    by -= (fallTime * fallTime * 2) * ruptureFactor; // Gravity curve
-                    bx += (Math.cos(idx) * fallTime * 2) * ruptureFactor; // Scatter out
-                 } else {
-                    // Swell the pipe
-                    by += Math.cos(crossAngle) * bulge * ruptureFactor * 0.8;
-                    bz += Math.sin(crossAngle) * bulge * ruptureFactor * 0.8;
-                 }
+            // Critical Overload (Packet Loss): the pipe ruptures and particles fall heavily
+            if (!net.solved && load > criticalLimit) {
+              const overloadAmount = load - criticalLimit; // How far past the limit
+              const ruptureFactor = overloadAmount / (100 - criticalLimit + 1); // 0 to 1 scaling
+              
+              // If highly overloaded, drop a percentage of particles as packets
+              // Max 60% of particles drop when fully overloaded
+              if (Math.abs(Math.sin(idx * 11.111)) < ruptureFactor * 0.6) {
+                 // Fast, deep parabolic spark fall
+                 const fallTime = (t * 4 + seed * 10) % 3; // 0 to 3 seconds of falling
+                 by -= (fallTime * fallTime * 3); // Gravity curve pulling it way down
+                 bx += (Math.cos(idx) * fallTime * 3); // Scatter widely horizontally
               }
             }
             
@@ -596,40 +597,39 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
             let zOffset = 0;
             
             // ANIMATION LOGIC
-            if (vaultType === 1) {
-              if (logic.solved) {
-                rotOffset = 0; // locked
-                zOffset = -3.0; // pull apart
-              } else if (logic.slot1Correct) {
-                rotOffset = 0; // locked perfectly
-              } else if (logic.slot1 !== null) {
-                // Wrong gate: violently jamming
-                rotOffset = (t * 0.5) + (Math.sin(t * 30) * 0.05); 
-                vR += (Math.abs(Math.sin(idx * 12.9898 + t)) - 0.5) * 0.3; // slight radius jitter from grinding
-              } else {
-                // No gate: searching
-                rotOffset = t * 0.8;
+            if (logic.solved) {
+              // When solved, the entire unified cylinder rotates slowly and majestically
+              rotOffset = t * 0.2;
+              if (vaultType === 0) zOffset = -6.0; // Outer shell moves back
+              if (vaultType === 1) zOffset = -3.0; // Gate 1 moves back
+              if (vaultType === 2) zOffset = 3.0;  // Gate 2 moves forward
+            } else {
+              // Not fully solved
+              if (vaultType === 1) {
+                if (logic.slot1Correct) {
+                  rotOffset = 0; // locked perfectly
+                } else if (logic.slot1 !== null) {
+                  // Wrong gate: violently jamming
+                  rotOffset = (t * 0.5) + (Math.sin(t * 30) * 0.05); 
+                  vR += (Math.abs(Math.sin(idx * 12.9898 + t)) - 0.5) * 0.3; // slight radius jitter from grinding
+                } else {
+                  // No gate: searching
+                  rotOffset = t * 0.8;
+                }
               }
-            }
-            
-            if (vaultType === 2) {
-              if (logic.solved) {
-                rotOffset = 0; // locked
-                zOffset = 3.0; // pull apart
-              } else if (logic.slot2Correct) {
-                rotOffset = 0; // locked perfectly
-              } else if (logic.slot2 !== null) {
-                // Wrong gate: violently jamming
-                rotOffset = -(t * 0.6) + (Math.sin(t * 35) * 0.05); 
-                vR += (Math.abs(Math.sin(idx * 78.233 + t)) - 0.5) * 0.3;
-              } else {
-                // No gate: searching in opposite direction
-                rotOffset = -t * 0.7;
+              
+              if (vaultType === 2) {
+                if (logic.slot2Correct) {
+                  rotOffset = 0; // locked perfectly
+                } else if (logic.slot2 !== null) {
+                  // Wrong gate: violently jamming
+                  rotOffset = -(t * 0.6) + (Math.sin(t * 35) * 0.05); 
+                  vR += (Math.abs(Math.sin(idx * 78.233 + t)) - 0.5) * 0.3;
+                } else {
+                  // No gate: searching in opposite direction
+                  rotOffset = -t * 0.7;
+                }
               }
-            }
-            
-            if (vaultType === 0 && logic.solved) {
-               zOffset = -6.0; // Outer shell moves back too
             }
             
             const finalTheta = vTheta + rotOffset;
