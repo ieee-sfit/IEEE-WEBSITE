@@ -779,8 +779,8 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
     const targetPosition = cameraPath.getPoint(progress);
     
     // Cinematic Intro Reveal: Start far back and push straight through the occlusion screen
-    if (progress < 0.02) {
-      const revealP = progress / 0.02; // 0 to 1
+    if (progress < 0.01) {
+      const revealP = progress / 0.01; // 0 to 1
       targetPosition.set(
         0,
         50,
