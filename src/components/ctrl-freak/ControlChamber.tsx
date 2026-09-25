@@ -312,10 +312,12 @@ export function ControlChamber() {
   return (
     <group>
       {/* The Monolith (Initial Camera Occlusion for Intro Reveal - 0.75% scroll) */}
-      <mesh position={[0, 50, 145]}>
-        <boxGeometry args={[400, 400, 1]} />
-        <meshBasicMaterial color="#020202" />
-      </mesh>
+      {(!ancSolved || !networkSolved || !visionSolved || !logicSolved) && (
+        <mesh position={[0, 50, 145]}>
+          <boxGeometry args={[400, 400, 1]} />
+          <meshBasicMaterial color="#020202" />
+        </mesh>
+      )}
 
       {/* Floor & Deep Void */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -60, 0]}>

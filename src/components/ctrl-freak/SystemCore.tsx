@@ -813,8 +813,13 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
     // Get the exact point on the curve for this scroll percentage
     const targetPosition = cameraPath.getPoint(progress);
 
+    // Read solved state directly without triggering component re-renders
+    const sysState = useCtrlFreakStore.getState();
+    const isFullySolved = sysState.anc.solved && sysState.network.solved && sysState.vision.solved && sysState.logic.solved;
+
     // Cinematic Intro Reveal: Start behind the occlusion Monolith and push straight through it
-    if (progress < 0.0075) {
+    // If fully solved, skip this so the user can see the entire un-occluded Ziggurat when returning to top
+    if (!isFullySolved && progress < 0.0075) {
       const revealP = progress / 0.0075; // 0 to 1
       targetPosition.set(
         0,
