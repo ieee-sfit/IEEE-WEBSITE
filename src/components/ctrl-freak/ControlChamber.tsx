@@ -370,12 +370,14 @@ export function ControlChamber() {
         position={[40, 100, 60]} 
         intensity={ancSolved ? 4.5 : 3.0} 
         color="#ffffff" 
-        shadow-mapSize={[2048, 2048]}
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
         shadow-camera-far={250}
-        shadow-camera-left={-100}
-        shadow-camera-right={100}
-        shadow-camera-top={100}
-        shadow-camera-bottom={-100}
+        shadow-camera-left={-120}
+        shadow-camera-right={120}
+        shadow-camera-top={120}
+        shadow-camera-bottom={-120}
+        shadow-bias={-0.0005}
       />
       
       {/* Harsh stark rim light from the opposite side (Emergency Lockdown) */}
