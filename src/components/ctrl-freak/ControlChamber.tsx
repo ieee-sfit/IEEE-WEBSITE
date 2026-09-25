@@ -312,7 +312,7 @@ export function ControlChamber() {
   return (
     <group>
       {/* Floor & Deep Void */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -60, 0]}>
+      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, -60, 0]}>
         <circleGeometry args={[250, 32]} />
         <meshStandardMaterial color="#020202" roughness={1} />
       </mesh>
@@ -334,51 +334,59 @@ export function ControlChamber() {
 
       
       {/* The Instances */}
-      <instancedMesh ref={pillarRef} args={[undefined, undefined, pillarCount]}>
+      <instancedMesh ref={pillarRef} castShadow receiveShadow args={[undefined, undefined, pillarCount]}>
         <boxGeometry args={PILLAR_SIZE} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
-      <instancedMesh ref={beamRef} args={[undefined, undefined, beamCount]}>
+      <instancedMesh ref={beamRef} castShadow receiveShadow args={[undefined, undefined, beamCount]}>
         <boxGeometry args={BEAM_SIZE} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
-      <instancedMesh ref={platformRef} args={[undefined, undefined, platformCount]}>
+      <instancedMesh ref={platformRef} castShadow receiveShadow args={[undefined, undefined, platformCount]}>
         <boxGeometry args={PLATFORM_SIZE} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
-      <instancedMesh ref={stairRef} args={[undefined, undefined, stairCount]}>
+      <instancedMesh ref={stairRef} castShadow receiveShadow args={[undefined, undefined, stairCount]}>
         <boxGeometry args={STAIR_SIZE} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
-      {/* Basic Architecture Lighting (No real-time shadows yet) */}
-      {/* ambientLight moved entirely to SystemCore to establish the global floor */}
+      {/* Basic Architecture Lighting (Now with real-time shadows!) */}
       
-      {/* Key spotlight shining down and angled slightly to give the pillars bright faces */}
+      {/* Key spotlight shining down casting deep massive structural shadows */}
       <directionalLight 
-        position={[20, 80, 40]} 
-        intensity={ancSolved ? 2.5 : 2.0} 
+        castShadow
+        position={[40, 100, 60]} 
+        intensity={ancSolved ? 4.5 : 3.0} 
         color="#ffffff" 
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-camera-far={250}
+        shadow-camera-left={-120}
+        shadow-camera-right={120}
+        shadow-camera-top={120}
+        shadow-camera-bottom={-120}
+        shadow-bias={-0.0005}
       />
       
       {/* Harsh stark rim light from the opposite side (Emergency Lockdown) */}
       <directionalLight 
-        position={[-50, 20, -50]} 
-        intensity={logicSolved ? 0.05 : 0.25} 
-        color="#ff3333" 
+        position={[-60, 10, -60]} 
+        intensity={logicSolved ? 0.0 : 0.8} 
+        color="#ff2222" 
       />
       
       {/* Secondary stark blue/white rim light to create cinematic contrast (Data Infrastructure) */}
       <directionalLight 
         position={[60, 0, -20]} 
-        intensity={networkSolved ? 0.6 : 0.35} 
+        intensity={networkSolved ? 1.0 : 0.2} 
         color="#88ccff" 
       />
       
-      <hemisphereLight groundColor="#000000" color="#15171c" intensity={0.15} />
+      <hemisphereLight groundColor="#000000" color={logicSolved ? "#15171c" : "#1a0505"} intensity={0.2} />
       
       {/* Tiny red emissive strips (Floating warning lamps) */}
       <mesh position={[-25, 15, -15]}>
