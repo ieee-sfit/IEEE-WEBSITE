@@ -48,80 +48,126 @@ export function ControlChamber() {
     const platforms = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
     const stairs = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
 
-    // 1. PILLARS (The Cage -> The Perimeter)
+    // 1. PILLARS (24) -> A double-ring colonnade
     for (let i = 0; i < pillarCount; i++) {
       const angle = (i / pillarCount) * Math.PI * 2;
       
-      // Chaotic: closer in, random heights, visually enclosing
+      // Chaotic: random heights, closer in, tilted
       const cRadius = 70 + Math.random() * 20;
       let cPx = Math.cos(angle) * cRadius;
       let cPz = Math.sin(angle) * cRadius;
       if (Math.abs(cPx) < 15 && cPz > 50) cPx += (cPx >= 0 ? 25 : -25);
-      
       dummyC.position.set(cPx, -20 + Math.random() * 40, cPz);
-      // Chaotic: slight tilt for instability
       dummyC.rotation.set((Math.random()-0.5)*0.2, angle, (Math.random()-0.5)*0.2); 
       dummyC.scale.set(1, 1.5 + Math.random() * 1.5, 1);
       dummyC.updateMatrix();
       pillars.chaotic.push(dummyC.matrix.clone());
 
-      // Canonical: pulled out to radius 120, perfect upright ring, unified heights
-      const kRadius = 120;
-      dummyK.position.set(Math.cos(angle) * kRadius, 0, Math.sin(angle) * kRadius);
-      dummyK.rotation.set(0, angle, 0);
-      dummyK.scale.set(1, 1.5, 1);
+      // Canonical: Dual-ring colonnade
+      let kAngle, kRadius;
+      if (i < 8) { // Inner ring of 8
+        kAngle = (i / 8) * Math.PI * 2;
+        kRadius = 60;
+      } else { // Outer ring of 16
+        kAngle = ((i - 8) / 16) * Math.PI * 2;
+        kRadius = 100;
+      }
+      dummyK.position.set(Math.cos(kAngle) * kRadius, 10, Math.sin(kAngle) * kRadius);
+      dummyK.rotation.set(0, kAngle, 0); // Face inward
+      dummyK.scale.set(1, 2.5, 1); // Tall, unified load-bearing columns
       dummyK.updateMatrix();
       pillars.canonical.push(dummyK.matrix.clone());
     }
 
-    // 2. BEAMS (The Structure)
+    // 2. BEAMS (30) -> An octagonal truss system
     for (let i = 0; i < beamCount; i++) {
       // Chaotic
       let bx = (Math.random() - 0.5) * 120;
       let bz = (Math.random() - 0.5) * 120;
       if (Math.abs(bx) < 15 && bz > 50) bx += (bx >= 0 ? 25 : -25);
       dummyC.position.set(bx, -30 + Math.random() * 100, bz);
-      dummyC.rotation.set(
-        0, (Math.floor(Math.random() * 4) * Math.PI) / 2, 0
-      );
+      dummyC.rotation.set(0, (Math.floor(Math.random() * 4) * Math.PI) / 2, 0);
       if (i < 2) dummyC.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
       dummyC.scale.set(0.5 + Math.random(), 1, 1);
       dummyC.updateMatrix();
       beams.chaotic.push(dummyC.matrix.clone());
 
-      // Canonical: Neat structural rings around the core at 3 heights
-      const angle = (i / (beamCount/3)) * Math.PI * 2;
-      const heightIndex = i % 3;
-      const kRadius = 90;
-      dummyK.position.set(Math.cos(angle) * kRadius, -30 + (heightIndex * 40), Math.sin(angle) * kRadius);
-      dummyK.rotation.set(0, angle + Math.PI/2, 0); // Tangent to circle
-      dummyK.scale.set(1.5, 1, 1);
+      // Canonical: Authored Trusses
+      if (i < 8) { 
+        // Inner Top Octagon
+        const a1 = (i / 8) * Math.PI * 2;
+        const a2 = ((i + 1) / 8) * Math.PI * 2;
+        const mid = (a1 + a2) / 2;
+        const apothem = 60 * Math.cos(Math.PI / 8);
+        dummyK.position.set(Math.cos(mid) * apothem, 35, Math.sin(mid) * apothem);
+        dummyK.rotation.set(0, mid + Math.PI/2, 0);
+        dummyK.scale.set(1.15, 1, 1); // Exactly spans the chord
+      } else if (i < 16) { 
+        // Outer Top Octagon
+        const a1 = ((i - 8) / 8) * Math.PI * 2;
+        const a2 = ((i - 7) / 8) * Math.PI * 2;
+        const mid = (a1 + a2) / 2;
+        const apothem = 100 * Math.cos(Math.PI / 8);
+        dummyK.position.set(Math.cos(mid) * apothem, 35, Math.sin(mid) * apothem);
+        dummyK.rotation.set(0, mid + Math.PI/2, 0);
+        dummyK.scale.set(1.91, 1.5, 1); // Heavier outer truss
+      } else if (i < 24) { 
+        // Inner Bottom Octagon
+        const a1 = ((i - 16) / 8) * Math.PI * 2;
+        const a2 = ((i - 15) / 8) * Math.PI * 2;
+        const mid = (a1 + a2) / 2;
+        const apothem = 60 * Math.cos(Math.PI / 8);
+        dummyK.position.set(Math.cos(mid) * apothem, -25, Math.sin(mid) * apothem);
+        dummyK.rotation.set(0, mid + Math.PI/2, 0);
+        dummyK.scale.set(1.15, 1, 1);
+      } else { 
+        // 6 Radial Spokes connecting inner and outer top rings
+        const a = ((i - 24) / 6) * Math.PI * 2;
+        dummyK.position.set(Math.cos(a) * 80, 35, Math.sin(a) * 80);
+        dummyK.rotation.set(0, a, 0);
+        dummyK.scale.set(1, 1, 1); // length 40 connects r=60 to r=100
+      }
       dummyK.updateMatrix();
       beams.canonical.push(dummyK.matrix.clone());
     }
 
-    // 3. PLATFORMS
+    // 3. PLATFORMS (15) -> Symmetrical stations and walkways
     for (let i = 0; i < platformCount; i++) {
       const angle = (i / platformCount) * Math.PI * 2;
       
       // Chaotic
       const cRadius = 25 + Math.random() * 10;
       dummyC.position.set(Math.cos(angle) * cRadius, -15 + (i * 8), Math.sin(angle) * cRadius);
-      dummyC.rotation.set(0, angle, (Math.random()-0.5)*0.3); // Tilted
+      dummyC.rotation.set(0, angle, (Math.random()-0.5)*0.3);
       dummyC.scale.set(1 + Math.random() * 0.5, 1, 1 + Math.random() * 0.5);
       dummyC.updateMatrix();
       platforms.chaotic.push(dummyC.matrix.clone());
 
-      // Canonical: Flat, exact radial alignment, uniform spacing
-      const kRadius = 45;
-      dummyK.position.set(Math.cos(angle) * kRadius, -20 + (i * 5), Math.sin(angle) * kRadius);
-      dummyK.rotation.set(0, angle, 0);
-      dummyK.scale.set(1.2, 1, 1.2);
+      // Canonical
+      if (i < 4) {
+        // 4 Main Terminal Stations on cardinal axes
+        const a = (i / 4) * Math.PI * 2;
+        dummyK.position.set(Math.cos(a) * 35, -10, Math.sin(a) * 35);
+        dummyK.rotation.set(0, a, 0);
+        dummyK.scale.set(1.5, 1, 1.5);
+      } else if (i < 12) {
+        // 8 Outer Walkway Platforms
+        const a = ((i - 4) / 8) * Math.PI * 2 + (Math.PI/8);
+        dummyK.position.set(Math.cos(a) * 75, -15, Math.sin(a) * 75);
+        dummyK.rotation.set(0, a + Math.PI/2, 0); // Tangential
+        dummyK.scale.set(1.5, 1, 0.8);
+      } else {
+        // 3 High Observation Decks
+        const a = ((i - 12) / 3) * Math.PI * 2;
+        dummyK.position.set(Math.cos(a) * 60, 15, Math.sin(a) * 60);
+        dummyK.rotation.set(0, a, 0);
+        dummyK.scale.set(1, 1, 1);
+      }
       dummyK.updateMatrix();
       platforms.canonical.push(dummyK.matrix.clone());
     }
 
-    // 4. STAIRCASES
+    // 4. STAIRCASES (12)
     for (let i = 0; i < stairCount; i++) {
       const angle = (i / stairCount) * Math.PI * 2;
       
@@ -133,15 +179,23 @@ export function ControlChamber() {
       dummyC.position.set(sx, -20 + (i * 8), sz);
       const slope = Math.PI / 4;
       dummyC.rotation.set(slope, angle, 0);
-      if (i < 2) dummyC.rotation.set(-slope, angle, Math.PI); // Escher upside down
+      if (i < 2) dummyC.rotation.set(-slope, angle, Math.PI);
       dummyC.scale.set(1, 1, 1);
       dummyC.updateMatrix();
       stairs.chaotic.push(dummyC.matrix.clone());
 
-      // Canonical: Connecting ramps in a perfect circle
-      const kRadius = 65;
-      dummyK.position.set(Math.cos(angle) * kRadius, -15 + (i * 5), Math.sin(angle) * kRadius);
-      dummyK.rotation.set(0.2, angle + Math.PI/2, 0); // Gentle connecting slope
+      // Canonical
+      if (i < 4) {
+        // 4 ramps leading up to the main terminal stations
+        const a = (i / 4) * Math.PI * 2;
+        dummyK.position.set(Math.cos(a) * 45, -12.5, Math.sin(a) * 45);
+        dummyK.rotation.set(Math.PI / 6, a, 0);
+      } else {
+        // 8 ramps connecting the outer walkway ring
+        const a = ((i - 4) / 8) * Math.PI * 2;
+        dummyK.position.set(Math.cos(a) * 75, -12.5, Math.sin(a) * 75);
+        dummyK.rotation.set(Math.PI / 6, a + Math.PI/2, 0); // Tangential slope
+      }
       dummyK.scale.set(1, 1, 1);
       dummyK.updateMatrix();
       stairs.canonical.push(dummyK.matrix.clone());
