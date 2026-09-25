@@ -263,37 +263,34 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       wave[i3 + 1] = waveY;
       wave[i3 + 2] = 0;
 
-      // --- SHAPE 3 (NETWORK) Orbital Rings ---
-      // We have 3 rings. Split 12000 particles into 3 groups of 4000.
+      // --- SHAPE 3 (NETWORK) Orbital Rings in XY ---
+      // 3 rings in the XY plane so they perfectly face the camera
       const ringIdx = Math.floor(i / (count / 3)); 
       const ringBaseRadius = 3 + ringIdx * 2.5; // Radii: 3, 5.5, 8
       const ringAngle = Math.random() * Math.PI * 2;
       const ringThickness = (Math.random() - 0.5) * 1.2;
-      const ringHeight = (Math.random() - 0.5) * 0.5;
       
       network[i3]     = Math.cos(ringAngle) * (ringBaseRadius + ringThickness);
-      network[i3 + 1] = ringHeight;
-      network[i3 + 2] = Math.sin(ringAngle) * (ringBaseRadius + ringThickness);
+      network[i3 + 1] = Math.sin(ringAngle) * (ringBaseRadius + ringThickness);
+      network[i3 + 2] = (Math.random() - 0.5) * 0.5; // slight depth
 
       // 4. VISION (Anamorphic Shape)
-      // Vision will be populated dynamically via useEffect
       vision[i3] = 0; vision[i3+1] = 0; vision[i3+2] = 0;
 
-      // 5. THE VAULT (Logic) -> Energy Trace Pipes
-      // We have two distinct paths (Left and Right) merging at the center.
-      // Left path: X goes from -8 to 0. Right path: X goes from 8 to 0.
+      // 5. THE VAULT (Logic) -> V-Shape Trace Pipes in XY
+      // Left path: X goes from -10 to 0, Y goes from 6 to 0
+      // Right path: X goes from 10 to 0, Y goes from 6 to 0
       const isLeftPath = i < count / 2;
       const progressAlongPath = Math.random(); // 0 (start) to 1 (center)
-      const pathX = isLeftPath ? -8 + (progressAlongPath * 8) : 8 - (progressAlongPath * 8);
-      const pathZ = -4 + (progressAlongPath * 4); // Both come forward to Z=0
+      const pathX = isLeftPath ? -10 + (progressAlongPath * 10) : 10 - (progressAlongPath * 10);
+      const pathY = 6 - (progressAlongPath * 6);
       
-      // Add thickness to the pipe
       const angleInPipe = Math.random() * Math.PI * 2;
       const pipeRadius = Math.random() * 0.8;
       
       circuit[i3]     = pathX + Math.cos(angleInPipe) * pipeRadius;
-      circuit[i3 + 1] = Math.sin(angleInPipe) * pipeRadius;
-      circuit[i3 + 2] = pathZ;
+      circuit[i3 + 1] = pathY + Math.sin(angleInPipe) * pipeRadius;
+      circuit[i3 + 2] = (Math.random() - 0.5) * pipeRadius;
 
       // 6. RING (The Clock / 12:00)
       const angle = Math.random() * Math.PI * 2;
@@ -439,7 +436,7 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
           const net = useCtrlFreakStore.getState().network;
           
           const applyNetworkMods = (px: number, py: number, pz: number) => {
-            const r = Math.sqrt(px*px + pz*pz);
+            const r = Math.sqrt(px*px + py*py);
             let ringIdx = 0;
             if (r > 4.2 && r < 6.7) ringIdx = 1;
             if (r >= 6.7) ringIdx = 2;
@@ -448,9 +445,8 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
             const isOverloaded = load > 70;
             const isUnderloaded = load < 10;
             
-            let currentAngle = Math.atan2(pz, px);
+            let currentAngle = Math.atan2(py, px);
             let currentR = r;
-            let currentY = py;
             
             if (net.solved) {
               // Smooth, perfectly synchronous spin
@@ -463,7 +459,6 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
               if (isOverloaded) {
                 // Ring bulges and vibrates violently
                 currentR += (Math.random() - 0.5) * 2.0;
-                currentY += (Math.random() - 0.5) * 1.5;
               }
               if (isUnderloaded) {
                 // Ring shrinks and stutters
@@ -472,16 +467,11 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
               }
             }
             
-            // Reconstruct coordinates and apply 30 deg tilt so we can see the rings from above
-            const tilt = Math.PI / 6; 
+            // Reconstruct coordinates in XY
             const newX = Math.cos(currentAngle) * currentR;
-            const newZ = Math.sin(currentAngle) * currentR;
-            const newY = currentY;
+            const newY = Math.sin(currentAngle) * currentR;
             
-            const tiltedY = newY * Math.cos(tilt) - newZ * Math.sin(tilt);
-            const tiltedZ = newY * Math.sin(tilt) + newZ * Math.cos(tilt);
-            
-            return [newX, tiltedY, tiltedZ];
+            return [newX, newY, pz];
           };
 
           if (shape1 === shapes.network) {
@@ -540,41 +530,40 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
           const logic = useCtrlFreakStore.getState().logic;
           
           const applyCircuitMods = (px: number, py: number, pz: number) => {
+            let nx = px;
+            let ny = py;
+            let nz = pz;
+            
             if (logic.solved) {
-               // Explode into a massive spinning geometric diamond structure
-               const r = Math.sqrt(px*px + py*py + pz*pz);
+               // Explode into a massive spinning geometric diamond star!
+               const r = Math.sqrt(px*px + py*py);
+               const angle = Math.atan2(py, px);
+               const starR = r * (1 + 2 * Math.abs(Math.cos(angle * 2))); // 4-point star shape
                const speed = t * 2.0;
-               const nx = px * Math.cos(speed) - pz * Math.sin(speed);
-               const nz = px * Math.sin(speed) + pz * Math.cos(speed);
-               const scale = 1.5 + Math.sin(t * 5 + r) * 0.2;
-               return [nx * scale, py * scale, nz * scale];
+               nx = Math.cos(angle + speed) * starR;
+               ny = Math.sin(angle + speed) * starR;
+               nz += (Math.random() - 0.5) * 5.0; // Thick explosion depth
+               return [nx, ny, nz];
             }
             
             const isLeftPath = px < 0;
             const slotCorrect = isLeftPath ? logic.slot1Correct : logic.slot2Correct;
             
             // Distance from center (0 = center, 1 = far edge)
-            const progressAlongPath = 1.0 - (Math.abs(px) / 8); 
-            
-            let nx = px;
-            let ny = py;
-            let nz = pz;
+            const progressAlongPath = 1.0 - (Math.abs(px) / 10); 
             
             if (slotCorrect) {
               // High speed energy flow towards the center
-              const flowSpeed = t * -15.0; // Negative moves towards 0
-              const offset = (Math.abs(px) + flowSpeed) % 8;
-              const newPx = (offset < 0 ? 8 + offset : offset);
+              const flowSpeed = t * -20.0; // Fast!
+              const offset = (Math.abs(px) + flowSpeed) % 10;
+              const newPx = (offset < 0 ? 10 + offset : offset);
               
               nx = isLeftPath ? -newPx : newPx;
-              nz = -4 + ((1.0 - (newPx / 8)) * 4);
-              
-              // Tighten the pipe when solved
-              ny *= 0.3; 
+              ny = 6 - ((1.0 - (newPx / 10)) * 6); // Reconstruct Y along the V shape
             } else {
               // If the path is blocked, particles near the middle (progress > 0.4) swirl chaotically
               if (progressAlongPath > 0.4) {
-                const chaos = (progressAlongPath - 0.4) * 5.0;
+                const chaos = (progressAlongPath - 0.4) * 15.0; // MASSIVE explosion
                 nx += (Math.random() - 0.5) * chaos;
                 ny += (Math.random() - 0.5) * chaos;
                 nz += (Math.random() - 0.5) * chaos;
