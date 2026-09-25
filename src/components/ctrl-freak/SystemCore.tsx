@@ -796,11 +796,11 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
   // A cinematic spline path for the camera to fly through the brutalist chamber
   const cameraPath = useMemo(() => {
     return new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0, 50, 80),    // 0.0: Arrival High (looking down at the core)
-      new THREE.Vector3(0, 0, 22),     // 0.2: Core Center (incident detected)
-      new THREE.Vector3(-25, -10, 15), // 0.35: Station 1 (Left Low, ANC)
-      new THREE.Vector3(25, -15, 20),  // 0.5: Station 2 (Right Lower, Network)
-      new THREE.Vector3(30, 20, -5),   // 0.65: Station 3 (Right High, behind the core, Vision)
+      new THREE.Vector3(0, 80, 160),   // 0.0: Arrival High (looking down at the entire massive containment facility)
+      new THREE.Vector3(0, 0, 30),     // 0.2: Core Center (incident detected)
+      new THREE.Vector3(-35, -5, 25),  // 0.35: Station 1 (Left Low, ANC)
+      new THREE.Vector3(35, -5, 20),   // 0.5: Station 2 (Right Lower, Network)
+      new THREE.Vector3(30, 25, -20),  // 0.65: Station 3 (Right High, behind the core, Vision)
       new THREE.Vector3(-20, 15, -20), // 0.8: Station 4 (Back Left High, Logic)
       new THREE.Vector3(0, 0, 22),     // 1.0: Final Clock (Front Center)
     ], false, 'catmullrom', 0.5);
@@ -813,15 +813,7 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
     // Get the exact point on the curve for this scroll percentage
     const targetPosition = cameraPath.getPoint(progress);
     
-    // Cinematic Intro Reveal: Start far back and push straight through the occlusion screen
-    if (progress < 0.01) {
-      const revealP = progress / 0.01; // 0 to 1
-      targetPosition.set(
-        0,
-        50,
-        THREE.MathUtils.lerp(120, 80, revealP)
-      );
-    }
+
     
     // Smoothly lerp the camera towards the target position
     state.camera.position.lerp(targetPosition, 0.05);
