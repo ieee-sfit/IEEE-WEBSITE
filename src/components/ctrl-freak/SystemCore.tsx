@@ -796,13 +796,13 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
   // A cinematic spline path for the camera to fly through the brutalist chamber
   const cameraPath = useMemo(() => {
     return new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0, 80, 160),   // 0.0: Arrival High (looking down at the entire massive containment facility)
-      new THREE.Vector3(0, 0, 30),     // 0.2: Core Center (incident detected)
-      new THREE.Vector3(-35, -5, 25),  // 0.35: Station 1 (Left Low, ANC)
-      new THREE.Vector3(35, -5, 20),   // 0.5: Station 2 (Right Lower, Network)
-      new THREE.Vector3(30, 25, -20),  // 0.65: Station 3 (Right High, behind the core, Vision)
-      new THREE.Vector3(-20, 15, -20), // 0.8: Station 4 (Back Left High, Logic)
-      new THREE.Vector3(0, 0, 22),     // 1.0: Final Clock (Front Center)
+      new THREE.Vector3(0, 80, 160),   // 0.0: Arrival High
+      new THREE.Vector3(0, 0, 30),     // 0.2: Core Center
+      new THREE.Vector3(-35, -5, 25),  // 0.35: Station 1 (Left Low)
+      new THREE.Vector3(35, -5, 20),   // 0.5: Station 2 (Right Lower)
+      new THREE.Vector3(30, 25, -20),  // 0.65: Station 3 (Right High)
+      new THREE.Vector3(-20, 15, -20), // 0.8: Station 4 (Back Left High)
+      new THREE.Vector3(0, -6, 28),    // 1.0: Final Clock (Dipped Low, looking UP at the massive Boss Entity)
     ], false, 'catmullrom', 0.5);
   }, []);
 
@@ -818,21 +818,17 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
     const isFullySolved = sysState.anc.solved && sysState.network.solved && sysState.vision.solved && sysState.logic.solved;
 
     // Cinematic Intro Reveal: Start behind the occlusion Monolith and push straight through it
-    // If fully solved, skip this so the user can see the entire un-occluded Ziggurat when returning to top
     if (!isFullySolved && progress < 0.0075) {
-      const revealP = progress / 0.0075; // 0 to 1
-      targetPosition.set(
-        0,
-        80,
-        THREE.MathUtils.lerp(160, 130, revealP)
-      );
+      const revealP = progress / 0.0075;
+      targetPosition.set(0, 80, THREE.MathUtils.lerp(160, 130, revealP));
     }
     
     // Smoothly lerp the camera towards the target position
     state.camera.position.lerp(targetPosition, 0.05);
     
-    // Always keep the camera focused on the System Core at the center of the room
-    state.camera.lookAt(0, 0, 0);
+    // Adjust lookAt based on scroll progress to reveal the entity behind the core
+    const lookAtY = THREE.MathUtils.lerp(0, 5, progress);
+    state.camera.lookAt(0, lookAtY, 0);
   });
 
   return null;
