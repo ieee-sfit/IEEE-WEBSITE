@@ -390,8 +390,8 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
     }
   }, [visionPitch, visionYaw, count, baseVision, shapes]);
 
-  // Initial render buffer
-  const [positions] = useState(() => new Float32Array(count * 3));
+  // Initial render buffer (useMemo instead of useState so it updates when count changes)
+  const positions = useMemo(() => new Float32Array(count * 3), [count]);
 
   // --- THE CLOCK ---
   // Starts at 720 (12 minutes). When it hits 0, it goes negative, which we use to count upwards in red.
