@@ -33,6 +33,7 @@ export function ControlChamber() {
   // React to solved states for lighting changes
   const ancSolved = useCtrlFreakStore(s => s.anc.solved);
   const networkSolved = useCtrlFreakStore(s => s.network.solved);
+  const visionSolved = useCtrlFreakStore(s => s.vision.solved);
   const logicSolved = useCtrlFreakStore(s => s.logic.solved);
 
   // Keep track of current interpolated stability
