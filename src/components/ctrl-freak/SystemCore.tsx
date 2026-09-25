@@ -778,6 +778,16 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
     // Get the exact point on the curve for this scroll percentage
     const targetPosition = cameraPath.getPoint(progress);
     
+    // Cinematic Intro Reveal: Start behind the monolith and sweep out
+    if (progress < 0.05) {
+      const revealP = progress / 0.05; // 0 to 1
+      targetPosition.set(
+        THREE.MathUtils.lerp(35, 0, revealP),
+        50,
+        80
+      );
+    }
+    
     // Smoothly lerp the camera towards the target position
     state.camera.position.lerp(targetPosition, 0.05);
     

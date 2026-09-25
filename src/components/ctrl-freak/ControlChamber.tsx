@@ -150,6 +150,12 @@ export function ControlChamber() {
         <meshBasicMaterial color="#ff3333" transparent opacity={0.02} />
       </mesh>
       
+      {/* The Monolith (Initial Camera Occlusion for Intro Reveal) */}
+      <mesh position={[25, 50, 50]}>
+        <boxGeometry args={[30, 150, 20]} />
+        <primitive object={brutalistMaterial} attach="material" />
+      </mesh>
+      
       {/* The Instances */}
       <instancedMesh ref={pillarRef} args={[undefined, undefined, pillarCount]}>
         <boxGeometry args={PILLAR_SIZE} />
