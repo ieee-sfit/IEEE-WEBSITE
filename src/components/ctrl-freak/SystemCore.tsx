@@ -263,7 +263,7 @@ const SceneExporter = () => {
 // A massive, glitching point cloud that evolves into specific formations based on scroll progress
 const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) => {
   const pointsRef = useRef<THREE.Points>(null);
-  const count = 8000; // Balanced count for visual density and mobile performance
+  const count = 3500; // Optimized count for mobile device performance
   
   // Pre-calculate all target shapes
   const shapes = useMemo(() => {
@@ -785,7 +785,7 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
         size={0.06}
         sizeAttenuation={true}
         depthWrite={false}
-        depthTest={false}
+        depthTest={true}
         blending={THREE.AdditiveBlending}
       />
     </Points>
@@ -812,8 +812,16 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
     
     // Get the exact point on the curve for this scroll percentage
     const targetPosition = cameraPath.getPoint(progress);
-    
 
+    // Cinematic Intro Reveal: Start behind the occlusion Monolith and push straight through it
+    if (progress < 0.0075) {
+      const revealP = progress / 0.0075; // 0 to 1
+      targetPosition.set(
+        0,
+        80,
+        THREE.MathUtils.lerp(160, 130, revealP)
+      );
+    }
     
     // Smoothly lerp the camera towards the target position
     state.camera.position.lerp(targetPosition, 0.05);
@@ -828,7 +836,7 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
 export const SystemCore = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) => {
   return (
     <div className="w-full h-full">
-      <Canvas shadows camera={{ position: [0, 50, 80], fov: 45 }}>
+      <Canvas camera={{ position: [0, 50, 80], fov: 45 }}>
         <SceneExporter />
         <color attach="background" args={['#050505']} />
         <ambientLight intensity={0.15} />
@@ -853,7 +861,6 @@ export const SystemCore = ({ scrollProgress }: { scrollProgress: MotionValue<num
             mipmapBlur
             radius={0.6}
           />
-          <Noise opacity={0.045} />
           <Vignette eskil={false} offset={0.05} darkness={1.15} />
         </EffectComposer>
       </Canvas>

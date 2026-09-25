@@ -52,13 +52,13 @@ export function ControlChamber() {
     for (let i = 0; i < pillarCount; i++) {
       const angle = (i / pillarCount) * Math.PI * 2;
       
-      // Chaotic: Blown completely outward, shattered containment
-      const cRadius = 90 + Math.random() * 40; 
+      // Chaotic: Blasted into an outer ring, tilted outward like a blown-open wall
+      const cRadius = 100 + (i % 2) * 15; 
       let cPx = Math.cos(angle) * cRadius;
       let cPz = Math.sin(angle) * cRadius;
-      dummyC.position.set(cPx, -20 + Math.random() * 60, cPz);
-      dummyC.rotation.set((Math.random()-0.5)*1.5, angle, (Math.random()-0.5)*1.5); // Wild tilts
-      dummyC.scale.set(1, 1.5 + Math.random() * 2, 1);
+      dummyC.position.set(cPx, -30, cPz);
+      dummyC.rotation.set(Math.PI / 2.2, angle + Math.PI/2, 0); // Lay them almost flat
+      dummyC.scale.set(1.5, 1.5, 1.5);
       dummyC.updateMatrix();
       pillars.chaotic.push(dummyC.matrix.clone());
 
@@ -94,12 +94,12 @@ export function ControlChamber() {
 
     // 2. BEAMS (30) -> The Overhead Vault Lock
     for (let i = 0; i < beamCount; i++) {
-      // Chaotic: Sheared and dangling
-      let bx = (Math.random() - 0.5) * 150;
-      let bz = (Math.random() - 0.5) * 150;
-      dummyC.position.set(bx, 20 + Math.random() * 80, bz);
-      dummyC.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
-      dummyC.scale.set(0.5 + Math.random(), 1, 1);
+      // Chaotic: Sheared and frozen mid-air far away
+      const angle = (i / beamCount) * Math.PI * 2;
+      const cRadius = 80 + (i % 3) * 25;
+      dummyC.position.set(Math.cos(angle) * cRadius, 40 + (i % 2) * 20, Math.sin(angle) * cRadius);
+      dummyC.rotation.set(0, angle + Math.PI/4, Math.PI / 4); // Angled spin
+      dummyC.scale.set(1, 1, 1);
       dummyC.updateMatrix();
       beams.chaotic.push(dummyC.matrix.clone());
 
@@ -141,12 +141,12 @@ export function ControlChamber() {
 
     // 3. PLATFORMS (15) -> Solid Ziggurat Base
     for (let i = 0; i < platformCount; i++) {
-      // Chaotic: Dangling, tilted
+      // Chaotic: Pushed to the ground layer far out
       const angle = (i / platformCount) * Math.PI * 2;
-      const cRadius = 40 + Math.random() * 30;
-      dummyC.position.set(Math.cos(angle) * cRadius, -20 + (i * 8), Math.sin(angle) * cRadius);
-      dummyC.rotation.set((Math.random()-0.5)*0.8, angle, (Math.random()-0.5)*0.8);
-      dummyC.scale.set(1 + Math.random() * 0.5, 1, 1 + Math.random() * 0.5);
+      const cRadius = 70 + (i % 2) * 20;
+      dummyC.position.set(Math.cos(angle) * cRadius, -40 + (i % 3) * 10, Math.sin(angle) * cRadius);
+      dummyC.rotation.set(0, angle, Math.PI / 8); 
+      dummyC.scale.set(1.5, 1, 1.5);
       dummyC.updateMatrix();
       platforms.chaotic.push(dummyC.matrix.clone());
 
@@ -189,10 +189,10 @@ export function ControlChamber() {
     for (let i = 0; i < stairCount; i++) {
       const angle = (i / stairCount) * Math.PI * 2;
       
-      // Chaotic
-      const cRadius = 60 + Math.random() * 20;
-      dummyC.position.set(Math.cos(angle) * cRadius, -20 + (i * 8), Math.sin(angle) * cRadius);
-      dummyC.rotation.set(Math.random() * Math.PI, angle, 0);
+      // Chaotic: Disconnected bridges hanging in the void
+      const cRadius = 90;
+      dummyC.position.set(Math.cos(angle) * cRadius, -10 + (i % 2) * 20, Math.sin(angle) * cRadius);
+      dummyC.rotation.set(Math.PI / 6, angle, Math.PI / 2); // Twisted
       dummyC.scale.set(1, 1, 1);
       dummyC.updateMatrix();
       stairs.chaotic.push(dummyC.matrix.clone());
@@ -311,8 +311,14 @@ export function ControlChamber() {
 
   return (
     <group>
+      {/* The Monolith (Initial Camera Occlusion for Intro Reveal - 0.75% scroll) */}
+      <mesh position={[0, 50, 145]}>
+        <boxGeometry args={[400, 400, 1]} />
+        <meshBasicMaterial color="#020202" />
+      </mesh>
+
       {/* Floor & Deep Void */}
-      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, -60, 0]}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -60, 0]}>
         <circleGeometry args={[250, 32]} />
         <meshStandardMaterial color="#020202" roughness={1} />
       </mesh>
@@ -334,42 +340,33 @@ export function ControlChamber() {
 
       
       {/* The Instances */}
-      <instancedMesh ref={pillarRef} castShadow receiveShadow args={[undefined, undefined, pillarCount]}>
+      <instancedMesh ref={pillarRef} args={[undefined, undefined, pillarCount]}>
         <boxGeometry args={PILLAR_SIZE} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
-      <instancedMesh ref={beamRef} castShadow receiveShadow args={[undefined, undefined, beamCount]}>
+      <instancedMesh ref={beamRef} args={[undefined, undefined, beamCount]}>
         <boxGeometry args={BEAM_SIZE} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
-      <instancedMesh ref={platformRef} castShadow receiveShadow args={[undefined, undefined, platformCount]}>
+      <instancedMesh ref={platformRef} args={[undefined, undefined, platformCount]}>
         <boxGeometry args={PLATFORM_SIZE} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
-      <instancedMesh ref={stairRef} castShadow receiveShadow args={[undefined, undefined, stairCount]}>
+      <instancedMesh ref={stairRef} args={[undefined, undefined, stairCount]}>
         <boxGeometry args={STAIR_SIZE} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
-      {/* Basic Architecture Lighting (Now with real-time shadows!) */}
+      {/* Basic Architecture Lighting (Shadows removed for mobile performance) */}
       
-      {/* Key spotlight shining down casting deep massive structural shadows */}
+      {/* Key spotlight shining down on the brutalist geometry */}
       <directionalLight 
-        castShadow
         position={[40, 100, 60]} 
         intensity={ancSolved ? 4.5 : 3.0} 
         color="#ffffff" 
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-far={250}
-        shadow-camera-left={-120}
-        shadow-camera-right={120}
-        shadow-camera-top={120}
-        shadow-camera-bottom={-120}
-        shadow-bias={-0.0005}
       />
       
       {/* Harsh stark rim light from the opposite side (Emergency Lockdown) */}
