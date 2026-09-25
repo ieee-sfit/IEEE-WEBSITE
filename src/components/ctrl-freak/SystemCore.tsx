@@ -785,7 +785,7 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
         size={0.06}
         sizeAttenuation={true}
         depthWrite={false}
-        depthTest={true}
+        depthTest={false}
         blending={THREE.AdditiveBlending}
       />
     </Points>
