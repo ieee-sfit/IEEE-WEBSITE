@@ -794,7 +794,7 @@ export const SystemCore = ({ scrollProgress }: { scrollProgress: MotionValue<num
       <Canvas camera={{ position: [0, 50, 80], fov: 45 }}>
         <SceneExporter />
         <color attach="background" args={['#050505']} />
-        <ambientLight intensity={0.5} />
+        <ambientLight intensity={0.05} />
         
         {/* Phase 0: The Architectural Prototype */}
         <ControlChamber />

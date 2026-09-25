@@ -1,5 +1,6 @@
 import { useRef, useEffect } from 'react';
 import * as THREE from 'three';
+import { useCtrlFreakStore } from '../../store/useCtrlFreakStore';
 
 // Procedural Vocabulary Geometry Sizes
 const PILLAR_SIZE: [number, number, number] = [3, 80, 3];
@@ -25,6 +26,11 @@ export function ControlChamber() {
   const beamCount = 36;
   const platformCount = 8;
   const stairCount = 12;
+
+  // React to solved states for lighting changes
+  const ancSolved = useCtrlFreakStore(s => s.anc.solved);
+  const networkSolved = useCtrlFreakStore(s => s.network.solved);
+  const logicSolved = useCtrlFreakStore(s => s.logic.solved);
 
   useEffect(() => {
     if (!pillarRef.current || !beamRef.current || !platformRef.current || !stairRef.current) return;
@@ -130,6 +136,20 @@ export function ControlChamber() {
         <meshStandardMaterial color="#050505" roughness={1} />
       </mesh>
       
+      {/* Subtle Structural Floor Rings */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -59.9, 0]}>
+        <ringGeometry args={[80, 82, 64]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.03} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -59.9, 0]}>
+        <ringGeometry args={[140, 142, 64]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.02} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -59.9, 0]}>
+        <ringGeometry args={[200, 205, 64]} />
+        <meshBasicMaterial color="#ff3333" transparent opacity={0.02} />
+      </mesh>
+      
       {/* The Instances */}
       <instancedMesh ref={pillarRef} args={[undefined, undefined, pillarCount]}>
         <boxGeometry args={PILLAR_SIZE} />
@@ -151,34 +171,46 @@ export function ControlChamber() {
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
-      {/* Basic Architecture Lighting (No real-time shadows yet) */}
-      <ambientLight intensity={0.1} />
+      {/* Basic Architecture Lighting */}
       
-      {/* Key spotlight shining down and angled slightly to give the pillars bright faces */}
-      <directionalLight 
+      {/* Key spotlight: Cold white inspection light. Brighter when ANC stabilizes */}
+      <spotLight 
         position={[20, 80, 40]} 
-        intensity={2.5} 
+        intensity={ancSolved ? 4000 : 1500} 
         color="#ffffff" 
+        angle={Math.PI / 6}
+        penumbra={0.5}
+        distance={200}
       />
       
-      {/* Harsh stark rim light from the opposite side */}
-      <directionalLight 
-        position={[-50, 20, -50]} 
-        intensity={1.0} 
-        color="#ff3333" 
+      {/* Emergency Lockdown Light: Harsh red, fades out when Logic is solved */}
+      <pointLight 
+        position={[-30, 10, -30]} 
+        intensity={logicSolved ? 200 : 2500} 
+        color="#ff1111" 
+        distance={150}
       />
       
-      {/* Secondary stark blue/white rim light to create cinematic contrast */}
-      <directionalLight 
-        position={[60, 0, -20]} 
-        intensity={1.5} 
-        color="#88ccff" 
+      {/* Data Infrastructure Light: Deep cyan rim light, flares up when Network balanced */}
+      <pointLight 
+        position={[40, -10, -20]} 
+        intensity={networkSolved ? 3000 : 500} 
+        color="#00ddff" 
+        distance={180}
       />
       
-      <hemisphereLight groundColor="#000000" color="#222222" intensity={0.3} />
+      {/* Tiny red emissive strips (Floating warning lamps) */}
+      <mesh position={[-25, 15, -15]}>
+         <boxGeometry args={[6, 0.2, 0.2]} />
+         <meshStandardMaterial color="#330000" emissive="#ff1111" emissiveIntensity={5} />
+      </mesh>
+      <mesh position={[35, 5, -25]} rotation={[0, Math.PI/4, 0]}>
+         <boxGeometry args={[4, 0.2, 0.2]} />
+         <meshStandardMaterial color="#002233" emissive="#00ddff" emissiveIntensity={5} />
+      </mesh>
       
-      {/* Dense fog pushed back so we can actually see the chamber */}
-      <fog attach="fog" args={['#050505', 40, 180]} />
+      {/* Dense fog pushed back to create foreground/midground depth layers */}
+      <fog attach="fog" args={['#050505', 30, 200]} />
     </group>
   );
 }
