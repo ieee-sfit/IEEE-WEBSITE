@@ -48,7 +48,7 @@ export function ControlChamber() {
     const platforms = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
     const stairs = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
 
-    // 1. PILLARS (24) -> The Containment Shield
+    // 1. PILLARS (24) -> The Perimeter Trench & Anchor Towers
     for (let i = 0; i < pillarCount; i++) {
       const angle = (i / pillarCount) * Math.PI * 2;
       
@@ -62,19 +62,31 @@ export function ControlChamber() {
       dummyC.updateMatrix();
       pillars.chaotic.push(dummyC.matrix.clone());
 
-      // Canonical: Massive Containment Vault Walls
-      if (i < 12) {
-        // Inner heavy shield ring
-        const a = (i / 12) * Math.PI * 2;
-        dummyK.position.set(Math.cos(a) * 45, -5, Math.sin(a) * 45);
+      // Canonical: NO BIRDCAGE. Massive walls and distant anchors.
+      if (i < 4) {
+        // 4 Massive Anchor Towers placed far away in the corners
+        const a = (i / 4) * Math.PI * 2 + (Math.PI / 4);
+        dummyK.position.set(Math.cos(a) * 120, 10, Math.sin(a) * 120);
         dummyK.rotation.set(0, a, 0);
-        dummyK.scale.set(4, 2.5, 2); // Massive heavy slabs
+        dummyK.scale.set(4, 2, 4); // Extremely thick (12x160x12)
+      } else if (i < 12) {
+        // 8 Pillars laid flat to form a heavy octagonal floor boundary
+        const a = ((i - 4) / 8) * Math.PI * 2;
+        dummyK.position.set(Math.cos(a) * 85, -20, Math.sin(a) * 85);
+        dummyK.rotation.set(Math.PI / 2, a + Math.PI/2, 0); // Laid flat, tangential
+        dummyK.scale.set(2, 1.05, 2); // Length matches octagonal edge
+      } else if (i < 20) {
+        // 8 Pillars laid flat to form a second stacked ring on top of the first
+        const a = ((i - 12) / 8) * Math.PI * 2;
+        dummyK.position.set(Math.cos(a) * 85, -14, Math.sin(a) * 85);
+        dummyK.rotation.set(Math.PI / 2, a + Math.PI/2, 0); 
+        dummyK.scale.set(2, 1.05, 2); 
       } else {
-        // Outer reinforced buttresses
-        const a = ((i - 12) / 12) * Math.PI * 2 + (Math.PI / 12);
-        dummyK.position.set(Math.cos(a) * 65, -10, Math.sin(a) * 65);
-        dummyK.rotation.set(0, a, 0);
-        dummyK.scale.set(2, 3, 1.5); 
+        // Last 4 pillars acting as heavy horizontal cross-beams high in the ceiling
+        const a = ((i - 20) / 4) * Math.PI * 2;
+        dummyK.position.set(Math.cos(a) * 40, 50, Math.sin(a) * 40);
+        dummyK.rotation.set(Math.PI / 2, a, 0); // Flat, pointing towards center
+        dummyK.scale.set(2, 1.2, 2); 
       }
       dummyK.updateMatrix();
       pillars.canonical.push(dummyK.matrix.clone());
@@ -91,40 +103,43 @@ export function ControlChamber() {
       dummyC.updateMatrix();
       beams.chaotic.push(dummyC.matrix.clone());
 
-      // Canonical: Massive interlocking vault door overhead
+      // Canonical: A rigid, brutalist overhead locking grid (No stray floating pieces)
       if (i < 8) {
-         // Primary locking cross-beams (criss-crossing directly over the core forming an iris)
-         const a = (i / 8) * Math.PI; // 0 to PI
-         dummyK.position.set(0, 35, 0);
-         dummyK.rotation.set(0, a, 0);
-         dummyK.scale.set(2.5, 2, 2); // Extremely heavy
+         // Inner Octagon Aperture over the core
+         const a1 = (i / 8) * Math.PI * 2;
+         const a2 = ((i + 1) / 8) * Math.PI * 2;
+         const mid = (a1 + a2) / 2;
+         const apothem = 25 * Math.cos(Math.PI / 8);
+         dummyK.position.set(Math.cos(mid) * apothem, 30, Math.sin(mid) * apothem);
+         dummyK.rotation.set(0, mid + Math.PI/2, 0);
+         dummyK.scale.set(0.48, 2, 2); // Exact length for r=25
       } else if (i < 16) {
-         // Octagonal inner vault frame (supports the cross-beams)
+         // Outer Octagon Frame
          const a1 = ((i - 8) / 8) * Math.PI * 2;
          const a2 = ((i - 7) / 8) * Math.PI * 2;
          const mid = (a1 + a2) / 2;
-         const apothem = 45 * Math.cos(Math.PI / 8);
+         const apothem = 65 * Math.cos(Math.PI / 8);
          dummyK.position.set(Math.cos(mid) * apothem, 30, Math.sin(mid) * apothem);
          dummyK.rotation.set(0, mid + Math.PI/2, 0);
-         dummyK.scale.set(0.86, 1.5, 1.5);
+         dummyK.scale.set(1.24, 2, 2);
       } else if (i < 24) {
-         // Outer radial locking arms (sliding inward)
+         // 8 Radial Spokes connecting inner and outer octagons
          const a = ((i - 16) / 8) * Math.PI * 2;
-         dummyK.position.set(Math.cos(a) * 60, 25, Math.sin(a) * 60);
+         dummyK.position.set(Math.cos(a) * 45, 30, Math.sin(a) * 45);
          dummyK.rotation.set(0, a, 0);
-         dummyK.scale.set(1.5, 1.5, 1.5);
+         dummyK.scale.set(1, 2, 2); // Connects r=25 to r=65
       } else {
-         // 6 heavy vertical/diagonal blast shields anchoring the lock to the floor
+         // 6 Heavy vertical drop-struts anchoring the overhead grid to the pedestal
          const a = ((i - 24) / 6) * Math.PI * 2;
-         dummyK.position.set(Math.cos(a) * 55, 10, Math.sin(a) * 55);
-         dummyK.rotation.set(Math.PI / 3, a + Math.PI/2, 0); // Diagonal slope
-         dummyK.scale.set(1, 2, 2);
+         dummyK.position.set(Math.cos(a) * 45, 10, Math.sin(a) * 45);
+         dummyK.rotation.set(0, a, Math.PI / 2); // Vertical
+         dummyK.scale.set(1, 3, 3);
       }
       dummyK.updateMatrix();
       beams.canonical.push(dummyK.matrix.clone());
     }
 
-    // 3. PLATFORMS (15) -> Observation Decks
+    // 3. PLATFORMS (15) -> Solid Ziggurat Base
     for (let i = 0; i < platformCount; i++) {
       // Chaotic: Dangling, tilted
       const angle = (i / platformCount) * Math.PI * 2;
@@ -135,31 +150,42 @@ export function ControlChamber() {
       dummyC.updateMatrix();
       platforms.chaotic.push(dummyC.matrix.clone());
 
-      // Canonical: Multi-level tiered observation decks around the containment vault
-      if (i < 6) {
-        // Lower engineering deck
-        const a = (i / 6) * Math.PI * 2;
-        dummyK.position.set(Math.cos(a) * 55, -15, Math.sin(a) * 55);
+      // Canonical: Monolithic solid base (ZERO floating pieces)
+      if (i === 0) {
+        // Center core pedestal
+        dummyK.position.set(0, -10, 0);
+        dummyK.rotation.set(0, 0, 0);
+        dummyK.scale.set(3, 2, 3); // 45x4x45 solid block
+      } else if (i < 5) {
+        // 4 Cardinal extensions overlapping the center
+        const a = ((i - 1) / 4) * Math.PI * 2;
+        dummyK.position.set(Math.cos(a) * 35, -12, Math.sin(a) * 35);
         dummyK.rotation.set(0, a, 0);
-        dummyK.scale.set(1.5, 1, 1.5);
-      } else if (i < 12) {
-        // Mid-level observation walkway
-        const a = ((i - 6) / 6) * Math.PI * 2 + (Math.PI/6);
-        dummyK.position.set(Math.cos(a) * 75, 5, Math.sin(a) * 75);
-        dummyK.rotation.set(0, a + Math.PI/2, 0); // Tangential
-        dummyK.scale.set(2, 1, 1.5);
+        dummyK.scale.set(2, 1.5, 3); 
+      } else if (i < 9) {
+        // 4 Corner fills completing the solid 90x90 square
+        const a = ((i - 5) / 4) * Math.PI * 2 + (Math.PI / 4);
+        dummyK.position.set(Math.cos(a) * 35, -14, Math.sin(a) * 35);
+        dummyK.rotation.set(0, a, 0);
+        dummyK.scale.set(2.5, 1, 2.5);
+      } else if (i < 13) {
+        // 4 Secondary raised platforms wrapping the core
+        const a = ((i - 9) / 4) * Math.PI * 2 + (Math.PI / 4);
+        dummyK.position.set(Math.cos(a) * 15, -7, Math.sin(a) * 15);
+        dummyK.rotation.set(0, a, 0);
+        dummyK.scale.set(1, 2, 1);
       } else {
-        // 3 High oversight command platforms
-        const a = ((i - 12) / 3) * Math.PI * 2;
-        dummyK.position.set(Math.cos(a) * 85, 25, Math.sin(a) * 85);
-        dummyK.rotation.set(0, a, 0);
-        dummyK.scale.set(1.5, 1, 1.5);
+        // Last 2 platforms acting as heavy vertical blast shields right beside the core
+        const sign = i === 13 ? 1 : -1;
+        dummyK.position.set(sign * 12, -2, 0);
+        dummyK.rotation.set(0, 0, Math.PI / 2); // Standing upright
+        dummyK.scale.set(1, 1.5, 1.5);
       }
       dummyK.updateMatrix();
       platforms.canonical.push(dummyK.matrix.clone());
     }
 
-    // 4. STAIRCASES (12) -> Access Routes
+    // 4. STAIRCASES (12) -> Heavy Buttresses & Ramps
     for (let i = 0; i < stairCount; i++) {
       const angle = (i / stairCount) * Math.PI * 2;
       
@@ -171,19 +197,20 @@ export function ControlChamber() {
       dummyC.updateMatrix();
       stairs.chaotic.push(dummyC.matrix.clone());
 
-      // Canonical
-      if (i < 6) {
-        // Connect lower engineering deck to mid observation
-        const a = (i / 6) * Math.PI * 2;
-        dummyK.position.set(Math.cos(a) * 65, -5, Math.sin(a) * 65);
-        dummyK.rotation.set(Math.PI / 4, a, 0); // Slope upwards outward
+      // Canonical: Anchoring the Ziggurat to the floor
+      if (i < 4) {
+        // 4 Main access ramps on cardinal axes leading to the pedestal
+        const a = (i / 4) * Math.PI * 2;
+        dummyK.position.set(Math.cos(a) * 55, -16, Math.sin(a) * 55);
+        dummyK.rotation.set(Math.PI / 6, a, 0);
+        dummyK.scale.set(1.5, 2, 1.5); // Wide, heavy ramps
       } else {
-        // Connect mid to high command
-        const a = ((i - 6) / 6) * Math.PI * 2 + (Math.PI/6);
-        dummyK.position.set(Math.cos(a) * 80, 15, Math.sin(a) * 80);
-        dummyK.rotation.set(Math.PI / 4, a + Math.PI/2, 0); // Tangential slope
+        // 8 Tangential buttresses securing the corners of the base
+        const a = ((i - 4) / 8) * Math.PI * 2 + (Math.PI / 8);
+        dummyK.position.set(Math.cos(a) * 50, -15, Math.sin(a) * 50);
+        dummyK.rotation.set(Math.PI / 4, a + Math.PI/2, 0);
+        dummyK.scale.set(1, 3, 1); // Thick structural wedges
       }
-      dummyK.scale.set(1, 1, 1);
       dummyK.updateMatrix();
       stairs.canonical.push(dummyK.matrix.clone());
     }
