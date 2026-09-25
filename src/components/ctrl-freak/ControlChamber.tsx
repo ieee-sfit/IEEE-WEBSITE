@@ -8,13 +8,13 @@ const BEAM_SIZE: [number, number, number] = [40, 2, 2];
 const PLATFORM_SIZE: [number, number, number] = [12, 1, 12];
 const STAIR_SIZE: [number, number, number] = [4, 0.5, 15]; // Represented as a slanted box for silhouette
 
-// The single, flat, dark concrete material
+// The premium, dark sci-fi material
 const brutalistMaterial = new THREE.MeshStandardMaterial({
-  color: '#ffffff', // Base white to multiply with instance colors
-  roughness: 0.82,
-  metalness: 0.05,
-  emissive: '#050609',
-  emissiveIntensity: 0.3,
+  color: '#ffffff', // Required so instanceColor isn't tinted
+  roughness: 0.78,
+  metalness: 0.18,
+  emissive: '#030405',
+  emissiveIntensity: 0.15,
 });
 
 export function ControlChamber() {
@@ -146,9 +146,9 @@ export function ControlChamber() {
       if (!ref.current) return;
       const tempMatrix = new THREE.Matrix4();
       const position = new THREE.Vector3();
-      const cForeground = new THREE.Color('#1d2024');
-      const cMidground = new THREE.Color('#15171a');
-      const cBackground = new THREE.Color('#101113');
+      const cForeground = new THREE.Color('#121519');
+      const cMidground = new THREE.Color('#0d1013');
+      const cBackground = new THREE.Color('#080a0c');
       
       for (let i = 0; i < count; i++) {
         ref.current.getMatrixAt(i, tempMatrix);
@@ -181,21 +181,21 @@ export function ControlChamber() {
       {/* Floor & Deep Void */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -60, 0]}>
         <circleGeometry args={[250, 32]} />
-        <meshStandardMaterial color="#050505" roughness={1} />
+        <meshStandardMaterial color="#020202" roughness={1} />
       </mesh>
       
       {/* Subtle Structural Floor Rings */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -59.9, 0]}>
         <ringGeometry args={[80, 82, 64]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.03} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.015} />
       </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -59.9, 0]}>
         <ringGeometry args={[140, 142, 64]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.02} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.01} />
       </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -59.9, 0]}>
         <ringGeometry args={[200, 205, 64]} />
-        <meshBasicMaterial color="#ff3333" transparent opacity={0.02} />
+        <meshBasicMaterial color="#ff3333" transparent opacity={0.01} />
       </mesh>
       
       {/* The Monolith (Initial Camera Occlusion for Intro Reveal) */}
