@@ -20,9 +20,11 @@ export function ControlChamber() {
   const beamRef = useRef<THREE.InstancedMesh>(null);
   const platformRef = useRef<THREE.InstancedMesh>(null);
   const stairRef = useRef<THREE.InstancedMesh>(null);
+  const conduitRef = useRef<THREE.InstancedMesh>(null);
 
   // Vocabulary limits
   const pillarCount = 24;
+  const conduitCount = Math.floor(pillarCount / 3);
   const beamCount = 36;
   const platformCount = 8;
   const stairCount = 12;
@@ -52,12 +54,22 @@ export function ControlChamber() {
       
       dummy.position.set(px, -20 + Math.random() * 40, pz);
       dummy.rotation.set(0, angle, 0); 
-      dummy.scale.set(1, 1.5 + Math.random() * 1.5, 1); // Taller pillars
+      const pScaleY = 1.5 + Math.random() * 1.5;
+      dummy.scale.set(1, pScaleY, 1); // Taller pillars
       
       dummy.updateMatrix();
       pillarRef.current.setMatrixAt(i, dummy.matrix);
+      
+      // Add a neon conduit to every 3rd pillar
+      if (i % 3 === 0 && conduitRef.current) {
+        dummy.scale.set(0.05, pScaleY * 0.8, 0.05); // Thin strip
+        dummy.position.set(px + 1.6, dummy.position.y, pz + 1.6); // Attach to corner
+        dummy.updateMatrix();
+        conduitRef.current.setMatrixAt(Math.floor(i / 3), dummy.matrix);
+      }
     }
     pillarRef.current.instanceMatrix.needsUpdate = true;
+    if (conduitRef.current) conduitRef.current.instanceMatrix.needsUpdate = true;
 
     // 2. BEAMS (The Structure)
     for (let i = 0; i < beamCount; i++) {
@@ -143,24 +155,14 @@ export function ControlChamber() {
 
   return (
     <group>
-      {/* Floor & Deep Void */}
+      {/* 1. The Neural Grid (Floor) */}
+      <gridHelper 
+        args={[400, 100, '#00ddff', '#002233']} 
+        position={[0, -59.9, 0]} 
+      />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -60, 0]}>
-        <circleGeometry args={[250, 32]} />
+        <planeGeometry args={[400, 400]} />
         <meshStandardMaterial color="#050505" roughness={1} />
-      </mesh>
-      
-      {/* Subtle Structural Floor Rings */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -59.9, 0]}>
-        <ringGeometry args={[80, 82, 64]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.03} />
-      </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -59.9, 0]}>
-        <ringGeometry args={[140, 142, 64]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.02} />
-      </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -59.9, 0]}>
-        <ringGeometry args={[200, 205, 64]} />
-        <meshBasicMaterial color="#ff3333" transparent opacity={0.02} />
       </mesh>
       
       {/* The Monolith (Initial Camera Occlusion for Intro Reveal) */}
@@ -174,6 +176,12 @@ export function ControlChamber() {
       <instancedMesh ref={pillarRef} args={[undefined, undefined, pillarCount]}>
         <boxGeometry args={PILLAR_SIZE} />
         <primitive object={brutalistMaterial} attach="material" />
+      </instancedMesh>
+      
+      {/* 2. Data Conduits (Neon Strips on Pillars) */}
+      <instancedMesh ref={conduitRef} args={[undefined, undefined, conduitCount]}>
+        <boxGeometry args={PILLAR_SIZE} />
+        <meshStandardMaterial color="#00ddff" emissive="#00ddff" emissiveIntensity={2} transparent opacity={0.8} />
       </instancedMesh>
 
       <instancedMesh ref={beamRef} args={[undefined, undefined, beamCount]}>
@@ -191,31 +199,44 @@ export function ControlChamber() {
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
-      {/* Basic Architecture Lighting (No real-time shadows yet) */}
-      <ambientLight intensity={0.1} />
+      {/* LIGHTING MIDPOINT: Hybrid of Global Visibility and Dramatic Local Pools */}
       
-      {/* Key spotlight shining down and angled slightly to give the pillars bright faces */}
+      {/* A faint global baseline so the background pillars don't vanish into pure #000000 */}
+      <ambientLight intensity={0.15} />
+      <hemisphereLight groundColor="#000000" color="#222222" intensity={0.2} />
+      
+      {/* A soft directional rim light to give the outer pillars 3D shape */}
       <directionalLight 
-        position={[20, 80, 40]} 
-        intensity={ancSolved ? 3.5 : 2.5} 
+        position={[20, 80, -40]} 
+        intensity={0.4} 
+        color="#445566" 
+      />
+      
+      {/* Localized Dramatic Lights (These decay and intensely light up the core) */}
+      <spotLight 
+        position={[0, 80, 20]} 
+        intensity={ancSolved ? 4000 : 1500} 
         color="#ffffff" 
+        angle={Math.PI / 4}
+        penumbra={0.8}
+        distance={250}
       />
       
-      {/* Harsh stark rim light from the opposite side (Emergency Lockdown) */}
-      <directionalLight 
-        position={[-50, 20, -50]} 
-        intensity={logicSolved ? 0.2 : 1.0} 
-        color="#ff3333" 
+      {/* Emergency Lockdown Light: Harsh red pool */}
+      <pointLight 
+        position={[-30, 10, -30]} 
+        intensity={logicSolved ? 200 : 2500} 
+        color="#ff1111" 
+        distance={150}
       />
       
-      {/* Secondary stark blue/white rim light to create cinematic contrast (Data Infrastructure) */}
-      <directionalLight 
-        position={[60, 0, -20]} 
-        intensity={networkSolved ? 2.5 : 1.5} 
-        color="#88ccff" 
+      {/* Data Infrastructure Light: Deep cyan pool */}
+      <pointLight 
+        position={[40, -10, -20]} 
+        intensity={networkSolved ? 3000 : 500} 
+        color="#00ddff" 
+        distance={180}
       />
-      
-      <hemisphereLight groundColor="#000000" color="#222222" intensity={0.3} />
       
       {/* Tiny red emissive strips (Floating warning lamps) */}
       <mesh position={[-25, 15, -15]}>
@@ -227,7 +248,7 @@ export function ControlChamber() {
          <meshStandardMaterial color="#002233" emissive="#00ddff" emissiveIntensity={5} />
       </mesh>
       
-      {/* Dense fog pushed back so we can actually see the chamber */}
+      {/* Dense fog pushed back to create cinematic atmosphere */}
       <fog attach="fog" args={['#050505', 40, 180]} />
     </group>
   );
