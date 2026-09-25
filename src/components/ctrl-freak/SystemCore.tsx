@@ -263,39 +263,23 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       wave[i3 + 1] = waveY;
       wave[i3 + 2] = 0;
 
-      // --- SHAPE 3 (NETWORK) Orbital Relay ---
-      // Central sphere (10%) + 3 massive orbital rings (30% each)
-      const netType = i < count * 0.1 ? 0 : Math.floor(((i - count * 0.1) / (count * 0.9)) * 3) + 1;
-      let nxBase = 0, nyBase = 0, nzBase = 0;
+      // --- SHAPE 3 (NETWORK) Fiber-Optic Bridges ---
+      // 3 parallel data streams running horizontally (Source -> Stream)
+      const bridgeIdx = Math.floor(i / (count / 3));
+      const bridgeY = bridgeIdx === 0 ? 5 : bridgeIdx === 1 ? 0 : -5;
       
-      if (netType === 0) {
-        // Central Core
-        const cTheta = Math.random() * 2 * Math.PI;
-        const cPhi = Math.acos(Math.random() * 2 - 1);
-        const cR = Math.random() * 1.5;
-        nxBase = cR * Math.sin(cPhi) * Math.cos(cTheta);
-        nyBase = cR * Math.sin(cPhi) * Math.sin(cTheta);
-        nzBase = cR * Math.cos(cPhi);
-      } else {
-        // Rings: 1=Frankfurt(YZ plane), 2=London(XZ plane), 3=Mumbai(XY plane)
-        const ringAngle = Math.random() * 2 * Math.PI;
-        const ringRadius = 5.0 + Math.random() * 1.0;
-        const ringThickness = Math.random() * 0.5;
-        const tx = Math.cos(ringAngle) * ringRadius;
-        const ty = Math.sin(ringAngle) * ringRadius;
-        const perp = (Math.random() - 0.5) * ringThickness;
-        
-        if (netType === 1) { // Frankfurt (YZ plane orbit) -> X is perpendicular
-          nxBase = perp; nyBase = tx; nzBase = ty;
-        } else if (netType === 2) { // London (XZ plane orbit) -> Y is perpendicular
-          nxBase = tx; nyBase = perp; nzBase = ty;
-        } else { // Mumbai (XY plane orbit) -> Z is perpendicular
-          nxBase = tx; nyBase = ty; nzBase = perp;
-        }
-      }
-      network[i3]     = nxBase;
-      network[i3 + 1] = nyBase;
-      network[i3 + 2] = nzBase;
+      const p = Math.random();
+      const bx = -12 + p * 24; // Span from x=-12 to x=12
+      
+      const crossAngle = Math.random() * Math.PI * 2;
+      const crossRadius = Math.random() * 0.4;
+      
+      const by = bridgeY + Math.cos(crossAngle) * crossRadius;
+      const bz = Math.sin(crossAngle) * crossRadius;
+      
+      network[i3]     = bx;
+      network[i3 + 1] = by;
+      network[i3 + 2] = bz;
 
       // 4. VISION (Anamorphic Shape)
       vision[i3] = 0; vision[i3+1] = 0; vision[i3+2] = 0;
@@ -471,55 +455,60 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
           const net = useCtrlFreakStore.getState().network;
           
           const applyNetworkMods = (idx: number) => {
-            const netType = idx < count * 0.1 ? 0 : Math.floor(((idx - count * 0.1) / (count * 0.9)) * 3) + 1;
+            const bridgeIdx = Math.floor(idx / (count / 3));
+            const load = bridgeIdx === 0 ? net.frankfurt : bridgeIdx === 1 ? net.london : net.mumbai;
             
-            // Recompute base position identically to the generator
-            let nx = 0, ny = 0, nz = 0;
-            if (netType === 0) {
-              const cTheta = Math.abs(Math.sin(idx * 12.9898)) * Math.PI * 2;
-              const cPhi = Math.acos((Math.abs(Math.sin(idx * 78.233)) * 2) - 1);
-              const cR = Math.abs(Math.sin(idx * 43.111)) * 1.5;
-              nx = cR * Math.sin(cPhi) * Math.cos(cTheta);
-              ny = cR * Math.sin(cPhi) * Math.sin(cTheta);
-              nz = cR * Math.cos(cPhi);
-            } else {
-              const load = netType === 1 ? net.frankfurt : netType === 2 ? net.london : net.mumbai;
-              const ringAngle = Math.abs(Math.sin(idx * 12.9898)) * Math.PI * 2;
-              const ringRadius = 5.0 + Math.abs(Math.sin(idx * 78.233)) * 1.0;
-              const ringThickness = Math.abs(Math.sin(idx * 43.111)) * 0.5;
-              
-              // ANIMATION: Spin the ring based on load
-              const spinSpeed = net.solved ? 2.0 : (0.2 + (load / 100) * 1.5);
-              const currentAngle = ringAngle + t * spinSpeed;
-              
-              let rMod = ringRadius;
-              let tMod = ringThickness;
-              
-              // Structural Integrity based on Load
-              if (!net.solved) {
-                if (load > 70) {
-                  // Overload: ring warps and wobbles, particles scatter
-                  rMod += Math.sin(currentAngle * 3 + t * 5) * ((load - 70) / 15);
-                  tMod += (Math.abs(Math.sin(idx * 12.9898 + t)) - 0.5) * ((load - 70) / 5);
-                } else if (load < 15) {
-                  // Underload: ring shrinks
-                  rMod *= 0.6;
-                }
-              }
-              
-              const tx = Math.cos(currentAngle) * rMod;
-              const ty = Math.sin(currentAngle) * rMod;
-              const perp = (Math.abs(Math.sin(idx * 99.999)) - 0.5) * tMod;
-              
-              if (netType === 1) { 
-                nx = perp; ny = tx; nz = ty;
-              } else if (netType === 2) { 
-                nx = tx; ny = perp; nz = ty;
-              } else { 
-                nx = tx; ny = ty; nz = perp;
+            const bridgeY = bridgeIdx === 0 ? 5 : bridgeIdx === 1 ? 0 : -5;
+            
+            // Stable seed for this particle
+            const seed = Math.abs(Math.sin(idx * 12.9898 + 78.233));
+            
+            // Flow speed based on load (or fast if solved)
+            const speed = net.solved ? 2.0 : (0.2 + (load / 100) * 1.5);
+            
+            // Calculate flow progress (-12 to 12)
+            const rawP = (seed + (t * speed * 0.5)) % 1.0;
+            let bx = -12 + rawP * 24;
+            
+            // Thickness is directly controlled by load
+            // Solved: thin, perfect fiber. Underload: thread. High load: swollen pipe.
+            const baseThick = net.solved ? 0.2 : (0.1 + (load / 100) * 1.5);
+            
+            const crossAngle = Math.abs(Math.sin(idx * 43.111)) * Math.PI * 2;
+            const dist = Math.abs(Math.sin(idx * 99.999));
+            
+            let by = bridgeY + Math.cos(crossAngle) * baseThick * dist;
+            let bz = Math.sin(crossAngle) * baseThick * dist;
+            
+            // Overload (>70): the pipe swells dangerously in the middle and ruptures
+            if (!net.solved && load > 70) {
+              const ruptureFactor = (load - 70) / 30; // 0 to 1
+              // The middle of the bridge is bx = 0
+              const distFromCenter = Math.abs(bx);
+              if (distFromCenter < 5) {
+                 const bulge = Math.cos((distFromCenter / 5) * (Math.PI / 2));
+                 
+                 // If highly overloaded, particles break out of the pipe and fall
+                 if (Math.abs(Math.sin(idx * 11.111)) < ruptureFactor * 0.7) {
+                    // Particle drops out
+                    by -= ((t * 5 + seed * 10) % 15) * ruptureFactor; // Fall down
+                    bx += (Math.random() - 0.5) * 2; // Scatter horizontally
+                 } else {
+                    // Swell the pipe
+                    by += Math.cos(crossAngle) * bulge * ruptureFactor * 3.0;
+                    bz += Math.sin(crossAngle) * bulge * ruptureFactor * 3.0;
+                 }
               }
             }
-            return [nx, ny, nz];
+            
+            // Underload (<15): Data barely makes it across, breaks into dotted lines
+            if (!net.solved && load < 15) {
+               if (Math.abs(Math.sin(idx * 55.555 + t * 2)) > 0.3) {
+                  bx *= 0.01; by *= 0.01; bz *= 0.01; // Hide some particles to make it look fragmented
+               }
+            }
+            
+            return [bx, by, bz];
           };
 
           if (shape1 === shapes.network) {
