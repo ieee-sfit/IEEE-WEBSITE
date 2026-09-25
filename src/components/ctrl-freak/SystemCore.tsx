@@ -245,9 +245,6 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
 
     // Primary Hubs are globally defined as PRIMARY_HUBS
 
-    // SHAPE 5 (LOGIC): Tesseract (Cube)
-    const cW = Math.ceil(Math.cbrt(count));
-
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
 
