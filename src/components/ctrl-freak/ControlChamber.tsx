@@ -320,7 +320,7 @@ export function ControlChamber() {
       )}
 
       {/* Floor & Deep Void */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -60, 0]}>
+      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, -60, 0]}>
         <circleGeometry args={[250, 32]} />
         <meshStandardMaterial color="#020202" roughness={1} />
       </mesh>
@@ -342,33 +342,40 @@ export function ControlChamber() {
 
       
       {/* The Instances */}
-      <instancedMesh ref={pillarRef} args={[undefined, undefined, pillarCount]}>
+      <instancedMesh ref={pillarRef} args={[undefined, undefined, pillarCount]} castShadow receiveShadow>
         <boxGeometry args={PILLAR_SIZE} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
-      <instancedMesh ref={beamRef} args={[undefined, undefined, beamCount]}>
+      <instancedMesh ref={beamRef} args={[undefined, undefined, beamCount]} castShadow receiveShadow>
         <boxGeometry args={BEAM_SIZE} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
-      <instancedMesh ref={platformRef} args={[undefined, undefined, platformCount]}>
+      <instancedMesh ref={platformRef} args={[undefined, undefined, platformCount]} castShadow receiveShadow>
         <boxGeometry args={PLATFORM_SIZE} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
-      <instancedMesh ref={stairRef} args={[undefined, undefined, stairCount]}>
+      <instancedMesh ref={stairRef} args={[undefined, undefined, stairCount]} castShadow receiveShadow>
         <boxGeometry args={STAIR_SIZE} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
-      {/* Basic Architecture Lighting (Shadows removed for mobile performance) */}
+      {/* Basic Architecture Lighting (Restored cinematic shadows) */}
       
       {/* Key spotlight shining down on the brutalist geometry */}
       <directionalLight 
+        castShadow
         position={[40, 100, 60]} 
         intensity={ancSolved ? 4.5 : 3.0} 
         color="#ffffff" 
+        shadow-mapSize={[2048, 2048]}
+        shadow-camera-far={250}
+        shadow-camera-left={-100}
+        shadow-camera-right={100}
+        shadow-camera-top={100}
+        shadow-camera-bottom={-100}
       />
       
       {/* Harsh stark rim light from the opposite side (Emergency Lockdown) */}

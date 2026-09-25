@@ -841,7 +841,7 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
 export const SystemCore = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) => {
   return (
     <div className="w-full h-full">
-      <Canvas camera={{ position: [0, 50, 80], fov: 45 }}>
+      <Canvas shadows camera={{ position: [0, 50, 80], fov: 45 }}>
         <SceneExporter />
         <color attach="background" args={['#050505']} />
         <ambientLight intensity={0.15} />
@@ -866,6 +866,7 @@ export const SystemCore = ({ scrollProgress }: { scrollProgress: MotionValue<num
             mipmapBlur
             radius={0.6}
           />
+          <Noise opacity={0.045} />
           <Vignette eskil={false} offset={0.05} darkness={1.15} />
         </EffectComposer>
       </Canvas>
