@@ -48,17 +48,16 @@ export function ControlChamber() {
     const platforms = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
     const stairs = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
 
-    // 1. PILLARS (24) -> The Perimeter Trench & Anchor Towers
+    // 1. PILLARS (24) -> Fingers
     for (let i = 0; i < pillarCount; i++) {
       const angle = (i / pillarCount) * Math.PI * 2;
       
-      // Chaotic: Blasted into an outer ring, tilted outward like a blown-open wall
-      const cRadius = 100 + (i % 2) * 15; 
-      let cPx = Math.cos(angle) * cRadius;
-      let cPz = Math.sin(angle) * cRadius;
-      dummyC.position.set(cPx, -30, cPz);
-      dummyC.rotation.set(Math.PI / 2.2, angle + Math.PI/2, 0); // Lay them almost flat
-      dummyC.scale.set(1.5, 1.5, 1.5);
+      // Chaotic: Shattered debris floating far away in the void
+      const cRadius = 140 + Math.random() * 80; // Pushed far back
+      dummyC.position.set(Math.cos(angle) * cRadius, (Math.random() - 0.5) * 160, Math.sin(angle) * cRadius);
+      dummyC.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
+      // Scale down randomly so they don't block the screen
+      dummyC.scale.set(Math.random() * 0.8 + 0.5, Math.random() * 0.3 + 0.1, Math.random() * 0.8 + 0.5); 
       dummyC.updateMatrix();
       pillars.chaotic.push(dummyC.matrix.clone());
 
@@ -126,12 +125,12 @@ export function ControlChamber() {
 
     // 2. BEAMS (36) -> Colossal Cable-Braided Forearms
     for (let i = 0; i < beamCount; i++) {
-      // Chaotic: Sheared and frozen mid-air far away
+      // Chaotic: Scattered cables frozen mid-air
       const angle = (i / beamCount) * Math.PI * 2;
-      const cRadius = 80 + (i % 3) * 25;
-      dummyC.position.set(Math.cos(angle) * cRadius, 40 + (i % 2) * 20, Math.sin(angle) * cRadius);
-      dummyC.rotation.set(0, angle + Math.PI/4, Math.PI / 4); 
-      dummyC.scale.set(1, 1, 1);
+      const cRadius = 150 + Math.random() * 100;
+      dummyC.position.set(Math.cos(angle) * cRadius, (Math.random() - 0.5) * 200, Math.sin(angle) * cRadius);
+      dummyC.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2); 
+      dummyC.scale.set(Math.random() * 0.5 + 0.5, Math.random() * 1.5 + 0.5, Math.random() * 1.5 + 0.5);
       dummyC.updateMatrix();
       beams.chaotic.push(dummyC.matrix.clone());
 
@@ -184,12 +183,12 @@ export function ControlChamber() {
 
     // 3. PLATFORMS (8) -> Giant Cupped Palms
     for (let i = 0; i < platformCount; i++) {
-      // Chaotic: Pushed to the ground layer far out
+      // Chaotic: Massive plates tumbling in the distance
       const angle = (i / platformCount) * Math.PI * 2;
-      const cRadius = 70 + (i % 2) * 20;
-      dummyC.position.set(Math.cos(angle) * cRadius, -40 + (i % 3) * 10, Math.sin(angle) * cRadius);
-      dummyC.rotation.set(0, angle, Math.PI / 8); 
-      dummyC.scale.set(1.5, 1, 1.5);
+      const cRadius = 130 + Math.random() * 70;
+      dummyC.position.set(Math.cos(angle) * cRadius, (Math.random() - 0.5) * 150, Math.sin(angle) * cRadius);
+      dummyC.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2); 
+      dummyC.scale.set(Math.random() * 2 + 1, Math.random() * 1.5 + 0.5, Math.random() * 2 + 1);
       dummyC.updateMatrix();
       platforms.chaotic.push(dummyC.matrix.clone());
 
@@ -221,13 +220,12 @@ export function ControlChamber() {
 
     // 4. STAIRCASES (12) -> Sharp Fingertips and Knuckles
     for (let i = 0; i < stairCount; i++) {
+      // Chaotic: Sharp debris
       const angle = (i / stairCount) * Math.PI * 2;
-      
-      // Chaotic: Disconnected bridges hanging in the void
-      const cRadius = 90;
-      dummyC.position.set(Math.cos(angle) * cRadius, -10 + (i % 2) * 20, Math.sin(angle) * cRadius);
-      dummyC.rotation.set(Math.PI / 6, angle, Math.PI / 2); 
-      dummyC.scale.set(1, 1, 1);
+      const cRadius = 140 + Math.random() * 80;
+      dummyC.position.set(Math.cos(angle) * cRadius, (Math.random() - 0.5) * 160, Math.sin(angle) * cRadius);
+      dummyC.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2); 
+      dummyC.scale.set(Math.random() * 1.5 + 0.5, Math.random() * 1.5 + 0.5, Math.random() * 1.5 + 0.5);
       dummyC.updateMatrix();
       stairs.chaotic.push(dummyC.matrix.clone());
 
