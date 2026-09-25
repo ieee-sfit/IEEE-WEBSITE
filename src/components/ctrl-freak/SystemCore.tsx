@@ -263,7 +263,7 @@ const SceneExporter = () => {
 // A massive, glitching point cloud that evolves into specific formations based on scroll progress
 const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) => {
   const pointsRef = useRef<THREE.Points>(null);
-  const count = 3500; // Optimized count for mobile device performance
+  const count = 8000; // Restored to 8k for maximum visual density
   
   // Pre-calculate all target shapes
   const shapes = useMemo(() => {
