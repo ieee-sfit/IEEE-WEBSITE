@@ -173,6 +173,18 @@ export function ControlChamber() {
 
       {/* Basic Architecture Lighting */}
       
+      {/* Global architectural fill light so background pillars don't vanish entirely */}
+      <directionalLight 
+        position={[-50, 40, -30]} 
+        intensity={0.4} 
+        color="#ffffff" 
+      />
+      <directionalLight 
+        position={[50, -20, 30]} 
+        intensity={0.2} 
+        color="#88ccff" 
+      />
+      
       {/* Key spotlight: Cold white inspection light. Brighter when ANC stabilizes */}
       <spotLight 
         position={[20, 80, 40]} 
