@@ -469,9 +469,13 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
             const rawP = (seed + (t * speed * 0.5)) % 1.0;
             let bx = -12 + rawP * 24;
             
-            // Thickness is directly controlled by load
-            // Solved: thin, perfect fiber. Underload: thread. High load: swollen pipe.
-            const baseThick = net.solved ? 0.05 : (0.02 + (load / 100) * 0.4);
+            // Base thickness with geometric throbbing when overloaded
+            let pulse = 1.0;
+            if (!net.solved && load > 70) {
+               // Throbs aggressively 4 times per second (t * 24 roughly)
+               pulse = 1.0 + Math.abs(Math.sin(t * 24)) * 0.8; 
+            }
+            const baseThick = net.solved ? 0.05 : (0.02 + (load / 100) * 0.4) * pulse;
             
             const crossAngle = Math.abs(Math.sin(idx * 43.111)) * Math.PI * 2;
             const dist = Math.abs(Math.sin(idx * 99.999));
@@ -487,11 +491,12 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
               if (distFromCenter < 5) {
                  const bulge = Math.cos((distFromCenter / 5) * (Math.PI / 2));
                  
-                 // If highly overloaded, particles break out of the pipe and fall (tightened spread)
+                 // If highly overloaded, particles break out of the pipe and fall as sparks
                  if (Math.abs(Math.sin(idx * 11.111)) < ruptureFactor * 0.4) {
-                    // Particle drops out
-                    by -= ((t * 8 + seed * 5) % 4) * ruptureFactor; // Fall down slightly
-                    bx += (Math.random() - 0.5) * 0.5; // Scatter horizontally slightly
+                    // Parabolic spark fall
+                    const fallTime = (t * 3 + seed * 10) % 2; // Time active as a spark (0 to 2)
+                    by -= (fallTime * fallTime * 2) * ruptureFactor; // Gravity curve
+                    bx += (Math.cos(idx) * fallTime * 2) * ruptureFactor; // Scatter out
                  } else {
                     // Swell the pipe
                     by += Math.cos(crossAngle) * bulge * ruptureFactor * 0.8;
@@ -502,8 +507,9 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
             
             // Underload (<15): Data barely makes it across, breaks into dotted lines
             if (!net.solved && load < 15) {
-               if (Math.abs(Math.sin(idx * 55.555 + t * 2)) > 0.3) {
-                  bx *= 0.01; by *= 0.01; bz *= 0.01; // Hide some particles to make it look fragmented
+               // Create solid dashes of data with completely empty spaces between them
+               if (Math.abs(Math.sin(idx * 0.5 + t * 4)) > 0.4) {
+                  bx *= 0.01; by *= 0.01; bz *= 0.01; // Hide particles entirely
                }
             }
             

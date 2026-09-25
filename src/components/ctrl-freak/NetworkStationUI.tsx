@@ -75,7 +75,7 @@ export const NetworkStationUI = () => {
             <div className="flex justify-between items-end text-[10px] text-gray-500 tracking-[0.2em] uppercase mb-2">
               <div className="flex flex-col">
                 <span>Frankfurt Relay</span>
-                {frankfurt > 70 && <span className="text-[#FF3333] tracking-widest text-[8px]">[OVERLOADED]</span>}
+                {frankfurt > 70 && <span className="text-[#FF3333] tracking-widest text-[8px]">[OVERLOADED / PACKET LOSS]</span>}
                 {resolution === '4K' && frankfurt < 60 && <span className="text-yellow-500 tracking-widest text-[8px]">[INSUFFICIENT INGEST]</span>}
                 {resolution === '1080p' && Math.abs(frankfurt - 33) > 10 && frankfurt <= 70 && <span className="text-yellow-500 tracking-widest text-[8px]">[IMBALANCED]</span>}
               </div>
@@ -94,7 +94,7 @@ export const NetworkStationUI = () => {
             <div className="flex justify-between items-end text-[10px] text-gray-500 tracking-[0.2em] uppercase mb-2">
               <div className="flex flex-col">
                 <span>London Relay</span>
-                {london > 70 && <span className="text-[#FF3333] tracking-widest text-[8px]">[SATURATED]</span>}
+                {london > 70 && <span className="text-[#FF3333] tracking-widest text-[8px]">[SATURATED / PACKET LOSS]</span>}
                 {resolution === '1080p' && Math.abs(london - 33) > 10 && london <= 70 && <span className="text-yellow-500 tracking-widest text-[8px]">[IMBALANCED]</span>}
               </div>
               <span>{london}%</span>
@@ -112,8 +112,8 @@ export const NetworkStationUI = () => {
             <div className="flex justify-between items-end text-[10px] text-gray-500 tracking-[0.2em] uppercase mb-2">
               <div className="flex flex-col">
                 <span>Mumbai Relay (Corrupted)</span>
-                {resolution === '4K' && mumbai > 15 && <span className="text-[#FF3333] tracking-widest text-[8px]">[OVERHEATING]</span>}
-                {resolution === '1080p' && mumbai > 40 && <span className="text-[#FF3333] tracking-widest text-[8px]">[CRITICAL]</span>}
+                {resolution === '4K' && mumbai > 15 && <span className="text-[#FF3333] tracking-widest text-[8px]">[OVERHEATING / PACKET LOSS]</span>}
+                {resolution === '1080p' && mumbai > 40 && <span className="text-[#FF3333] tracking-widest text-[8px]">[CRITICAL / PACKET LOSS]</span>}
                 {resolution === '1080p' && Math.abs(mumbai - 34) > 10 && mumbai <= 40 && <span className="text-yellow-500 tracking-widest text-[8px]">[IMBALANCED]</span>}
               </div>
               <span className={mumbai > 40 || (resolution === '4K' && mumbai > 15) ? 'text-[#FF3333]' : ''}>{mumbai}%</span>
