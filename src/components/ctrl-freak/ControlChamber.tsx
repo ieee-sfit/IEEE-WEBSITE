@@ -10,9 +10,11 @@ const STAIR_SIZE: [number, number, number] = [4, 0.5, 15]; // Represented as a s
 
 // The single, flat, dark concrete material (as requested, no heavy textures yet)
 const brutalistMaterial = new THREE.MeshStandardMaterial({
-  color: '#1a1a1a',
-  roughness: 0.9,
-  metalness: 0.1,
+  color: '#17191c',
+  roughness: 0.82,
+  metalness: 0.05,
+  emissive: '#050609',
+  emissiveIntensity: 0.3,
 });
 
 export function ControlChamber() {
@@ -192,43 +194,43 @@ export function ControlChamber() {
       </instancedMesh>
 
       {/* Basic Architecture Lighting (No real-time shadows yet) */}
-      <ambientLight intensity={0.1} />
+      {/* ambientLight moved entirely to SystemCore to establish the global floor */}
       
       {/* Key spotlight shining down and angled slightly to give the pillars bright faces */}
       <directionalLight 
         position={[20, 80, 40]} 
-        intensity={ancSolved ? 3.5 : 2.5} 
+        intensity={ancSolved ? 2.5 : 2.0} 
         color="#ffffff" 
       />
       
       {/* Harsh stark rim light from the opposite side (Emergency Lockdown) */}
       <directionalLight 
         position={[-50, 20, -50]} 
-        intensity={logicSolved ? 0.2 : 1.0} 
+        intensity={logicSolved ? 0.05 : 0.25} 
         color="#ff3333" 
       />
       
       {/* Secondary stark blue/white rim light to create cinematic contrast (Data Infrastructure) */}
       <directionalLight 
         position={[60, 0, -20]} 
-        intensity={networkSolved ? 2.5 : 1.5} 
+        intensity={networkSolved ? 0.6 : 0.35} 
         color="#88ccff" 
       />
       
-      <hemisphereLight groundColor="#000000" color="#222222" intensity={0.3} />
+      <hemisphereLight groundColor="#000000" color="#15171c" intensity={0.15} />
       
       {/* Tiny red emissive strips (Floating warning lamps) */}
       <mesh position={[-25, 15, -15]}>
          <boxGeometry args={[6, 0.2, 0.2]} />
-         <meshStandardMaterial color="#330000" emissive="#ff1111" emissiveIntensity={5} />
+         <meshStandardMaterial color="#330000" emissive="#ff1111" emissiveIntensity={2.5} />
       </mesh>
       <mesh position={[35, 5, -25]} rotation={[0, Math.PI/4, 0]}>
          <boxGeometry args={[4, 0.2, 0.2]} />
-         <meshStandardMaterial color="#002233" emissive="#00ddff" emissiveIntensity={5} />
+         <meshStandardMaterial color="#002233" emissive="#00ddff" emissiveIntensity={2.5} />
       </mesh>
       
       {/* Dense fog pushed back to create cinematic atmosphere */}
-      <fog attach="fog" args={['#050505', 40, 180]} />
+      <fog attach="fog" args={['#050505', 50, 190]} />
     </group>
   );
 }
