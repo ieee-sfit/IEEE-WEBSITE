@@ -263,34 +263,36 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       wave[i3 + 1] = waveY;
       wave[i3 + 2] = 0;
 
-      // --- SHAPE 3 (NETWORK) Orbital Rings in XY ---
-      // 3 rings in the XY plane so they perfectly face the camera
-      const ringIdx = Math.floor(i / (count / 3)); 
-      const ringBaseRadius = 3 + ringIdx * 2.5; // Radii: 3, 5.5, 8
-      const ringAngle = Math.random() * Math.PI * 2;
-      const ringThickness = (Math.random() - 0.5) * 1.2;
-      
-      network[i3]     = Math.cos(ringAngle) * (ringBaseRadius + ringThickness);
-      network[i3 + 1] = Math.sin(ringAngle) * (ringBaseRadius + ringThickness);
-      network[i3 + 2] = (Math.random() - 0.5) * 0.5; // slight depth
+      // --- SHAPE 3 (NETWORK) Traffic-flow topology ---
+      const netPathIdx = Math.floor(i / (count / 3)); // 0: Frankfurt (Top), 1: London (Mid), 2: Mumbai (Bot)
+      const netP = Math.random(); 
+      const archY = netPathIdx === 0 ? 6 : netPathIdx === 1 ? 0 : -6;
+      const netX = -12 + netP * 24;
+      const netY = archY * (1 - Math.pow(2 * netP - 1, 2));
+      const netSpread = Math.random() * 0.5;
+      const netAngle = Math.random() * Math.PI * 2;
+      network[i3]     = netX + Math.cos(netAngle) * netSpread;
+      network[i3 + 1] = netY + Math.sin(netAngle) * netSpread;
+      network[i3 + 2] = (Math.random() - 0.5) * netSpread;
 
       // 4. VISION (Anamorphic Shape)
       vision[i3] = 0; vision[i3+1] = 0; vision[i3+2] = 0;
 
-      // 5. THE VAULT (Logic) -> V-Shape Trace Pipes in XY
-      // Left path: X goes from -10 to 0, Y goes from 6 to 0
-      // Right path: X goes from 10 to 0, Y goes from 6 to 0
-      const isLeftPath = i < count / 2;
-      const progressAlongPath = Math.random(); // 0 (start) to 1 (center)
-      const pathX = isLeftPath ? -10 + (progressAlongPath * 10) : 10 - (progressAlongPath * 10);
-      const pathY = 6 - (progressAlongPath * 6);
+      // 5. THE VAULT (Logic) -> Branching Circuit Topology
+      const circPathIdx = Math.floor((i % count) / (count / 5)); // 5 paths
+      const circP = Math.random();
+      let sX = 0, sY = 0, eX = 0, eY = 0;
+      if (circPathIdx === 0) { sX = -6; sY = 6; eX = -2; eY = 1; } // Keycard -> Gate1
+      else if (circPathIdx === 1) { sX = 0; sY = 6; eX = -2; eY = 1; } // Pressure -> Gate1
+      else if (circPathIdx === 2) { sX = -2; sY = 1; eX = 2; eY = -3; } // Gate1 -> Gate2
+      else if (circPathIdx === 3) { sX = 6; sY = 6; eX = 2; eY = -3; } // Switch -> Gate2
+      else { sX = 2; sY = -3; eX = 2; eY = -8; } // Gate2 -> Output
       
-      const angleInPipe = Math.random() * Math.PI * 2;
-      const pipeRadius = Math.random() * 0.8;
-      
-      circuit[i3]     = pathX + Math.cos(angleInPipe) * pipeRadius;
-      circuit[i3 + 1] = pathY + Math.sin(angleInPipe) * pipeRadius;
-      circuit[i3 + 2] = (Math.random() - 0.5) * pipeRadius;
+      const circSpread = Math.random() * 0.3;
+      const circAngle = Math.random() * Math.PI * 2;
+      circuit[i3]     = sX + (eX - sX) * circP + Math.cos(circAngle) * circSpread;
+      circuit[i3 + 1] = sY + (eY - sY) * circP + Math.sin(circAngle) * circSpread;
+      circuit[i3 + 2] = (Math.random() - 0.5) * 0.5;
 
       // 6. RING (The Clock / 12:00)
       const angle = Math.random() * Math.PI * 2;
@@ -435,51 +437,51 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
         if (netWeight > 0) {
           const net = useCtrlFreakStore.getState().network;
           
-          const applyNetworkMods = (px: number, py: number, pz: number) => {
-            const r = Math.sqrt(px*px + py*py);
-            let ringIdx = 0;
-            if (r > 4.2 && r < 6.7) ringIdx = 1;
-            if (r >= 6.7) ringIdx = 2;
+          const applyNetworkMods = (idx: number) => {
+            const netPathIdx = Math.floor(idx / (count / 3)); // 0: Frankfurt, 1: London, 2: Mumbai
+            const load = netPathIdx === 0 ? net.frankfurt : netPathIdx === 1 ? net.london : net.mumbai;
             
-            const load = ringIdx === 0 ? net.mumbai : ringIdx === 1 ? net.london : net.frankfurt;
             const isOverloaded = load > 70;
-            const isUnderloaded = load < 10;
+            const flowSpeed = net.solved ? 1.0 : (load / 50.0);
             
-            let currentAngle = Math.atan2(py, px);
-            let currentR = r;
+            // Seed for this specific particle
+            const rand = Math.abs(Math.sin(idx * 12.9898)) * 43758.5453;
+            const seed = rand - Math.floor(rand);
             
-            // Spin speed based on load
-            const spinSpeed = net.solved ? 1.5 : (isOverloaded ? 4.0 : isUnderloaded ? 0.2 : 1.0);
-            const rotatedAngle = currentAngle + t * spinSpeed;
+            // Animated progress (Flow from Left to Right)
+            const p = (seed + t * 0.5 * flowSpeed) % 1.0;
             
-            // The magic: A ripple that depends on load!
-            // As the user drags the slider, the ring physically warps more and more.
-            const ripplePeaks = 5 + ringIdx * 2; // 5, 7, 9 bumps
-            const rippleAmp = (load / 100) * 1.5; 
-            currentR += Math.sin(currentAngle * ripplePeaks + t * 5.0) * rippleAmp;
+            const archY = netPathIdx === 0 ? 6 : netPathIdx === 1 ? 0 : -6;
+            let nx = -12 + p * 24;
+            let ny = archY * (1 - Math.pow(2 * p - 1, 2));
             
+            // Thickness depends on load
+            const baseSpread = net.solved ? 0.3 : (load / 60.0);
+            const spread = baseSpread * ((seed * 1.5) % 1.0);
+            const angle = seed * Math.PI * 2 * 100.0;
+            
+            nx += Math.cos(angle) * spread;
+            ny += Math.sin(angle) * spread;
+            let nz = (seed - 0.5) * spread * 2.0;
+            
+            // Congestion turbulence if overloaded
             if (isOverloaded && !net.solved) {
-              currentR += (Math.random() - 0.5) * 1.0; // Glitchy jitter
-            }
-            if (isUnderloaded && !net.solved) {
-              currentR *= (0.9 + Math.random() * 0.1); // Sputtering shrink
+              const turbulence = (Math.sin(p * 20 + t * 5) + Math.cos(p * 15 - t * 3)) * 0.8;
+              nx += turbulence;
+              ny += (Math.random() - 0.5) * 1.5;
             }
             
-            // Reconstruct coordinates in XY using the ROTATED angle
-            const newX = Math.cos(rotatedAngle) * currentR;
-            const newY = Math.sin(rotatedAngle) * currentR;
-            
-            return [newX, newY, pz];
+            return [nx, ny, nz];
           };
 
           if (shape1 === shapes.network) {
-            const [nx, ny, nz] = applyNetworkMods(shape1[i3], shape1[i3+1], shape1[i3+2]);
+            const [nx, ny, nz] = applyNetworkMods(i);
             x = nx * (1 - lerpFactor) + shape2[i3] * lerpFactor;
             y = ny * (1 - lerpFactor) + shape2[i3+1] * lerpFactor;
             z = nz * (1 - lerpFactor) + shape2[i3+2] * lerpFactor;
           }
           if (shape2 === shapes.network) {
-            const [nx, ny, nz] = applyNetworkMods(shape2[i3], shape2[i3+1], shape2[i3+2]);
+            const [nx, ny, nz] = applyNetworkMods(i);
             x = shape1[i3] * (1 - lerpFactor) + nx * lerpFactor;
             y = shape1[i3+1] * (1 - lerpFactor) + ny * lerpFactor;
             z = shape1[i3+2] * (1 - lerpFactor) + nz * lerpFactor;
@@ -527,75 +529,101 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
         if (circuitWeight > 0) {
           const logic = useCtrlFreakStore.getState().logic;
           
-          const applyCircuitMods = (px: number, py: number, pz: number) => {
-            let nx = px;
-            let ny = py;
-            let nz = pz;
+          const applyCircuitMods = (idx: number) => {
+            const pathIdx = Math.floor((idx % count) / (count / 5)); // 0 to 4
+            const rand = Math.abs(Math.sin(idx * 4.1234)) * 43758.5453;
+            const seed = rand - Math.floor(rand);
             
-            if (logic.solved) {
-               // Explode into a massive spinning geometric diamond star!
-               const r = Math.sqrt(px*px + py*py);
-               const angle = Math.atan2(py, px);
-               
-               // Calculate the star shape FIRST
-               const starR = r * (1.0 + 1.5 * Math.abs(Math.cos(angle * 2.0))); // 4-point star
-               const sx = Math.cos(angle) * starR;
-               const sy = Math.sin(angle) * starR;
-               
-               // Rotate the ENTIRE star geometry so the user visually sees it spinning
-               const speed = t * 2.0;
-               nx = sx * Math.cos(speed) - sy * Math.sin(speed);
-               ny = sx * Math.sin(speed) + sy * Math.cos(speed);
-               nz += (Math.random() - 0.5) * 5.0; // Thick explosion depth
-               
-               // Add a global pulsing scale effect
-               const scale = 1.0 + Math.sin(t * 5.0 + r) * 0.2;
-               return [nx * scale, ny * scale, nz * scale];
+            let pathActive = true;
+            let blockageProgress = 1.0;
+            
+            // Logic gate evaluation for path blocking
+            if (pathIdx === 2) { // Gate 1 -> Gate 2
+              if (!logic.slot1Correct) { pathActive = false; blockageProgress = 0.1; }
+            } else if (pathIdx === 4) { // Gate 2 -> Output
+              if (!logic.slot2Correct) { pathActive = false; blockageProgress = 0.1; }
+              if (!logic.slot1Correct) { pathActive = false; blockageProgress = 0.0; } // Starved completely
             }
             
-            const isLeftPath = px < 0;
-            const slotCorrect = isLeftPath ? logic.slot1Correct : logic.slot2Correct;
+            const speed = pathActive ? (logic.solved ? 2.0 : 1.0) : 0.2;
+            let p = (seed + t * 0.5 * speed) % 1.0;
             
-            // Use 'pz' as a stable random seed to reconstruct the pipe thickness natively
-            const rand = Math.abs(pz); 
-            const angleInPipe = rand * 100.0;
-            const pipeRadius = (rand % 0.8);
-            
-            // Base flow along the V-shape
-            const flowSpeed = slotCorrect ? (t * -25.0) : (t * -5.0);
-            const offset = (Math.abs(px) + flowSpeed) % 10;
-            const newPx = (offset < 0 ? 10 + offset : offset);
-            
-            nx = isLeftPath ? -newPx : newPx;
-            ny = 0.6 * newPx; // V-shape equation (X: 10->0, Y: 6->0)
-            
-            // Add thickness (Tighten it into a laser beam if solved!)
-            const tighten = slotCorrect ? 0.1 : 1.0;
-            nx += Math.cos(angleInPipe) * pipeRadius * tighten;
-            ny += Math.sin(angleInPipe) * pipeRadius * tighten;
-            
-            // Calculate distance along path (0 = start, 1 = center)
-            const progressAlongPath = 1.0 - (newPx / 10);
-            
-            if (!slotCorrect && progressAlongPath > 0.4) {
-              // HUGE chaotic explosion where the path is blocked
-              const chaos = (progressAlongPath - 0.4) * 20.0; 
-              nx += (Math.random() - 0.5) * chaos;
-              ny += (Math.random() - 0.5) * chaos;
-              nz += (Math.random() - 0.5) * chaos;
+            if (!pathActive && p > blockageProgress) {
+               // Particles pool up and become a turbulent cloud at the blockage
+               p = blockageProgress + (Math.random() * 0.1); 
             }
             
-            return [nx, ny, nz];
+            let sX = 0, sY = 0, eX = 0, eY = 0;
+            if (pathIdx === 0) { sX = -6; sY = 6; eX = -2; eY = 1; }
+            else if (pathIdx === 1) { sX = 0; sY = 6; eX = -2; eY = 1; }
+            else if (pathIdx === 2) { sX = -2; sY = 1; eX = 2; eY = -3; }
+            else if (pathIdx === 3) { sX = 6; sY = 6; eX = 2; eY = -3; }
+            else { sX = 2; sY = -3; eX = 2; eY = -8; }
+            
+            let nx = sX + (eX - sX) * p;
+            let ny = sY + (eY - sY) * p;
+            
+            // Geometry thickness
+            const angle = seed * Math.PI * 2 * 100.0;
+            let spreadRadius = 0.2;
+            
+            // Apply gate geometry if near a node!
+            const isNearGate1 = Math.sqrt(Math.pow(nx - -2, 2) + Math.pow(ny - 1, 2)) < 1.0;
+            const isNearGate2 = Math.sqrt(Math.pow(nx - 2, 2) + Math.pow(ny - -3, 2)) < 1.0;
+            
+            let dx = Math.cos(angle) * spreadRadius;
+            let dy = Math.sin(angle) * spreadRadius;
+            
+            if (isNearGate1 && logic.slot1) {
+               if (logic.slot1 === 'AND') {
+                 dx = (Math.cos(angle) < 0 ? Math.cos(angle)*0.2 : Math.cos(angle)) * 1.5;
+                 dy = Math.sin(angle) * 1.5;
+               } else if (logic.slot1 === 'OR') {
+                 dx = (Math.cos(angle) < 0 ? -0.5 + Math.abs(Math.sin(angle))*0.5 : Math.cos(angle)) * 1.5;
+                 dy = Math.sin(angle) * 1.5;
+               } else if (logic.slot1 === 'NOT') {
+                 dx = (Math.cos(angle) > 0 ? 1 : -0.5) * 1.2;
+                 dy = (Math.cos(angle) > 0 ? 0 : Math.sin(angle)) * 1.2;
+               } else if (logic.slot1 === 'XOR') {
+                 dx = (Math.cos(angle) < 0 ? -0.5 + Math.abs(Math.sin(angle))*0.5 : Math.cos(angle) - 0.5) * 1.5;
+                 dy = Math.sin(angle) * 1.5;
+               }
+            } else if (isNearGate2 && logic.slot2) {
+               if (logic.slot2 === 'AND') {
+                 dx = (Math.cos(angle) < 0 ? Math.cos(angle)*0.2 : Math.cos(angle)) * 1.5;
+                 dy = Math.sin(angle) * 1.5;
+               } else if (logic.slot2 === 'OR') {
+                 dx = (Math.cos(angle) < 0 ? -0.5 + Math.abs(Math.sin(angle))*0.5 : Math.cos(angle)) * 1.5;
+                 dy = Math.sin(angle) * 1.5;
+               } else if (logic.slot2 === 'NOT') {
+                 dx = (Math.cos(angle) > 0 ? 1 : -0.5) * 1.2;
+                 dy = (Math.cos(angle) > 0 ? 0 : Math.sin(angle)) * 1.2;
+               } else if (logic.slot2 === 'XOR') {
+                 dx = (Math.cos(angle) < 0 ? -0.5 + Math.abs(Math.sin(angle))*0.5 : Math.cos(angle) - 0.5) * 1.5;
+                 dy = Math.sin(angle) * 1.5;
+               }
+            }
+            
+            let nz = (seed - 0.5) * spreadRadius * 2.0;
+            
+            if (!pathActive && p >= blockageProgress) {
+              // Chaotic explosion at the block point
+              dx += (Math.random() - 0.5) * 5.0;
+              dy += (Math.random() - 0.5) * 5.0;
+              nz += (Math.random() - 0.5) * 5.0;
+            }
+            
+            return [nx + dx, ny + dy, nz];
           };
 
           if (shape1 === shapes.circuit) {
-            const [nx, ny, nz] = applyCircuitMods(shape1[i3], shape1[i3+1], shape1[i3+2]);
+            const [nx, ny, nz] = applyCircuitMods(i);
             x = nx * (1 - lerpFactor) + shape2[i3] * lerpFactor;
             y = ny * (1 - lerpFactor) + shape2[i3+1] * lerpFactor;
             z = nz * (1 - lerpFactor) + shape2[i3+2] * lerpFactor;
           }
           if (shape2 === shapes.circuit) {
-            const [nx, ny, nz] = applyCircuitMods(shape2[i3], shape2[i3+1], shape2[i3+2]);
+            const [nx, ny, nz] = applyCircuitMods(i);
             x = shape1[i3] * (1 - lerpFactor) + nx * lerpFactor;
             y = shape1[i3+1] * (1 - lerpFactor) + ny * lerpFactor;
             z = shape1[i3+2] * (1 - lerpFactor) + nz * lerpFactor;
