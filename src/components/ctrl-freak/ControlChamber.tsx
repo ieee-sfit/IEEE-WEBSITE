@@ -151,9 +151,10 @@ export function ControlChamber() {
       </mesh>
       
       {/* The Monolith (Initial Camera Occlusion for Intro Reveal) */}
-      <mesh position={[25, 50, 50]}>
-        <boxGeometry args={[30, 150, 20]} />
-        <primitive object={brutalistMaterial} attach="material" />
+      <mesh position={[0, 50, 95]}>
+        {/* Massive flat wall to block the architecture. Camera pushes straight through it. */}
+        <boxGeometry args={[400, 400, 1]} />
+        <meshBasicMaterial color="#020202" />
       </mesh>
       
       {/* The Instances */}
