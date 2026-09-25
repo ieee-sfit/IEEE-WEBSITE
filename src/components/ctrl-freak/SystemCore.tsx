@@ -471,7 +471,7 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
             
             // Thickness is directly controlled by load
             // Solved: thin, perfect fiber. Underload: thread. High load: swollen pipe.
-            const baseThick = net.solved ? 0.2 : (0.1 + (load / 100) * 1.5);
+            const baseThick = net.solved ? 0.05 : (0.02 + (load / 100) * 0.4);
             
             const crossAngle = Math.abs(Math.sin(idx * 43.111)) * Math.PI * 2;
             const dist = Math.abs(Math.sin(idx * 99.999));
@@ -487,15 +487,15 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
               if (distFromCenter < 5) {
                  const bulge = Math.cos((distFromCenter / 5) * (Math.PI / 2));
                  
-                 // If highly overloaded, particles break out of the pipe and fall
-                 if (Math.abs(Math.sin(idx * 11.111)) < ruptureFactor * 0.7) {
+                 // If highly overloaded, particles break out of the pipe and fall (tightened spread)
+                 if (Math.abs(Math.sin(idx * 11.111)) < ruptureFactor * 0.4) {
                     // Particle drops out
-                    by -= ((t * 5 + seed * 10) % 15) * ruptureFactor; // Fall down
-                    bx += (Math.random() - 0.5) * 2; // Scatter horizontally
+                    by -= ((t * 8 + seed * 5) % 4) * ruptureFactor; // Fall down slightly
+                    bx += (Math.random() - 0.5) * 0.5; // Scatter horizontally slightly
                  } else {
                     // Swell the pipe
-                    by += Math.cos(crossAngle) * bulge * ruptureFactor * 3.0;
-                    bz += Math.sin(crossAngle) * bulge * ruptureFactor * 3.0;
+                    by += Math.cos(crossAngle) * bulge * ruptureFactor * 0.8;
+                    bz += Math.sin(crossAngle) * bulge * ruptureFactor * 0.8;
                  }
               }
             }
@@ -741,7 +741,7 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       <PointMaterial
         transparent
         color="#ff3333"
-        size={0.035}
+        size={0.06}
         sizeAttenuation={true}
         depthWrite={false}
         depthTest={false}
