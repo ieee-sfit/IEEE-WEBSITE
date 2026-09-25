@@ -173,15 +173,18 @@ export function ControlChamber() {
 
       {/* Basic Architecture Lighting */}
       
+      <ambientLight intensity={0.2} />
+      <hemisphereLight groundColor="#000000" color="#222222" intensity={0.4} />
+      
       {/* Global architectural fill light so background pillars don't vanish entirely */}
       <directionalLight 
         position={[-50, 40, -30]} 
-        intensity={0.4} 
+        intensity={0.6} 
         color="#ffffff" 
       />
       <directionalLight 
         position={[50, -20, 30]} 
-        intensity={0.2} 
+        intensity={0.4} 
         color="#88ccff" 
       />
       
