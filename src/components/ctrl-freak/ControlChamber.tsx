@@ -62,37 +62,18 @@ export function ControlChamber() {
       dummyC.updateMatrix();
       pillars.chaotic.push(dummyC.matrix.clone());
 
-      // Canonical: NO BIRDCAGE. Massive walls and distant anchors.
-      if (i < 4) {
-        // 4 Massive Anchor Towers placed far away in the corners
-        const a = (i / 4) * Math.PI * 2 + (Math.PI / 4);
-        dummyK.position.set(Math.cos(a) * 120, 10, Math.sin(a) * 120);
-        dummyK.rotation.set(0, a, 0);
-        dummyK.scale.set(4, 2, 4); // Extremely thick (12x160x12)
-      } else if (i < 12) {
-        // 8 Pillars laid flat to form a heavy octagonal floor boundary
-        const a = ((i - 4) / 8) * Math.PI * 2;
-        dummyK.position.set(Math.cos(a) * 85, -20, Math.sin(a) * 85);
-        dummyK.rotation.set(Math.PI / 2, a + Math.PI/2, 0); // Laid flat, tangential
-        dummyK.scale.set(2, 1.05, 2); // Length matches octagonal edge
-      } else if (i < 20) {
-        // 8 Pillars laid flat to form a second stacked ring on top of the first
-        const a = ((i - 12) / 8) * Math.PI * 2;
-        dummyK.position.set(Math.cos(a) * 85, -14, Math.sin(a) * 85);
-        dummyK.rotation.set(Math.PI / 2, a + Math.PI/2, 0); 
-        dummyK.scale.set(2, 1.05, 2); 
-      } else {
-        // Last 4 pillars acting as heavy horizontal cross-beams high in the ceiling
-        const a = ((i - 20) / 4) * Math.PI * 2;
-        dummyK.position.set(Math.cos(a) * 40, 50, Math.sin(a) * 40);
-        dummyK.rotation.set(Math.PI / 2, a, 0); // Flat, pointing towards center
-        dummyK.scale.set(2, 1.2, 2); 
-      }
+      // Canonical: The 24 Massive Clamping Fingers
+      const a = (i / pillarCount) * Math.PI * 2;
+      dummyK.position.set(Math.cos(a) * 50, 15, Math.sin(a) * 50);
+      dummyK.rotation.set(0, a, 0);
+      dummyK.rotateX(-Math.PI / 2.5); // Steep clamp inward
+      dummyK.scale.set(1.5, 1.2, 1.5);
+      
       dummyK.updateMatrix();
       pillars.canonical.push(dummyK.matrix.clone());
     }
 
-    // 2. BEAMS (30) -> The Overhead Vault Lock
+    // 2. BEAMS (36) -> The Overhead Vault Lock
     for (let i = 0; i < beamCount; i++) {
       // Chaotic: Sheared and frozen mid-air far away
       const angle = (i / beamCount) * Math.PI * 2;
@@ -103,43 +84,26 @@ export function ControlChamber() {
       dummyC.updateMatrix();
       beams.chaotic.push(dummyC.matrix.clone());
 
-      // Canonical: A rigid, brutalist overhead locking grid (No stray floating pieces)
-      if (i < 8) {
-         // Inner Octagon Aperture over the core
-         const a1 = (i / 8) * Math.PI * 2;
-         const a2 = ((i + 1) / 8) * Math.PI * 2;
-         const mid = (a1 + a2) / 2;
-         const apothem = 25 * Math.cos(Math.PI / 8);
-         dummyK.position.set(Math.cos(mid) * apothem, 30, Math.sin(mid) * apothem);
-         dummyK.rotation.set(0, mid + Math.PI/2, 0);
-         dummyK.scale.set(0.48, 2, 2); // Exact length for r=25
-      } else if (i < 16) {
-         // Outer Octagon Frame
-         const a1 = ((i - 8) / 8) * Math.PI * 2;
-         const a2 = ((i - 7) / 8) * Math.PI * 2;
-         const mid = (a1 + a2) / 2;
-         const apothem = 65 * Math.cos(Math.PI / 8);
-         dummyK.position.set(Math.cos(mid) * apothem, 30, Math.sin(mid) * apothem);
-         dummyK.rotation.set(0, mid + Math.PI/2, 0);
-         dummyK.scale.set(1.24, 2, 2);
-      } else if (i < 24) {
-         // 8 Radial Spokes connecting inner and outer octagons
-         const a = ((i - 16) / 8) * Math.PI * 2;
-         dummyK.position.set(Math.cos(a) * 45, 30, Math.sin(a) * 45);
-         dummyK.rotation.set(0, a, 0);
-         dummyK.scale.set(1, 2, 2); // Connects r=25 to r=65
-      } else {
-         // 6 Heavy vertical drop-struts anchoring the overhead grid to the pedestal
-         const a = ((i - 24) / 6) * Math.PI * 2;
-         dummyK.position.set(Math.cos(a) * 45, 10, Math.sin(a) * 45);
-         dummyK.rotation.set(0, a, Math.PI / 2); // Vertical
-         dummyK.scale.set(1, 3, 3);
-      }
+      // Canonical: 3 Locking Rings (12 beams each) wrapping the fingers
+      const ringIndex = Math.floor(i / 12);
+      const ringAngle = ((i % 12) / 12) * Math.PI * 2;
+      
+      // Radius and height for the three rings gripping the fingers
+      const radius = ringIndex === 0 ? 55 : (ringIndex === 1 ? 30 : 10);
+      const height = ringIndex === 0 ? -10 : (ringIndex === 1 ? 25 : 55);
+      
+      dummyK.position.set(Math.cos(ringAngle) * radius, height, Math.sin(ringAngle) * radius);
+      dummyK.rotation.set(0, ringAngle + Math.PI / 2, 0);
+      
+      // Calculate length needed to connect dodecagon points with 15% overlap
+      const scaleX = ((2 * radius * Math.sin(Math.PI / 12)) / 40) * 1.15;
+      dummyK.scale.set(scaleX, 3.5, 3.5);
+
       dummyK.updateMatrix();
       beams.canonical.push(dummyK.matrix.clone());
     }
 
-    // 3. PLATFORMS (15) -> Solid Ziggurat Base
+    // 3. PLATFORMS (8) -> Solid Ziggurat Base
     for (let i = 0; i < platformCount; i++) {
       // Chaotic: Pushed to the ground layer far out
       const angle = (i / platformCount) * Math.PI * 2;
@@ -150,37 +114,18 @@ export function ControlChamber() {
       dummyC.updateMatrix();
       platforms.chaotic.push(dummyC.matrix.clone());
 
-      // Canonical: Monolithic solid base (ZERO floating pieces)
+      // Canonical: The Heavy Anvil Base
       if (i === 0) {
-        // Center core pedestal
         dummyK.position.set(0, -10, 0);
         dummyK.rotation.set(0, 0, 0);
-        dummyK.scale.set(3, 2, 3); // 45x4x45 solid block
-      } else if (i < 5) {
-        // 4 Cardinal extensions overlapping the center
-        const a = ((i - 1) / 4) * Math.PI * 2;
-        dummyK.position.set(Math.cos(a) * 35, -12, Math.sin(a) * 35);
-        dummyK.rotation.set(0, a, 0);
-        dummyK.scale.set(2, 1.5, 3); 
-      } else if (i < 9) {
-        // 4 Corner fills completing the solid 90x90 square
-        const a = ((i - 5) / 4) * Math.PI * 2 + (Math.PI / 4);
-        dummyK.position.set(Math.cos(a) * 35, -14, Math.sin(a) * 35);
-        dummyK.rotation.set(0, a, 0);
-        dummyK.scale.set(2.5, 1, 2.5);
-      } else if (i < 13) {
-        // 4 Secondary raised platforms wrapping the core
-        const a = ((i - 9) / 4) * Math.PI * 2 + (Math.PI / 4);
-        dummyK.position.set(Math.cos(a) * 15, -7, Math.sin(a) * 15);
-        dummyK.rotation.set(0, a, 0);
-        dummyK.scale.set(1, 2, 1);
+        dummyK.scale.set(4, 4, 4); // 48x4x48 solid block
       } else {
-        // Last 2 platforms acting as heavy vertical blast shields right beside the core
-        const sign = i === 13 ? 1 : -1;
-        dummyK.position.set(sign * 12, -2, 0);
-        dummyK.rotation.set(0, 0, Math.PI / 2); // Standing upright
-        dummyK.scale.set(1, 1.5, 1.5);
+        // Stacked plates to form a massive jagged foundation
+        dummyK.position.set(0, -15 + (i * 1.5), 0);
+        dummyK.rotation.set(0, i * (Math.PI / 7), 0);
+        dummyK.scale.set(5 - i*0.2, 1.5, 5 - i*0.2); 
       }
+      
       dummyK.updateMatrix();
       platforms.canonical.push(dummyK.matrix.clone());
     }
@@ -197,20 +142,12 @@ export function ControlChamber() {
       dummyC.updateMatrix();
       stairs.chaotic.push(dummyC.matrix.clone());
 
-      // Canonical: Anchoring the Ziggurat to the floor
-      if (i < 4) {
-        // 4 Main access ramps on cardinal axes leading to the pedestal
-        const a = (i / 4) * Math.PI * 2;
-        dummyK.position.set(Math.cos(a) * 55, -16, Math.sin(a) * 55);
-        dummyK.rotation.set(Math.PI / 6, a, 0);
-        dummyK.scale.set(1.5, 2, 1.5); // Wide, heavy ramps
-      } else {
-        // 8 Tangential buttresses securing the corners of the base
-        const a = ((i - 4) / 8) * Math.PI * 2 + (Math.PI / 8);
-        dummyK.position.set(Math.cos(a) * 50, -15, Math.sin(a) * 50);
-        dummyK.rotation.set(Math.PI / 4, a + Math.PI/2, 0);
-        dummyK.scale.set(1, 3, 1); // Thick structural wedges
-      }
+      // Canonical: The Gripper Teeth right over the core
+      dummyK.position.set(Math.cos(angle) * 7, 50, Math.sin(angle) * 7);
+      dummyK.rotation.set(0, angle, 0);
+      dummyK.rotateX(-Math.PI / 2); // Pointing straight down at the core
+      dummyK.scale.set(1.5, 3, 1.5); 
+      
       dummyK.updateMatrix();
       stairs.canonical.push(dummyK.matrix.clone());
     }
