@@ -73,28 +73,34 @@ export function ControlChamber() {
       const rig = new THREE.Object3D();
       
       if (fingerIdx === 0) {
-        // Thumb (comes from the bottom/front of palm to wrap around the back)
-        rig.position.set(sign * 7, -6, 2);
-        // Base points UP and INWARD
-        rig.rotation.set(0, 0, sign * Math.PI / 4); 
-        // Angle thumb to point backward towards camera (yaw)
-        rig.rotateY(sign * Math.PI / 4);
+        // Thumb: Asymmetric, coming diagonally from underneath/outside
+        rig.position.set(sign * 9, -10, 4);
+        rig.rotation.set(0, 0, sign * Math.PI / 3); // Point heavily UP
+        rig.rotateY(sign * Math.PI / 4); // Yaw it outwards
+        rig.rotateX(-0.2); // Pitch slightly forward
+      } else if (fingerIdx === 1) {
+        // Top finger: Reaching over from behind
+        rig.position.set(sign * 9, 10, -5);
+        rig.rotation.set(0, 0, sign * 2 * Math.PI / 3); // Point DOWN and IN
+        rig.rotateX(0.2); // Reaching over the top
+      } else if (fingerIdx === 2) {
+        // Mid finger: Slightly in front, silhouetted against the core
+        rig.position.set(sign * 12, 2, 2); // Closer to camera
+        rig.rotation.set(0, 0, sign * Math.PI / 2); // Point straight IN
+        rig.rotateY(sign * -0.2); // Point slightly backwards (towards core)
       } else {
-        // 3 Fingers wrapping from the top back to the front
-        const zSpread = (fingerIdx - 2) * 5.5; // Spread along Z axis (depth)
-        rig.position.set(sign * 10, 9, zSpread - 3);
-        
-        // Base points DOWN and INWARD towards the core
-        rig.rotation.set(0, 0, sign * 3 * Math.PI / 4);
-        
-        // Splay them slightly like a fan
-        const splay = (fingerIdx - 2) * 0.15;
-        rig.rotateZ(splay);
+        // Bottom finger: Supporting from below and slightly behind
+        rig.position.set(sign * 11, -5, -2);
+        rig.rotation.set(0, 0, sign * Math.PI / 3); // Point UP and IN
       }
 
       let currentJoint = rig;
       const jointLength = 12; // massive thick fingers
-      const curl = fingerIdx === 0 ? 0.45 : 0.55; 
+      
+      let curl = 0.5;
+      if (fingerIdx === 0) curl = 0.6; // Thumb locks tight
+      if (fingerIdx === 1) curl = 0.55; // Top reaches over heavily
+      if (fingerIdx === 2) curl = 0.45; // Mid slightly more open
 
       for (let j = 0; j <= jointIdx; j++) {
         const nextJoint = new THREE.Object3D();
@@ -134,10 +140,10 @@ export function ControlChamber() {
       const sign = isLeft ? -1 : 1;
       const cableIdx = isLeft ? i : (i - 18);
       
-      // Arm origin far in the background and wide
-      const start = new THREE.Vector3(sign * 70, -30, -150); 
+      // Arm origin far outside the frame from above and behind
+      const start = new THREE.Vector3(sign * 80, 50, -180); 
       // Arm connection to the wrists
-      const end = new THREE.Vector3(sign * 15, 0, -10); 
+      const end = new THREE.Vector3(sign * 14, -2, -12); 
       
       // Create a bundled cylinder of cables using 3 lengthwise segments of 6 bundled cables
       const segment = Math.floor(cableIdx / 6); // 0, 1, 2
@@ -187,25 +193,27 @@ export function ControlChamber() {
       dummyC.updateMatrix();
       platforms.chaotic.push(dummyC.matrix.clone());
 
-      // Canonical: 4 plates per hand forming a massive curved palm
+      // Canonical: 4 plates heavily overlapping to form one huge armored palm structure
       const isLeft = i < 4;
       const sign = isLeft ? -1 : 1;
       const plateIdx = i % 4;
       
-      const yOffset = (plateIdx - 1.5) * 4.5;
-      dummyK.position.set(sign * 14, yOffset, -10);
+      const rig = new THREE.Object3D();
+      rig.position.set(sign * 12, -2, -8); 
+      rig.rotation.set(0, sign * Math.PI / 2, 0); // Faces inward
+      rig.rotateX(Math.PI / 2); // Flat face faces the core
       
-      // Base rotation: flat plate normal is Y. We want it to face X (inward towards the core).
-      dummyK.rotation.set(0, 0, sign * Math.PI / 2);
+      // Heavy overlap to form a solid jagged wall behind the core
+      rig.translateY((plateIdx - 1.5) * 2.5); // Spread tightly vertically
+      rig.translateX(plateIdx % 2 === 0 ? -1.5 : 1.5); // Stagger depth heavily
       
-      // Now tilt them up/down to form a cup. The top plates tilt down, bottom tilt up.
-      const pitch = (plateIdx - 1.5) * 0.25;
-      dummyK.rotateX(pitch);
+      rig.rotateX((plateIdx - 1.5) * 0.15); // Slight curve
+      rig.rotateZ(plateIdx * 0.12); // Stagger rotation so it looks like jagged scales/armor
       
-      // Curve around the core slightly (yaw)
-      dummyK.rotateY(sign * 0.2);
+      dummyK.position.copy(rig.position);
+      dummyK.rotation.copy(rig.rotation);
       
-      dummyK.scale.set(3, 1.5, 4);
+      dummyK.scale.set(4.5, 1.5, 4.5); // Thicker massive plates
       
       dummyK.updateMatrix();
       platforms.canonical.push(dummyK.matrix.clone());
@@ -234,19 +242,30 @@ export function ControlChamber() {
         
         const rig = new THREE.Object3D();
         if (fingerIdx === 0) {
-          rig.position.set(sign * 7, -6, 2);
-          rig.rotation.set(0, 0, sign * Math.PI / 4);
+          rig.position.set(sign * 9, -10, 4);
+          rig.rotation.set(0, 0, sign * Math.PI / 3);
           rig.rotateY(sign * Math.PI / 4);
+          rig.rotateX(-0.2);
+        } else if (fingerIdx === 1) {
+          rig.position.set(sign * 9, 10, -5);
+          rig.rotation.set(0, 0, sign * 2 * Math.PI / 3);
+          rig.rotateX(0.2);
+        } else if (fingerIdx === 2) {
+          rig.position.set(sign * 12, 2, 2);
+          rig.rotation.set(0, 0, sign * Math.PI / 2);
+          rig.rotateY(sign * -0.2);
         } else {
-          const zSpread = (fingerIdx - 2) * 5.5; 
-          rig.position.set(sign * 10, 9, zSpread - 3);
-          rig.rotation.set(0, 0, sign * 3 * Math.PI / 4);
-          rig.rotateZ((fingerIdx - 2) * 0.15);
+          rig.position.set(sign * 11, -5, -2);
+          rig.rotation.set(0, 0, sign * Math.PI / 3);
         }
 
         let currentJoint = rig;
         const jointLength = 12;
-        const curl = fingerIdx === 0 ? 0.45 : 0.55;
+        
+        let curl = 0.5;
+        if (fingerIdx === 0) curl = 0.6;
+        if (fingerIdx === 1) curl = 0.55;
+        if (fingerIdx === 2) curl = 0.45;
 
         for (let j = 0; j <= 2; j++) {
           const nextJoint = new THREE.Object3D();
@@ -259,7 +278,7 @@ export function ControlChamber() {
         const claw = new THREE.Object3D();
         claw.position.set(0, jointLength, 0); 
         // Snap the claw inward sharply
-        claw.rotation.set(0, 0, sign * 0.75); 
+        claw.rotation.set(0, 0, sign * 0.85); 
         currentJoint.add(claw);
 
         rig.updateMatrixWorld(true);
@@ -269,16 +288,18 @@ export function ControlChamber() {
         // Stairs are 4 x 0.5 x 15 (Long along Z). 
         // Fingers are aligned along Y. We align the stair to point along Y.
         m.multiply(new THREE.Matrix4().makeRotationX(Math.PI / 2));
-        m.multiply(new THREE.Matrix4().makeScale(0.6, 1.5, 0.6));
+        m.multiply(new THREE.Matrix4().makeScale(0.5, 1.2, 0.5)); // Sharper, slightly smaller claws
         dummyK.matrix.copy(m);
       } else {
         // 2 Knuckle armor plates on the back of the palm
         const knuckleIdx = localI - 4;
-        dummyK.position.set(sign * 18, knuckleIdx === 0 ? 6 : -6, -12);
+        dummyK.position.set(sign * 16, knuckleIdx === 0 ? 5 : -7, -10);
+        
         // Angled to cover the wrist joint
         dummyK.rotation.set(0, 0, sign * Math.PI / 2);
-        dummyK.rotateX(knuckleIdx === 0 ? 0.4 : -0.4);
-        dummyK.scale.set(1.5, 2.5, 1.5);
+        dummyK.rotateX(knuckleIdx === 0 ? 0.3 : -0.3);
+        dummyK.rotateZ(0.2); // Add chaotic slant
+        dummyK.scale.set(1.5, 3.0, 1.5);
         
         const m = new THREE.Matrix4();
         m.makeRotationFromEuler(dummyK.rotation);
@@ -323,15 +344,19 @@ export function ControlChamber() {
       const interpolateInstances = (
         ref: React.RefObject<THREE.InstancedMesh>, 
         data: { chaotic: THREE.Matrix4[], canonical: THREE.Matrix4[] }, 
-        count: number
+        count: number,
+        localProgress: number
       ) => {
         for (let i = 0; i < count; i++) {
           data.chaotic[i].decompose(posC, quatC, scaleC);
           data.canonical[i].decompose(posK, quatK, scaleK);
 
-          dummy.position.lerpVectors(posC, posK, currentStability.current);
-          dummy.quaternion.slerpQuaternions(quatC, quatK, currentStability.current);
-          dummy.scale.lerpVectors(scaleC, scaleK, currentStability.current);
+          // Use a custom easing function to make the snapping feel weighty and mechanical
+          const easeProgress = 1 - Math.pow(1 - localProgress, 3); // Cubic Out
+
+          dummy.position.lerpVectors(posC, posK, easeProgress);
+          dummy.quaternion.slerpQuaternions(quatC, quatK, easeProgress);
+          dummy.scale.lerpVectors(scaleC, scaleK, easeProgress);
           
           dummy.updateMatrix();
           ref.current!.setMatrixAt(i, dummy.matrix);
@@ -339,10 +364,19 @@ export function ControlChamber() {
         ref.current!.instanceMatrix.needsUpdate = true;
       };
 
-      interpolateInstances(pillarRef, transforms.pillars, pillarCount);
-      interpolateInstances(beamRef, transforms.beams, beamCount);
-      interpolateInstances(platformRef, transforms.platforms, platformCount);
-      interpolateInstances(stairRef, transforms.stairs, stairCount);
+      const p = currentStability.current;
+      const mapProgress = (val: number, start: number, end: number) => THREE.MathUtils.clamp((val - start) / (end - start), 0, 1);
+      
+      // STAGED ANIMATION: As stability increases, pieces assemble in sequence
+      const progressBeams = mapProgress(p, 0.0, 0.4);      // Forearms sweep in from the darkness
+      const progressPlatforms = mapProgress(p, 0.2, 0.6);  // Palms rotate into place behind the core
+      const progressPillars = mapProgress(p, 0.4, 0.85);   // Fingers close aggressively around the core
+      const progressStairs = mapProgress(p, 0.6, 1.0);     // Thumb and Claws lock into position
+
+      interpolateInstances(beamRef, transforms.beams, beamCount, progressBeams);
+      interpolateInstances(platformRef, transforms.platforms, platformCount, progressPlatforms);
+      interpolateInstances(pillarRef, transforms.pillars, pillarCount, progressPillars);
+      interpolateInstances(stairRef, transforms.stairs, stairCount, progressStairs);
     }
   });
 
