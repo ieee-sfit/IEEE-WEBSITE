@@ -171,48 +171,31 @@ export function ControlChamber() {
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
-      {/* Basic Architecture Lighting */}
+      {/* Basic Architecture Lighting (No real-time shadows yet) */}
+      <ambientLight intensity={0.1} />
       
-      <ambientLight intensity={0.2} />
-      <hemisphereLight groundColor="#000000" color="#222222" intensity={0.4} />
-      
-      {/* Global architectural fill light so background pillars don't vanish entirely */}
+      {/* Key spotlight shining down and angled slightly to give the pillars bright faces */}
       <directionalLight 
-        position={[-50, 40, -30]} 
-        intensity={0.6} 
+        position={[20, 80, 40]} 
+        intensity={ancSolved ? 3.5 : 2.5} 
         color="#ffffff" 
       />
+      
+      {/* Harsh stark rim light from the opposite side (Emergency Lockdown) */}
       <directionalLight 
-        position={[50, -20, 30]} 
-        intensity={0.4} 
+        position={[-50, 20, -50]} 
+        intensity={logicSolved ? 0.2 : 1.0} 
+        color="#ff3333" 
+      />
+      
+      {/* Secondary stark blue/white rim light to create cinematic contrast (Data Infrastructure) */}
+      <directionalLight 
+        position={[60, 0, -20]} 
+        intensity={networkSolved ? 2.5 : 1.5} 
         color="#88ccff" 
       />
       
-      {/* Key spotlight: Cold white inspection light. Brighter when ANC stabilizes */}
-      <spotLight 
-        position={[20, 80, 40]} 
-        intensity={ancSolved ? 4000 : 1500} 
-        color="#ffffff" 
-        angle={Math.PI / 6}
-        penumbra={0.5}
-        distance={200}
-      />
-      
-      {/* Emergency Lockdown Light: Harsh red, fades out when Logic is solved */}
-      <pointLight 
-        position={[-30, 10, -30]} 
-        intensity={logicSolved ? 200 : 2500} 
-        color="#ff1111" 
-        distance={150}
-      />
-      
-      {/* Data Infrastructure Light: Deep cyan rim light, flares up when Network balanced */}
-      <pointLight 
-        position={[40, -10, -20]} 
-        intensity={networkSolved ? 3000 : 500} 
-        color="#00ddff" 
-        distance={180}
-      />
+      <hemisphereLight groundColor="#000000" color="#222222" intensity={0.3} />
       
       {/* Tiny red emissive strips (Floating warning lamps) */}
       <mesh position={[-25, 15, -15]}>
@@ -224,8 +207,8 @@ export function ControlChamber() {
          <meshStandardMaterial color="#002233" emissive="#00ddff" emissiveIntensity={5} />
       </mesh>
       
-      {/* Dense fog pushed back to create foreground/midground depth layers */}
-      <fog attach="fog" args={['#050505', 30, 200]} />
+      {/* Dense fog pushed back so we can actually see the chamber */}
+      <fog attach="fog" args={['#050505', 40, 180]} />
     </group>
   );
 }
