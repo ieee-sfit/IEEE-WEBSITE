@@ -793,16 +793,16 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
 };
 
 const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) => {
-  // A cinematic spline path for the camera to fly through the brutalist chamber
+  // A cinematic spline path - camera stays LOW to make the arms tower overhead
   const cameraPath = useMemo(() => {
     return new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0, 80, 160),   // 0.0: Arrival High
-      new THREE.Vector3(0, 0, 30),     // 0.2: Core Center
-      new THREE.Vector3(-35, -5, 25),  // 0.35: Station 1 (Left Low)
-      new THREE.Vector3(35, -5, 20),   // 0.5: Station 2 (Right Lower)
-      new THREE.Vector3(30, 25, -20),  // 0.65: Station 3 (Right High)
-      new THREE.Vector3(-20, 15, -20), // 0.8: Station 4 (Back Left High)
-      new THREE.Vector3(0, 0, 35),     // 1.0: Final Clock (Straight ahead, eye-level with the massive hands)
+      new THREE.Vector3(0, 5, 90),      // 0.0: Ground level, far back - towering view UP at the arms
+      new THREE.Vector3(0, 8, 40),      // 0.2: Approach the core from below
+      new THREE.Vector3(-30, 5, 30),    // 0.35: Station 1 (Left, ground level)
+      new THREE.Vector3(30, 5, 25),     // 0.5: Station 2 (Right, ground level)
+      new THREE.Vector3(25, 18, -15),   // 0.65: Station 3 (Right, slightly elevated)
+      new THREE.Vector3(-20, 12, -15),  // 0.8: Station 4 (Back Left)
+      new THREE.Vector3(0, 10, 40),     // 1.0: Final Clock (Straight ahead, looking at core with arms overhead)
     ], false, 'catmullrom', 0.5);
   }, []);
 
@@ -820,14 +820,14 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
     // Cinematic Intro Reveal: Start behind the occlusion Monolith and push straight through it
     if (!isFullySolved && progress < 0.0075) {
       const revealP = progress / 0.0075;
-      targetPosition.set(0, 80, THREE.MathUtils.lerp(160, 130, revealP));
+      targetPosition.set(0, 5, THREE.MathUtils.lerp(160, 130, revealP));
     }
     
     // Smoothly lerp the camera towards the target position
     state.camera.position.lerp(targetPosition, 0.05);
     
-    // Always look directly at the core (0, 0, 0)
-    state.camera.lookAt(0, 0, 0);
+    // Look at the core but slightly above center so we're gazing UP at the structure
+    state.camera.lookAt(0, 15, 0);
   });
 
   return null;
@@ -836,7 +836,7 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
 export const SystemCore = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) => {
   return (
     <div className="w-full h-full">
-      <Canvas shadows camera={{ position: [0, 50, 80], fov: 45 }}>
+      <Canvas shadows camera={{ position: [0, 5, 90], fov: 45 }}>
         <SceneExporter />
         <color attach="background" args={['#050505']} />
         <ambientLight intensity={0.15} />
