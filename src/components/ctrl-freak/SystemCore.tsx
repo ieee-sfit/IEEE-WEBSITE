@@ -291,8 +291,8 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       sphere[i3 + 2] = r * Math.cos(phi);
 
       // 2. SINE WAVES (ANC - Base positions, animated in useFrame)
-      const waveX = (i / count) * 20 - 10;
-      let waveY = i % 2 === 0 ? 1.5 : -1.5;
+      const waveX = (i / count) * 40 - 20; // Widen to span -20 to 20
+      let waveY = i % 2 === 0 ? 3.5 : -3.5; // Spread vertically by 7 units
       wave[i3] = waveX;
       wave[i3 + 1] = waveY;
       wave[i3 + 2] = 0;
@@ -486,14 +486,44 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
         if (shapeBase === shapes.sphere) {
           const state = useCtrlFreakStore.getState();
           const isFullySolved = state.anc.solved && state.network.solved && state.vision.solved && state.logic.solved;
-          const chaos = isFullySolved ? 0 : 0.8;
-          const scrollExpansion = Math.sin(Math.min(1, progress / 0.28) * Math.PI);
-          const expansion = 1 + (scrollExpansion * 0.8);
-          const glitch = chaos > 0 && Math.random() > 0.95 ? 1.1 : 1;
           
-          bx = (bx * expansion * glitch) + (Math.random() - 0.5) * 6 * chaos;
-          by = (by * expansion * glitch) + (Math.random() - 0.5) * 6 * chaos;
-          bz = (bz * expansion * glitch) + (Math.random() - 0.5) * 6 * chaos;
+          if (isFullySolved) {
+            // VISUAL PAYOFF: Glorious Golden Ratio / Sacred Geometry Torus Knot
+            const pRatio = i / count;
+            const u = pRatio * Math.PI * 2 * 7; // 7 loops
+            const v = pRatio * Math.PI * 2 * 3; // 3 loops
+            
+            // Torus Knot parametric equation
+            const r = 6 + 2 * Math.cos(v);
+            bx = r * Math.cos(u);
+            by = r * Math.sin(u);
+            bz = 2 * Math.sin(v);
+            
+            // Majestic slow rotation on multiple axes
+            const sY = Math.sin(t * 0.4);
+            const cY = Math.cos(t * 0.4);
+            const tempX = bx * cY - bz * sY;
+            bz = bx * sY + bz * cY;
+            bx = tempX;
+            
+            const sZ = Math.sin(t * 0.2);
+            const cZ = Math.cos(t * 0.2);
+            const tempY = by * cZ - bx * sZ;
+            bx = by * sZ + bx * cZ;
+            by = tempY;
+            
+          } else {
+            // Base state: Stable, calm sphere (no chaotic jittering)
+            const scrollExpansion = Math.sin(Math.min(1, progress / 0.28) * Math.PI);
+            const expansion = 1 + (scrollExpansion * 0.5); // Subtle, controlled expansion
+            
+            // Add a very calm, slow breathing effect so it feels alive but not chaotic
+            const breathe = 1 + Math.sin(t * 1.5 + (i % 10)) * 0.05;
+            
+            bx = bx * expansion * breathe;
+            by = by * expansion * breathe;
+            bz = bz * expansion * breathe;
+          }
         } else if (shapeBase === shapes.wave) {
           const isTop = i % 2 === 0;
           const ancPhase = useCtrlFreakStore.getState().anc.phase;
@@ -501,14 +531,15 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
           const errorMagnitude = Math.min(1, Math.abs(ancPhase - 180) / 180);
           const currentPhaseOffset = isTop ? 0 : targetPhaseOffset;
           const amplitudeJitter = (Math.random() - 0.5) * errorMagnitude * 4.0;
-          const amplitude = 5.0 + amplitudeJitter;
+          const amplitude = 6.0 + amplitudeJitter; // Increased amplitude to fill space
           const scatterX = (Math.random() - 0.5) * errorMagnitude * 2.0;
           const scatterY = (Math.random() - 0.5) * errorMagnitude * 2.0;
           const scatterZ = (Math.random() - 0.5) * errorMagnitude * 3.0;
 
           bx += scatterX;
-          by += Math.sin(bx * 1.2 + t * 2 + currentPhaseOffset) * amplitude + scatterY;
-          bz += Math.sin(bx * 1.5 + t) * 2.5 + scatterZ;
+          // Adjusted frequency to 0.8 so it looks mathematically perfect over the wider 40-unit span
+          by += Math.sin(bx * 0.8 + t * 2 + currentPhaseOffset) * amplitude + scatterY;
+          bz += Math.sin(bx * 1.0 + t) * 2.5 + scatterZ;
         } else if (shapeBase === shapes.network) {
           const net = useCtrlFreakStore.getState().network;
           const bridgeIdx = Math.floor(i / (count / 3));

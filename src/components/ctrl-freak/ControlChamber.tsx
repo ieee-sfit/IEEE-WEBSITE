@@ -123,8 +123,11 @@ export function ControlChamber() {
         
         spikes.canonical.push(dummyK.matrix.clone());
       } else {
-        // Extra scatter for spikes array
-        spikes.canonical.push(dummyC.matrix.clone());
+        // Hide unused particles in canonical state
+        dummyK.position.set(0, -100, 0);
+        dummyK.scale.set(0, 0, 0);
+        dummyK.updateMatrix();
+        spikes.canonical.push(dummyK.matrix.clone());
       }
     }
 
@@ -179,7 +182,11 @@ export function ControlChamber() {
         dummyK.updateMatrix();
         carapaces.canonical.push(dummyK.matrix.clone());
       } else {
-        carapaces.canonical.push(dummyC.matrix.clone());
+        // Hide unused carapaces in canonical state
+        dummyK.position.set(0, -100, 0);
+        dummyK.scale.set(0, 0, 0);
+        dummyK.updateMatrix();
+        carapaces.canonical.push(dummyK.matrix.clone());
       }
     }
 
@@ -269,7 +276,11 @@ export function ControlChamber() {
         dummyK.matrix.multiply(new THREE.Matrix4().makeScale(0.8 * taper, 0.8 * taper, 0.8 * taper)); 
         joints.canonical.push(dummyK.matrix.clone());
       } else {
-        joints.canonical.push(dummyC.matrix.clone());
+        // Hide unused joints in canonical state
+        dummyK.position.set(0, -100, 0);
+        dummyK.scale.set(0, 0, 0);
+        dummyK.updateMatrix();
+        joints.canonical.push(dummyK.matrix.clone());
       }
     }
 
