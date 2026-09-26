@@ -72,35 +72,36 @@ export function ControlChamber() {
       
       const rig = new THREE.Object3D();
       
-      // All fingers anchor at the wrist region (X=±30, Y=20) and reach inward
-      // Spread them around the wrist in a fan pattern
+      // All fingers anchor at the wrist region (X=±30, Y=20) and wrap AROUND the core
+      // Like cupping a massive sphere: top two reach over, bottom two cup underneath
       const fingerPositions = [
-        [sign * 28, 12, 8],    // 0: Bottom-front (thumb)
-        [sign * 28, 28, -2],   // 1: Top 
-        [sign * 32, 22, 4],    // 2: Mid-outer
-        [sign * 28, 16, -8],   // 3: Bottom-back
+        [sign * 26, 8, 6],     // 0: Bottom-front — cups under the core
+        [sign * 26, 32, 0],    // 1: Top — reaches over the top of the core
+        [sign * 26, 24, 6],    // 2: Upper-mid — wraps around the top-side
+        [sign * 26, 14, -4],   // 3: Lower-mid — wraps around the bottom-side
       ];
       
       const fp = fingerPositions[fingerIdx];
       rig.position.set(fp[0], fp[1], fp[2]);
-      rig.lookAt(0, 0, 0);
+      rig.lookAt(0, fp[1] * 0.4, 0); // Look towards the core's vertical center, not origin
       
-      // Each finger gets a slightly different pitch to fan out around the core
-      const fingerCurls = [
-        { pitch: Math.PI / 3, yaw: sign * 0.3 },     // Thumb: aggressive curl
-        { pitch: -Math.PI / 5, yaw: sign * -0.05 },   // Top: reaches over
-        { pitch: 0, yaw: sign * 0.15 },                // Mid: straight grip
-        { pitch: Math.PI / 5, yaw: sign * -0.1 },      // Bottom: cups underneath
+      // Pitch the fingers so they wrap around the sphere:
+      // Top fingers pitch DOWN over the core, bottom fingers pitch UP under the core
+      const fingerOrient = [
+        { pitch: 0.8, yaw: sign * 0.15 },       // Bottom-front: curls upward around underside
+        { pitch: -0.6, yaw: sign * -0.05 },      // Top: curls downward over the top
+        { pitch: -0.2, yaw: sign * 0.05 },        // Upper-mid: slight downward wrap
+        { pitch: 0.4, yaw: sign * -0.05 },        // Lower-mid: slight upward wrap
       ];
       
-      rig.rotateX(fingerCurls[fingerIdx].pitch);
-      rig.rotateY(fingerCurls[fingerIdx].yaw);
+      rig.rotateX(fingerOrient[fingerIdx].pitch);
+      rig.rotateY(fingerOrient[fingerIdx].yaw);
 
       let currentJoint = rig;
       const jointLength = 12;
       
-      // Curl amount - how aggressively the finger bends towards the core
-      const curlAmounts = [0.45, 0.4, 0.35, 0.42];
+      // Higher curl = more aggressive inward bend toward the core (like closing a fist)
+      const curlAmounts = [0.5, 0.5, 0.45, 0.48];
       const curl = curlAmounts[fingerIdx];
 
       for (let j = 0; j <= jointIdx; j++) {
@@ -235,25 +236,25 @@ export function ControlChamber() {
         
         // MUST use the SAME finger base positions as the pillars above
         const fingerPositions = [
-          [sign * 28, 12, 8],
-          [sign * 28, 28, -2],
-          [sign * 32, 22, 4],
-          [sign * 28, 16, -8],
+          [sign * 26, 8, 6],
+          [sign * 26, 32, 0],
+          [sign * 26, 24, 6],
+          [sign * 26, 14, -4],
         ];
-        const fingerCurls = [
-          { pitch: Math.PI / 3, yaw: sign * 0.3 },
-          { pitch: -Math.PI / 5, yaw: sign * -0.05 },
-          { pitch: 0, yaw: sign * 0.15 },
-          { pitch: Math.PI / 5, yaw: sign * -0.1 },
+        const fingerOrient = [
+          { pitch: 0.8, yaw: sign * 0.15 },
+          { pitch: -0.6, yaw: sign * -0.05 },
+          { pitch: -0.2, yaw: sign * 0.05 },
+          { pitch: 0.4, yaw: sign * -0.05 },
         ];
-        const curlAmounts = [0.45, 0.4, 0.35, 0.42];
+        const curlAmounts = [0.5, 0.5, 0.45, 0.48];
         
         const rig = new THREE.Object3D();
         const fp = fingerPositions[fingerIdx];
         rig.position.set(fp[0], fp[1], fp[2]);
-        rig.lookAt(0, 0, 0);
-        rig.rotateX(fingerCurls[fingerIdx].pitch);
-        rig.rotateY(fingerCurls[fingerIdx].yaw);
+        rig.lookAt(0, fp[1] * 0.4, 0);
+        rig.rotateX(fingerOrient[fingerIdx].pitch);
+        rig.rotateY(fingerOrient[fingerIdx].yaw);
 
         let currentJoint = rig;
         const jointLength = 12;
@@ -412,7 +413,7 @@ export function ControlChamber() {
     <group>
       {/* The Monolith (Initial Camera Occlusion for Intro Reveal - 0.75% scroll) */}
       {(!ancSolved || !networkSolved || !visionSolved || !logicSolved) && (
-        <mesh position={[0, 15, 145]}>
+        <mesh position={[0, 50, 145]}>
           <boxGeometry args={[400, 400, 1]} />
           <meshBasicMaterial color="#020202" />
         </mesh>
