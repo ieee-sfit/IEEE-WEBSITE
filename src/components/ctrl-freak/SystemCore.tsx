@@ -477,236 +477,134 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
       
-      // Base morph interpolation
-      let x = shape1[i3] + (shape2[i3] - shape1[i3]) * lerpFactor;
-      let y = shape1[i3 + 1] + (shape2[i3 + 1] - shape1[i3 + 1]) * lerpFactor;
-      let z = shape1[i3 + 2] + (shape2[i3 + 2] - shape1[i3 + 2]) * lerpFactor;
+      // Get exact dynamic position for a given base shape
+      const getDynamicPos = (shapeBase: Float32Array) => {
+        let bx = shapeBase[i3];
+        let by = shapeBase[i3+1];
+        let bz = shapeBase[i3+2];
 
-      // --- useFrame network branch ---
-      if (shape1 === shapes.network || shape2 === shapes.network) {
-        const netWeight = shape1 === shapes.network ? (1 - lerpFactor) : lerpFactor;
-        if (netWeight > 0) {
-          const net = useCtrlFreakStore.getState().network;
+        if (shapeBase === shapes.sphere) {
+          const state = useCtrlFreakStore.getState();
+          const isFullySolved = state.anc.solved && state.network.solved && state.vision.solved && state.logic.solved;
+          const chaos = isFullySolved ? 0 : 0.8;
+          const scrollExpansion = Math.sin(Math.min(1, progress / 0.28) * Math.PI);
+          const expansion = 1 + (scrollExpansion * 0.8);
+          const glitch = chaos > 0 && Math.random() > 0.95 ? 1.1 : 1;
           
-          const applyNetworkMods = (idx: number) => {
-            const bridgeIdx = Math.floor(idx / (count / 3));
-            const load = bridgeIdx === 0 ? net.frankfurt : bridgeIdx === 1 ? net.london : net.mumbai;
-            
-            const bridgeY = bridgeIdx === 0 ? 5 : bridgeIdx === 1 ? 0 : -5;
-            
-            // Determine critical threshold based on relay and resolution
-            let criticalLimit = 100;
-            if (bridgeIdx === 0) criticalLimit = 85; // Frankfurt
-            else if (bridgeIdx === 1) criticalLimit = 70; // London
-            else if (bridgeIdx === 2) criticalLimit = net.resolution === '4K' ? 15 : 40; // Mumbai
-            
-            // Stable seed for this particle
-            const seed = Math.abs(Math.sin(idx * 12.9898 + 78.233));
-            
-            // Flow speed based on load
-            const speed = net.solved ? 2.0 : (0.2 + (load / 100) * 1.5);
-            
-            // Calculate flow progress (-12 to 12)
-            const rawP = (seed + (t * speed * 0.5)) % 1.0;
-            let bx = -12 + rawP * 24;
-            
-            // Warning Pulse (within 10% of critical limit, but not over it)
-            let pulse = 1.0;
-            const isWarning = !net.solved && load >= criticalLimit - 10 && load <= criticalLimit;
-            if (isWarning) {
-               pulse = 1.0 + Math.abs(Math.sin(t * 15)) * 0.4; 
-            }
-            
-            // Base thickness with geometric throbbing when in warning state
-            const baseThick = net.solved ? 0.05 : (0.02 + Math.min(load, criticalLimit) / 100 * 0.3) * pulse;
-            
-            const crossAngle = Math.abs(Math.sin(idx * 43.111)) * Math.PI * 2;
-            const dist = Math.abs(Math.sin(idx * 99.999));
-            
-            let by = bridgeY + Math.cos(crossAngle) * baseThick * dist;
-            let bz = Math.sin(crossAngle) * baseThick * dist;
-            
-            // Critical Overload (Packet Loss): the pipe ruptures and particles fall heavily
-            if (!net.solved && load > criticalLimit) {
-              const overloadAmount = load - criticalLimit; // How far past the limit
-              const ruptureFactor = overloadAmount / (100 - criticalLimit + 1); // 0 to 1 scaling
-              
-              // If highly overloaded, drop a percentage of particles as packets
-              // Max 60% of particles drop when fully overloaded
-              if (Math.abs(Math.sin(idx * 11.111)) < ruptureFactor * 0.6) {
-                 // Fast, deep parabolic spark fall
-                 const fallTime = (t * 4 + seed * 10) % 3; // 0 to 3 seconds of falling
-                 by -= (fallTime * fallTime * 3); // Gravity curve pulling it way down
-                 bx += (Math.cos(idx) * fallTime * 3); // Scatter widely horizontally
-              }
-            }
-            
-            // Underload (<15): Data barely makes it across, breaks into dotted lines
-            if (!net.solved && load < 15) {
-               // Create solid dashes of data with completely empty spaces between them
-               if (Math.abs(Math.sin(idx * 0.5 + t * 4)) > 0.4) {
-                  bx *= 0.01; by *= 0.01; bz *= 0.01; // Hide particles entirely
-               }
-            }
-            
-            return [bx, by, bz];
-          };
-
-          if (shape1 === shapes.network) {
-            const [nx, ny, nz] = applyNetworkMods(i);
-            x = nx * (1 - lerpFactor) + shape2[i3] * lerpFactor;
-            y = ny * (1 - lerpFactor) + shape2[i3+1] * lerpFactor;
-            z = nz * (1 - lerpFactor) + shape2[i3+2] * lerpFactor;
-          } else if (shape2 === shapes.network) {
-            const [nx, ny, nz] = applyNetworkMods(i);
-            x = shape1[i3] * (1 - lerpFactor) + nx * lerpFactor;
-            y = shape1[i3+1] * (1 - lerpFactor) + ny * lerpFactor;
-            z = shape1[i3+2] * (1 - lerpFactor) + nz * lerpFactor;
-          }
-        }
-      }
-      
-      // SINE WAVE ANIMATION (Active when shape1 or shape2 is wave)
-      if (shape1 === shapes.wave || shape2 === shapes.wave) {
-        // Calculate how much "sine" behavior to apply
-        const sineWeight = shape1 === shapes.wave ? (1 - lerpFactor) : lerpFactor;
-        if (sineWeight > 0) {
+          bx = (bx * expansion * glitch) + (Math.random() - 0.5) * 6 * chaos;
+          by = (by * expansion * glitch) + (Math.random() - 0.5) * 6 * chaos;
+          bz = (bz * expansion * glitch) + (Math.random() - 0.5) * 6 * chaos;
+        } else if (shapeBase === shapes.wave) {
           const isTop = i % 2 === 0;
-          // 4A/5A: Read the latest state straight from the store without causing re-renders
           const ancPhase = useCtrlFreakStore.getState().anc.phase;
           const targetPhaseOffset = (Math.PI / 180) * (ancPhase - 180);
           const errorMagnitude = Math.min(1, Math.abs(ancPhase - 180) / 180);
-          
           const currentPhaseOffset = isTop ? 0 : targetPhaseOffset;
-          
-          // 5B: Physical Response (Amplitude Instability & Turbulence) - SCALED UP
           const amplitudeJitter = (Math.random() - 0.5) * errorMagnitude * 4.0;
           const amplitude = 5.0 + amplitudeJitter;
-          
           const scatterX = (Math.random() - 0.5) * errorMagnitude * 2.0;
           const scatterY = (Math.random() - 0.5) * errorMagnitude * 2.0;
           const scatterZ = (Math.random() - 0.5) * errorMagnitude * 3.0;
 
-          // Spread out across X for a wider wave visualization
-          x += scatterX * sineWeight;
-          // Higher frequency (1.2) for more crests/troughs, taller amplitude (5.0)
-          y += (Math.sin(x * 1.2 + t * 2 + currentPhaseOffset) * amplitude + scatterY) * sineWeight;
-          z += (Math.sin(x * 1.5 + t) * 2.5 + scatterZ) * sineWeight;
-        }
-      }
-
-      // SPHERE EXPANSION & JITTER (Arrival)
-      if ((shape1 === shapes.sphere || shape2 === shapes.sphere) && progress < 0.26) {
-        const state = useCtrlFreakStore.getState();
-        const isFullySolved = state.anc.solved && state.network.solved && state.vision.solved && state.logic.solved;
-        const sphereWeight = shape1 === shapes.sphere ? (1 - lerpFactor) : lerpFactor;
-        
-        if (sphereWeight > 0) {
-          // No chaos if everything is solved. Otherwise, baseline chaos.
-          const chaos = isFullySolved ? 0 : 0.8; 
+          bx += scatterX;
+          by += Math.sin(bx * 1.2 + t * 2 + currentPhaseOffset) * amplitude + scatterY;
+          bz += Math.sin(bx * 1.5 + t) * 2.5 + scatterZ;
+        } else if (shapeBase === shapes.network) {
+          const net = useCtrlFreakStore.getState().network;
+          const bridgeIdx = Math.floor(i / (count / 3));
+          const load = bridgeIdx === 0 ? net.frankfurt : bridgeIdx === 1 ? net.london : net.mumbai;
+          const bridgeY = bridgeIdx === 0 ? 5 : bridgeIdx === 1 ? 0 : -5;
+          let criticalLimit = 100;
+          if (bridgeIdx === 0) criticalLimit = 85;
+          else if (bridgeIdx === 1) criticalLimit = 70;
+          else if (bridgeIdx === 2) criticalLimit = net.resolution === '4K' ? 15 : 40;
           
-          // Starts tight at 0, slowly expands as you scroll towards 0.14
-          // Math.sin creates a hump that peaks at 0.14 (Math.PI/2) and goes to 0 at 0.28
-          const scrollExpansion = Math.sin(Math.min(1, progress / 0.28) * Math.PI);
-          const expansion = 1 + (scrollExpansion * 0.8); // Expands up to 1.8x at peak scroll
+          const seed = Math.abs(Math.sin(i * 12.9898 + 78.233));
+          const speed = net.solved ? 2.0 : (0.2 + (load / 100) * 1.5);
+          const rawP = (seed + (t * speed * 0.5)) % 1.0;
           
-          const glitch = chaos > 0 && Math.random() > 0.95 ? 1.1 : 1;
+          bx = -12 + rawP * 24;
           
-          // Apply expansion relative to origin
-          x = (x * expansion * glitch) + (Math.random() - 0.5) * 6 * chaos;
-          y = (y * expansion * glitch) + (Math.random() - 0.5) * 6 * chaos;
-          z = (z * expansion * glitch) + (Math.random() - 0.5) * 6 * chaos;
-        }
-      }
-
-      // VAULT ANIMATION (Logic)
-      if (shape1 === shapes.circuit || shape2 === shapes.circuit) {
-        const circuitWeight = shape1 === shapes.circuit ? (1 - lerpFactor) : lerpFactor;
-        if (circuitWeight > 0) {
-          const logic = useCtrlFreakStore.getState().logic;
+          let pulse = 1.0;
+          const isWarning = !net.solved && load >= criticalLimit - 10 && load <= criticalLimit;
+          if (isWarning) pulse = 1.0 + Math.abs(Math.sin(t * 15)) * 0.4;
           
-          const applyCircuitMods = (idx: number) => {
-            const vaultType = Math.floor((idx / count) * 3);
-            const vTheta = Math.abs(Math.sin(idx * 12.9898)) * Math.PI * 2;
-            const teeth = (Math.sin(vTheta * 12) > 0.5 ? 0.3 : 0);
-            
-            let vR = 0;
-            let vZ = 0;
-            
-            if (vaultType === 0) {
-              // Outer static housing
-              vR = 6.0 + Math.abs(Math.sin(idx * 78.233)) * 1.0 + teeth;
-              vZ = -3.0 + Math.abs(Math.sin(idx * 43.111)) * 2.0;
-            } else if (vaultType === 1) {
-              // Middle tumbler (Gate 1)
-              vR = 4.5 + Math.abs(Math.sin(idx * 78.233)) * 1.0 + teeth;
-              vZ = -0.5 + Math.abs(Math.sin(idx * 43.111)) * 2.0;
-            } else {
-              // Inner tumbler (Gate 2)
-              vR = 3.0 + Math.abs(Math.sin(idx * 78.233)) * 1.0 + teeth;
-              vZ = 2.0 + Math.abs(Math.sin(idx * 43.111)) * 2.0;
+          const baseThick = net.solved ? 0.05 : (0.02 + Math.min(load, criticalLimit) / 100 * 0.3) * pulse;
+          const crossAngle = Math.abs(Math.sin(i * 43.111)) * Math.PI * 2;
+          const dist = Math.abs(Math.sin(i * 99.999));
+          
+          by = bridgeY + Math.cos(crossAngle) * baseThick * dist;
+          bz = Math.sin(crossAngle) * baseThick * dist;
+          
+          if (!net.solved && load > criticalLimit) {
+            const ruptureFactor = (load - criticalLimit) / (100 - criticalLimit + 1);
+            if (Math.abs(Math.sin(i * 11.111)) < ruptureFactor * 0.6) {
+               const fallTime = (t * 4 + seed * 10) % 3;
+               by -= (fallTime * fallTime * 3);
+               bx += (Math.cos(i) * fallTime * 3);
             }
-            
-            let rotOffset = 0;
-            let zOffset = 0;
-            
-            // ANIMATION LOGIC
-            if (logic.solved) {
-              // When solved, the entire unified cylinder rotates slowly and majestically
-              rotOffset = t * 0.2;
-              if (vaultType === 0) zOffset = -6.0; // Outer shell moves back
-              if (vaultType === 1) zOffset = -3.0; // Gate 1 moves back
-              if (vaultType === 2) zOffset = 3.0;  // Gate 2 moves forward
-            } else {
-              // Not fully solved
-              if (vaultType === 1) {
-                if (logic.slot1Correct) {
-                  rotOffset = 0; // locked perfectly
-                } else if (logic.slot1 !== null) {
-                  // Wrong gate: violently jamming
-                  rotOffset = (t * 0.5) + (Math.sin(t * 30) * 0.05); 
-                  vR += (Math.abs(Math.sin(idx * 12.9898 + t)) - 0.5) * 0.3; // slight radius jitter from grinding
-                } else {
-                  // No gate: searching
-                  rotOffset = t * 0.8;
-                }
-              }
-              
-              if (vaultType === 2) {
-                if (logic.slot2Correct) {
-                  rotOffset = 0; // locked perfectly
-                } else if (logic.slot2 !== null) {
-                  // Wrong gate: violently jamming
-                  rotOffset = -(t * 0.6) + (Math.sin(t * 35) * 0.05); 
-                  vR += (Math.abs(Math.sin(idx * 78.233 + t)) - 0.5) * 0.3;
-                } else {
-                  // No gate: searching in opposite direction
-                  rotOffset = -t * 0.7;
-                }
-              }
-            }
-            
-            const finalTheta = vTheta + rotOffset;
-            const nx = Math.cos(finalTheta) * vR;
-            const ny = Math.sin(finalTheta) * vR;
-            const nz = vZ + zOffset;
-            
-            return [nx, ny, nz];
-          };
-
-          if (shape1 === shapes.circuit) {
-            const [nx, ny, nz] = applyCircuitMods(i);
-            x = nx * (1 - lerpFactor) + shape2[i3] * lerpFactor;
-            y = ny * (1 - lerpFactor) + shape2[i3+1] * lerpFactor;
-            z = nz * (1 - lerpFactor) + shape2[i3+2] * lerpFactor;
-          } else if (shape2 === shapes.circuit) {
-            const [nx, ny, nz] = applyCircuitMods(i);
-            x = shape1[i3] * (1 - lerpFactor) + nx * lerpFactor;
-            y = shape1[i3+1] * (1 - lerpFactor) + ny * lerpFactor;
-            z = shape1[i3+2] * (1 - lerpFactor) + nz * lerpFactor;
           }
+          if (!net.solved && load < 15) {
+             if (Math.abs(Math.sin(i * 0.5 + t * 4)) > 0.4) {
+                bx *= 0.01; by *= 0.01; bz *= 0.01;
+             }
+          }
+        } else if (shapeBase === shapes.circuit) {
+          const logic = useCtrlFreakStore.getState().logic;
+          const vaultType = Math.floor((i / count) * 3);
+          const vTheta = Math.abs(Math.sin(i * 12.9898)) * Math.PI * 2;
+          const teeth = (Math.sin(vTheta * 12) > 0.5 ? 0.3 : 0);
+          
+          let vR = 0, vZ = 0;
+          if (vaultType === 0) {
+            vR = 6.0 + Math.abs(Math.sin(i * 78.233)) * 1.0 + teeth;
+            vZ = -3.0 + Math.abs(Math.sin(i * 43.111)) * 2.0;
+          } else if (vaultType === 1) {
+            vR = 4.5 + Math.abs(Math.sin(i * 78.233)) * 1.0 + teeth;
+            vZ = -0.5 + Math.abs(Math.sin(i * 43.111)) * 2.0;
+          } else {
+            vR = 3.0 + Math.abs(Math.sin(i * 78.233)) * 1.0 + teeth;
+            vZ = 2.0 + Math.abs(Math.sin(i * 43.111)) * 2.0;
+          }
+          
+          let rotOffset = 0, zOffset = 0;
+          if (logic.solved) {
+            rotOffset = t * 0.2;
+            if (vaultType === 0) zOffset = -6.0;
+            if (vaultType === 1) zOffset = -3.0;
+            if (vaultType === 2) zOffset = 3.0;
+          } else {
+            if (vaultType === 1) {
+              if (logic.slot1Correct) rotOffset = 0;
+              else if (logic.slot1 !== null) {
+                rotOffset = (t * 0.5) + (Math.sin(t * 30) * 0.05); 
+                vR += (Math.abs(Math.sin(i * 12.9898 + t)) - 0.5) * 0.3;
+              } else rotOffset = t * 0.8;
+            }
+            if (vaultType === 2) {
+              if (logic.slot2Correct) rotOffset = 0;
+              else if (logic.slot2 !== null) {
+                rotOffset = -(t * 0.6) + (Math.sin(t * 35) * 0.05); 
+                vR += (Math.abs(Math.sin(i * 78.233 + t)) - 0.5) * 0.3;
+              } else rotOffset = -t * 0.7;
+            }
+          }
+          
+          const finalTheta = vTheta + rotOffset;
+          bx = Math.cos(finalTheta) * vR;
+          by = Math.sin(finalTheta) * vR;
+          bz = vZ + zOffset;
         }
-      }
+
+        return [bx, by, bz];
+      };
+
+      const [m1x, m1y, m1z] = getDynamicPos(shape1);
+      const [m2x, m2y, m2z] = getDynamicPos(shape2);
+
+      const x = m1x + (m2x - m1x) * lerpFactor;
+      const y = m1y + (m2y - m1y) * lerpFactor;
+      const z = m1z + (m2z - m1z) * lerpFactor;
 
       // 720 COUNTDOWN (Clock)
       // Kept completely static for that monolithic, unyielding digital feel.
