@@ -797,6 +797,9 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
     let finalPos = invPos;
     if (transitionRef.current > 0.001) {
       const tourPos = revealPath.getPoint(progress);
+      finalPos = invPos.clone().lerp(tourPos, transitionRef.current);
+    }
+    
     // Smoothly lerp the camera towards the target position
     state.camera.position.lerp(finalPos, 0.05);
     
