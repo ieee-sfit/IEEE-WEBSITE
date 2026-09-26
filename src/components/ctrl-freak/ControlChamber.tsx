@@ -120,9 +120,17 @@ export function ControlChamber() {
         dummyK.matrix.copy(visual.matrixWorld);
         
         const taper = 1 - (jointIdx * (isThumb ? 0.2 : 0.25));
-        dummyK.matrix.multiply(new THREE.Matrix4().makeRotationZ(Math.PI / 4)); // Diamond profile
-        // Elongate along Z axis
-        dummyK.matrix.multiply(new THREE.Matrix4().makeScale(1.8 * taper * scales[fingerIdx], 1.8 * taper * scales[fingerIdx], (jointLength / 6) * scales[fingerIdx]));
+        // Point the Cone (+Y) along the local -Z axis
+        dummyK.matrix.multiply(new THREE.Matrix4().makeRotationX(-Math.PI / 2));
+        // Diamond profile
+        dummyK.matrix.multiply(new THREE.Matrix4().makeRotationY(Math.PI / 4));
+        
+        // Scale correctly (Local Y is length)
+        dummyK.matrix.multiply(new THREE.Matrix4().makeScale(
+          1.8 * taper * scales[fingerIdx], 
+          (jointLength / 14) * scales[fingerIdx] * 1.1, // 10% overlap to connect joints
+          1.8 * taper * scales[fingerIdx]
+        ));
         
         spikes.canonical.push(dummyK.matrix.clone());
       } else {

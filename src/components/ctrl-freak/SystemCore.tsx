@@ -493,11 +493,11 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
             const u = pRatio * Math.PI * 2 * 7; // 7 loops
             const v = pRatio * Math.PI * 2 * 3; // 3 loops
             
-            // Torus Knot parametric equation
-            const r = 6 + 2 * Math.cos(v);
+            // Torus Knot parametric equation (Massively scaled up)
+            const r = 25 + 8 * Math.cos(v);
             bx = r * Math.cos(u);
             by = r * Math.sin(u);
-            bz = 2 * Math.sin(v);
+            bz = 8 * Math.sin(v);
             
             // Majestic slow rotation on multiple axes
             const sY = Math.sin(t * 0.4);
@@ -754,12 +754,15 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
     ], false, 'catmullrom', 0.5);
   }, []);
 
-  // Once fully solved and user scrolls back up, use this towering low-angle path
+  // Once fully solved and user scrolls back up, use this cinematic spiral tour path
   const revealPath = useMemo(() => {
     return new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0, -15, 80),   // Ground level, far back - towering view UP at the arms
-      new THREE.Vector3(0, -10, 45),   // Approach from below
-      new THREE.Vector3(0, -5, 40),    // Final position looking up at the structure
+      new THREE.Vector3(0, -50, 150),   // 0.0: The Hero Shot. Super low angle, MASSIVELY pulled back.
+      new THREE.Vector3(90, -10, 80),   // 0.2: Sweeping out right, wide orbit
+      new THREE.Vector3(120, 25, -20),  // 0.4: Deep orbit around the right forearm gauntlet
+      new THREE.Vector3(40, 50, -60),   // 0.6: Sweeping over the back and far above the arches
+      new THREE.Vector3(-80, 20, -20),  // 0.8: Coasting across the top left shoulder
+      new THREE.Vector3(0, 0, 35),      // 1.0: End at the Clock (Matches the investigation end point)
     ], false, 'catmullrom', 0.5);
   }, []);
 
@@ -775,9 +778,11 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
     // Track if user has ever reached fully solved state
     if (isFullySolved) hasSeenSolved.current = true;
 
-    const isRevealMode = hasSeenSolved.current && isFullySolved && progress < 0.2;
+    // If fully solved, hijack the ENTIRE scroll path for the tour
+    const isRevealMode = hasSeenSolved.current && isFullySolved;
+    
     // Smoothly blend between 0 (Investigation) and 1 (Reveal)
-    transitionRef.current = THREE.MathUtils.damp(transitionRef.current, isRevealMode ? 1 : 0, 4, delta);
+    transitionRef.current = THREE.MathUtils.damp(transitionRef.current, isRevealMode ? 1 : 0, 2, delta);
 
     // Calculate investigation position
     const invPos = cameraPath.getPoint(progress);
@@ -788,13 +793,11 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
       invPos.set(0, 0, THREE.MathUtils.lerp(220, 200, revealP));
     }
 
-    // Calculate reveal position (only if we need it)
+    // Calculate cinematic tour position
     let finalPos = invPos;
     if (transitionRef.current > 0.001) {
-      // Map progress 0.0-0.2 to reveal path 0.0-1.0
-      const revealProgress = 1 - (progress / 0.2);
-      const revPos = revealPath.getPoint(THREE.MathUtils.clamp(revealProgress, 0, 1));
-      finalPos = invPos.clone().lerp(revPos, transitionRef.current);
+      const tourPos = revealPath.getPoint(progress);
+      finalPos = invPos.clone().lerp(tourPos, transitionRef.current);
     }
     
     // Smoothly lerp the camera towards the target position
