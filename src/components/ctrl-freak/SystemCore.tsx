@@ -6,7 +6,7 @@ import { GLTFExporter } from 'three-stdlib';
 import { MotionValue } from 'framer-motion';
 import { ControlChamber } from './ControlChamber';
 import { useCtrlFreakStore } from '../../store/useCtrlFreakStore';
-import { EffectComposer, Bloom, Vignette, Noise } from '@react-three/postprocessing';
+import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 
 const AmbientDust = () => {
   const pointsRef = useRef<THREE.Points>(null);
