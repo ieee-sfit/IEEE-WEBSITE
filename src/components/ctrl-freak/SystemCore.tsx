@@ -797,17 +797,11 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
     let finalPos = invPos;
     if (transitionRef.current > 0.001) {
       const tourPos = revealPath.getPoint(progress);
-      finalPos = invPos.clone().lerp(tourPos, transitionRef.current);
-    }
-    
-    // Shift framing rightwards during the hero shot reveal to avoid the UI text on the left
-    const panOffset = THREE.MathUtils.lerp(0, -30, transitionRef.current * (1 - progress));
-    const lookTarget = new THREE.Vector3(panOffset, 0, 0);
-    
     // Smoothly lerp the camera towards the target position
     state.camera.position.lerp(finalPos, 0.05);
     
-    state.camera.lookAt(lookTarget);
+    // ALWAYS look at the core so it remains dead center
+    state.camera.lookAt(0, 0, 0);
   });
 
   return null;

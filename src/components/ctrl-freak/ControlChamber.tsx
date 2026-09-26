@@ -73,38 +73,44 @@ export function ControlChamber() {
         
         const rig = new THREE.Object3D();
         
-        // Base knuckles positioned in an arc
-        const fingerPositions = [
-          [sign * 25, 12, 14],     // Index
-          [sign * 27, 14, 4],      // Middle
-          [sign * 27, 12, -6],     // Ring
-          [sign * 25, 8, -14],     // Pinky
-          [sign * 20, 2, 16],      // Thumb (low, forward)
-        ];
-        
-        const fp = fingerPositions[fingerIdx];
-        rig.position.set(fp[0], fp[1], fp[2]);
-        
-        // Orient the base of the finger inwards (towards the core)
-        rig.rotation.set(0, sign * -(Math.PI / 2), 0);
-        
-        // Splay the fingers outwards (Yaw) and Cup them (Pitch)
-        const fingerOrient = [
-          { pitch: 0.1, yaw: sign * -0.4 },     // Index (splay out)
-          { pitch: 0.0, yaw: sign * -0.1 },     // Middle
-          { pitch: -0.1, yaw: sign * 0.2 },     // Ring (splay in)
-          { pitch: -0.2, yaw: sign * 0.5 },     // Pinky (splay heavy in)
-          { pitch: 0.4, yaw: sign * -1.2 },     // Thumb (opposing, angled up/across)
-        ];
-        
-        rig.rotateX(fingerOrient[fingerIdx].pitch);
-        rig.rotateY(fingerOrient[fingerIdx].yaw);
+        // Base knuckles positioned in an asymmetric reaching pose
+        let fp, curl, jointScale;
+        if (isLeft) {
+          const fpLeft = [
+            [-30, 16, 5], [-30, 10, 5], [-30, 4, 5], [-30, -2, 5], [-25, 18, -2]
+          ];
+          fp = fpLeft[fingerIdx];
+          rig.position.set(fp[0], fp[1], fp[2]);
+          rig.rotation.set(0, Math.PI / 2, 0); // Point +X
+          
+          const orientLeft = [
+            { pitch: 0.1, yaw: -0.2 }, { pitch: 0.0, yaw: -0.1 }, { pitch: -0.1, yaw: 0.0 }, { pitch: -0.2, yaw: 0.1 }, { pitch: -0.5, yaw: -0.8 }
+          ];
+          rig.rotateX(orientLeft[fingerIdx].pitch);
+          rig.rotateY(orientLeft[fingerIdx].yaw);
+          
+          curl = [0.1, 0.1, 0.1, 0.1, 0.05][fingerIdx];
+          jointScale = [1.0, 1.05, 0.95, 0.8, 1.2][fingerIdx];
+        } else {
+          const fpRight = [
+            [30, -10, -5], [32, -15, -2], [34, -20, 2], [36, -25, 8], [38, -5, -8]
+          ];
+          fp = fpRight[fingerIdx];
+          rig.position.set(fp[0], fp[1], fp[2]);
+          rig.rotation.set(Math.PI / 4, -Math.PI / 2, 0); // Face -X and UP (+Y)
+          
+          const orientRight = [
+            { pitch: -0.4, yaw: 0.4 }, { pitch: -0.1, yaw: 0.2 }, { pitch: 0.2, yaw: -0.1 }, { pitch: 0.6, yaw: -0.4 }, { pitch: -0.8, yaw: 0.6 }
+          ];
+          rig.rotateX(orientRight[fingerIdx].pitch);
+          rig.rotateY(orientRight[fingerIdx].yaw);
+          
+          curl = [0.15, 0.2, 0.25, 0.3, 0.1][fingerIdx];
+          jointScale = [1.0, 1.05, 0.95, 0.8, 1.2][fingerIdx];
+        }
 
         let currentJoint = rig;
         const jointLength = isThumb ? 16 : 24; // Massive, long grasping fingers
-        const curlAmounts = [0.6, 0.7, 0.75, 0.8, 0.3]; // Extreme organic claw curl (up to 45 deg per joint)
-        const curl = curlAmounts[fingerIdx];
-        const scales = [0.9, 1.1, 0.9, 0.75, 1.2]; 
 
         for (let j = 0; j <= jointIdx; j++) {
           const nextJoint = new THREE.Object3D();
@@ -158,8 +164,13 @@ export function ControlChamber() {
       if (localI < 4) {
         // Imposing Palm Plates (Bulkier)
         const pz = 10 - (localI * 6); 
-        dummyK.position.set(sign * 36, 15, pz);
-        dummyK.lookAt(0, 0, 0);
+        if (isLeft) {
+          dummyK.position.set(-35, 10, pz);
+          dummyK.lookAt(0, 10, pz);
+        } else {
+          dummyK.position.set(38, -15, pz);
+          dummyK.lookAt(0, 20, pz); // Looking up at the core
+        }
         dummyK.rotateX(Math.PI / 2);
         dummyK.rotateY(Math.PI / 4); // Diamond rotation
         dummyK.scale.set(1.5, 1.6, 0.6); // Much thicker armored plates
@@ -170,13 +181,16 @@ export function ControlChamber() {
         const fIdx = localI - 4; 
         const t = fIdx / 11; 
         
-        const start = new THREE.Vector3(sign * 40, 18, 0);
-        const end = new THREE.Vector3(sign * 110, 60, -40);
+        if (isLeft) {
+          dummyK.position.lerpVectors(new THREE.Vector3(-40, 10, 0), new THREE.Vector3(-110, 50, -40), t);
+          dummyK.lookAt(-110, 50, -40);
+        } else {
+          dummyK.position.lerpVectors(new THREE.Vector3(45, -20, 0), new THREE.Vector3(90, -50, -60), t);
+          dummyK.lookAt(90, -50, -60);
+        }
         
-        dummyK.position.lerpVectors(start, end, t);
         dummyK.position.y += Math.sin(t * Math.PI) * 10; 
         
-        dummyK.lookAt(0, 0, 0);
         dummyK.rotateX(Math.PI / 2);
         dummyK.rotateY(Math.PI / 4);
         
@@ -263,35 +277,44 @@ export function ControlChamber() {
         const jointIdx = isThumb ? (localI - 12) : (localI % 3);
         
         const rig = new THREE.Object3D();
-        // Base knuckles positioned in an arc
-        const fingerPositions = [
-          [sign * 25, 12, 14],     
-          [sign * 27, 14, 4],      
-          [sign * 27, 12, -6],     
-          [sign * 25, 8, -14],    
-          [sign * 20, 2, 16],     
-        ];
-        
-        const fp = fingerPositions[fingerIdx];
-        rig.position.set(fp[0], fp[1], fp[2]);
-        rig.rotation.set(0, sign * -(Math.PI / 2), 0);
-        
-        const fingerOrient = [
-          { pitch: 0.1, yaw: sign * -0.4 },     
-          { pitch: 0.0, yaw: sign * -0.1 },     
-          { pitch: -0.1, yaw: sign * 0.2 },     
-          { pitch: -0.2, yaw: sign * 0.5 },     
-          { pitch: 0.4, yaw: sign * -1.2 },      
-        ];
-        
-        rig.rotateX(fingerOrient[fingerIdx].pitch);
-        rig.rotateY(fingerOrient[fingerIdx].yaw);
+        // Base knuckles positioned in an asymmetric reaching pose
+        let fp, curl, jointScale;
+        if (isLeft) {
+          const fpLeft = [
+            [-30, 16, 5], [-30, 10, 5], [-30, 4, 5], [-30, -2, 5], [-25, 18, -2]
+          ];
+          fp = fpLeft[fingerIdx];
+          rig.position.set(fp[0], fp[1], fp[2]);
+          rig.rotation.set(0, Math.PI / 2, 0); // Point +X
+          
+          const orientLeft = [
+            { pitch: 0.1, yaw: -0.2 }, { pitch: 0.0, yaw: -0.1 }, { pitch: -0.1, yaw: 0.0 }, { pitch: -0.2, yaw: 0.1 }, { pitch: -0.5, yaw: -0.8 }
+          ];
+          rig.rotateX(orientLeft[fingerIdx].pitch);
+          rig.rotateY(orientLeft[fingerIdx].yaw);
+          
+          curl = [0.1, 0.1, 0.1, 0.1, 0.05][fingerIdx];
+          jointScale = [1.0, 1.05, 0.95, 0.8, 1.2][fingerIdx];
+        } else {
+          const fpRight = [
+            [30, -10, -5], [32, -15, -2], [34, -20, 2], [36, -25, 8], [38, -5, -8]
+          ];
+          fp = fpRight[fingerIdx];
+          rig.position.set(fp[0], fp[1], fp[2]);
+          rig.rotation.set(Math.PI / 4, -Math.PI / 2, 0); // Face -X and UP (+Y)
+          
+          const orientRight = [
+            { pitch: -0.4, yaw: 0.4 }, { pitch: -0.1, yaw: 0.2 }, { pitch: 0.2, yaw: -0.1 }, { pitch: 0.6, yaw: -0.4 }, { pitch: -0.8, yaw: 0.6 }
+          ];
+          rig.rotateX(orientRight[fingerIdx].pitch);
+          rig.rotateY(orientRight[fingerIdx].yaw);
+          
+          curl = [0.15, 0.2, 0.25, 0.3, 0.1][fingerIdx];
+          jointScale = [1.0, 1.05, 0.95, 0.8, 1.2][fingerIdx];
+        }
 
         let currentJoint = rig;
         const jointLength = isThumb ? 16 : 24;
-        const curlAmounts = [0.6, 0.7, 0.75, 0.8, 0.3]; 
-        const curl = curlAmounts[fingerIdx];
-        const scales = [0.9, 1.1, 0.9, 0.75, 1.2]; 
 
         for (let j = 0; j <= jointIdx; j++) {
           const nextJoint = new THREE.Object3D();
