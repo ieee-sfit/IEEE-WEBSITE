@@ -44,15 +44,15 @@ export function ControlChamber() {
   const currentStability = useRef(0);
 
   const transforms = useMemo(() => {
-    const dummyC = new THREE.Object3D(); // Chaotic
-    const dummyK = new THREE.Object3D(); // Canonical (Ordered)
+    const dummyC = new THREE.Object3D();
+    const dummyK = new THREE.Object3D();
     
     const carapaces = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
     const spikes = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
     const joints = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
     const arches = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
 
-    // 1. SPIKES (Fingers & Claws)
+    // 1. SPIKES (Fingers & Thumbs)
     for (let i = 0; i < spikeCount; i++) {
       const angle = (i / spikeCount) * Math.PI * 2;
       const cRadius = 140 + Math.random() * 80;
@@ -66,64 +66,66 @@ export function ControlChamber() {
       const sign = isLeft ? -1 : 1;
       const localI = isLeft ? i : (i - 16);
       
-      if (localI < 12) {
-        // 4 Fingers, 3 joints each
-        const fingerIdx = Math.floor(localI / 3); 
-        const jointIdx = localI % 3; 
+      if (localI < 14) { // 4 fingers (12 segments) + 1 thumb (2 segments) = 14
+        const isThumb = localI >= 12;
+        const fingerIdx = isThumb ? 4 : Math.floor(localI / 3);
+        const jointIdx = isThumb ? (localI - 12) : (localI % 3);
         
         const rig = new THREE.Object3D();
         
-        // Push wrists far apart to X=±45
+        // Base knuckles positioning on the palm plate
         const fingerPositions = [
-          [sign * 42, 2, 10],     
-          [sign * 42, 34, 0],    
-          [sign * 46, 22, 8],    
-          [sign * 44, 10, -6],   
+          [sign * 46, 28, 12],     // Index
+          [sign * 48, 32, 4],      // Middle
+          [sign * 46, 26, -4],     // Ring
+          [sign * 44, 20, -10],    // Pinky
+          [sign * 40, 10, 16],     // Thumb (lower, forward)
         ];
         
         const fp = fingerPositions[fingerIdx];
         rig.position.set(fp[0], fp[1], fp[2]);
-        rig.lookAt(0, fp[1] * 0.6, 0); // Point toward a slightly higher center
+        rig.lookAt(0, -10, 0); // Point slightly below the core
         
+        // Distinct orientations to form a cupped hand
         const fingerOrient = [
-          { pitch: 0.6, yaw: sign * 0.1 },      
-          { pitch: -0.5, yaw: sign * -0.05 },     
-          { pitch: -0.1, yaw: sign * 0.05 },      
-          { pitch: 0.4, yaw: sign * -0.05 },      
+          { pitch: 0.1, yaw: sign * 0.1 },      // Index
+          { pitch: 0.0, yaw: sign * 0.0 },      // Middle
+          { pitch: -0.1, yaw: sign * -0.1 },    // Ring
+          { pitch: -0.2, yaw: sign * -0.2 },    // Pinky
+          { pitch: 0.2, yaw: sign * 0.8 },      // Thumb heavily rotated inward
         ];
         
         rig.rotateX(fingerOrient[fingerIdx].pitch);
         rig.rotateY(fingerOrient[fingerIdx].yaw);
 
         let currentJoint = rig;
-        const jointLength = 12;
-        const curlAmounts = [0.3, 0.3, 0.25, 0.25]; // Gentle inward curve
+        const jointLength = isThumb ? 10 : 12;
+        const curlAmounts = [0.25, 0.3, 0.35, 0.4, 0.15]; // How aggressively they curl inward
         const curl = curlAmounts[fingerIdx];
+        const scales = [0.9, 1.1, 0.85, 0.7, 1.3]; // Relative sizes
 
         for (let j = 0; j <= jointIdx; j++) {
           const nextJoint = new THREE.Object3D();
-          if (j > 0) nextJoint.position.set(0, jointLength, 0);
-          nextJoint.rotation.set(curl, 0, 0); 
+          if (j > 0) nextJoint.position.set(0, 0, -jointLength * scales[fingerIdx]);
+          nextJoint.rotation.set(-curl, 0, 0); // Curl along local X axis
           currentJoint.add(nextJoint);
           currentJoint = nextJoint;
         }
 
         const visual = new THREE.Object3D();
-        visual.position.set(0, jointLength / 2, 0);
+        visual.position.set(0, 0, (-jointLength * scales[fingerIdx]) / 2);
         currentJoint.add(visual);
 
         rig.updateMatrixWorld(true);
         dummyK.matrix.copy(visual.matrixWorld);
         
-        const taper = 1 - (jointIdx * 0.15);
-        // Spikes rotate 45 deg so edges face outward (diamond profile)
-        dummyK.matrix.multiply(new THREE.Matrix4().makeRotationY(Math.PI / 4));
-        // Elongate the spike
-        dummyK.matrix.multiply(new THREE.Matrix4().makeScale(1.5 * taper, (jointLength / 14) * 1.5, 1.5 * taper));
+        const taper = 1 - (jointIdx * (isThumb ? 0.2 : 0.25));
+        dummyK.matrix.multiply(new THREE.Matrix4().makeRotationZ(Math.PI / 4)); // Diamond profile
+        // Elongate along Z axis
+        dummyK.matrix.multiply(new THREE.Matrix4().makeScale(1.8 * taper * scales[fingerIdx], 1.8 * taper * scales[fingerIdx], (jointLength / 6) * scales[fingerIdx]));
         
         spikes.canonical.push(dummyK.matrix.clone());
       } else {
-        // Hide unused particles in canonical state
         dummyK.position.set(0, -100, 0);
         dummyK.scale.set(0, 0, 0);
         dummyK.updateMatrix();
@@ -131,7 +133,7 @@ export function ControlChamber() {
       }
     }
 
-    // 2. CARAPACES (Layered Forearms)
+    // 2. CARAPACES (Palms and Forearms)
     for (let i = 0; i < carapaceCount; i++) {
       const angle = (i / carapaceCount) * Math.PI * 2;
       const cRadius = 150 + Math.random() * 100;
@@ -143,54 +145,39 @@ export function ControlChamber() {
 
       const isLeft = i < 16;
       const sign = isLeft ? -1 : 1;
-      const segmentIdx = isLeft ? i : (i - 16);
+      const localI = isLeft ? i : (i - 16);
       
-      if (segmentIdx < 6) {
-        // 6 massive overlapping armor plates for the forearm
-        const start = new THREE.Vector3(sign * 90, 110, -25); 
-        const end = new THREE.Vector3(sign * 48, 18, 0); 
-        
-        const t = segmentIdx / 5; // 0 to 1
-        
-        // Curved trajectory for the arm
-        const pMid = new THREE.Vector3(sign * 110, 60, -10);
-        
-        // Quadratic bezier
-        const point = new THREE.Vector3();
-        point.x = (1-t)*(1-t)*start.x + 2*(1-t)*t*pMid.x + t*t*end.x;
-        point.y = (1-t)*(1-t)*start.y + 2*(1-t)*t*pMid.y + t*t*end.y;
-        point.z = (1-t)*(1-t)*start.z + 2*(1-t)*t*pMid.z + t*t*end.z;
-
-        // Next point for lookAt
-        const t2 = Math.min(1, t + 0.1);
-        const nextPoint = new THREE.Vector3();
-        nextPoint.x = (1-t2)*(1-t2)*start.x + 2*(1-t2)*t2*pMid.x + t2*t2*end.x;
-        nextPoint.y = (1-t2)*(1-t2)*start.y + 2*(1-t2)*t2*pMid.y + t2*t2*end.y;
-        nextPoint.z = (1-t2)*(1-t2)*start.z + 2*(1-t2)*t2*pMid.z + t2*t2*end.z;
-
-        dummyK.position.copy(point);
-        dummyK.lookAt(nextPoint);
-        
-        // Rotate so flat side faces out
+      if (localI < 4) {
+        // Solid Palm Plate
+        const pz = 12 - (localI * 8); 
+        dummyK.position.set(sign * 50, 20, pz);
+        dummyK.lookAt(0, 0, 0);
         dummyK.rotateX(Math.PI / 2);
-        dummyK.rotateY(Math.PI / 4); // Diamond orientation
-        
-        // Plates get smaller toward the wrist
-        const scale = 1.5 - (t * 0.8);
-        dummyK.scale.set(scale * 1.5, scale * 1.2, scale * 2.5); // Wide and flat
-        
+        dummyK.scale.set(3.5, 2.0, 4.0);
         dummyK.updateMatrix();
         carapaces.canonical.push(dummyK.matrix.clone());
       } else {
-        // Hide unused carapaces in canonical state
-        dummyK.position.set(0, -100, 0);
-        dummyK.scale.set(0, 0, 0);
+        // Armored Forearm Gauntlet (12 layered segments)
+        const fIdx = localI - 4; 
+        const t = fIdx / 11; 
+        
+        const start = new THREE.Vector3(sign * 52, 22, 0);
+        const end = new THREE.Vector3(sign * 140, 60, -30);
+        
+        dummyK.position.lerpVectors(start, end, t);
+        dummyK.position.y += Math.sin(t * Math.PI) * 12; // Arced muscular bunching
+        
+        dummyK.lookAt(0, 0, 0);
+        dummyK.rotateX(Math.PI / 2);
+        
+        const fScale = 4.0 - (t * 2.5); // Tapers off as it goes back
+        dummyK.scale.set(fScale * 1.6, fScale * 0.9, fScale * 2.0);
         dummyK.updateMatrix();
         carapaces.canonical.push(dummyK.matrix.clone());
       }
     }
 
-    // 3. ARCHES (The "Shirt Hanger" connecting the arms above)
+    // 3. ARCHES (Shirt Hanger & Wrist Bracers)
     for (let i = 0; i < archCount; i++) {
       const angle = (i / archCount) * Math.PI * 2;
       const cRadius = 130 + Math.random() * 70;
@@ -200,34 +187,53 @@ export function ControlChamber() {
       dummyC.updateMatrix();
       arches.chaotic.push(dummyC.matrix.clone());
 
-      // Canonical: Build a massive arched halo structure connecting the two arms
-      const t = i / (archCount - 1); // 0 to 1
-      const archAngle = t * Math.PI; // Half circle
-      
-      const archRadius = 90;
-      // Arch sits high up and slightly backward
-      const ax = Math.cos(archAngle) * archRadius;
-      const ay = 100 + Math.sin(archAngle) * (archRadius * 0.7); 
-      const az = -30 - Math.sin(archAngle) * 20;
+      if (i < 16) {
+        // Main Overhead Halo (Shirt Hanger)
+        const t = i / 15; 
+        const archAngle = t * Math.PI; 
+        const archRadius = 90;
+        
+        const ax = Math.cos(archAngle) * archRadius;
+        const ay = 100 + Math.sin(archAngle) * (archRadius * 0.7); 
+        const az = -30 - Math.sin(archAngle) * 20;
 
-      dummyK.position.set(ax, ay, az);
-      
-      // Look along the tangent of the circle
-      const tx = -Math.sin(archAngle);
-      const ty = Math.cos(archAngle) * 0.7;
-      const tz = -Math.cos(archAngle) * 0.2;
-      
-      const target = new THREE.Vector3(ax + tx, ay + ty, az + tz);
-      dummyK.lookAt(target);
-      dummyK.rotateX(Math.PI / 2);
-      
-      dummyK.scale.set(1.5, 1.5, 0.5); // Flat ribbon/halo
-      
-      dummyK.updateMatrix();
-      arches.canonical.push(dummyK.matrix.clone());
+        dummyK.position.set(ax, ay, az);
+        
+        const tx = -Math.sin(archAngle);
+        const ty = Math.cos(archAngle) * 0.7;
+        const tz = -Math.cos(archAngle) * 0.2;
+        const target = new THREE.Vector3(ax + tx, ay + ty, az + tz);
+        
+        dummyK.lookAt(target);
+        dummyK.rotateX(Math.PI / 2);
+        dummyK.scale.set(2.0, 2.0, 0.5); 
+        dummyK.updateMatrix();
+        arches.canonical.push(dummyK.matrix.clone());
+      } else {
+        // Mechanical Wrist Bracers (8 per wrist)
+        const wIdx = i - 16;
+        const isLeftWrist = wIdx < 8;
+        const wSign = isLeftWrist ? -1 : 1;
+        const localW = isLeftWrist ? wIdx : (wIdx - 8); 
+        
+        const wAngle = (localW / 8) * Math.PI * 2;
+        const wRadius = 18;
+        const wCenter = new THREE.Vector3(wSign * 80, 35, -15);
+        
+        dummyK.position.set(
+          wCenter.x + (Math.cos(wAngle) * wRadius * 0.2), 
+          wCenter.y + Math.sin(wAngle) * wRadius, 
+          wCenter.z + Math.cos(wAngle) * wRadius
+        );
+        
+        dummyK.lookAt(wCenter);
+        dummyK.scale.set(1.5, 1.5, 0.3); 
+        dummyK.updateMatrix();
+        arches.canonical.push(dummyK.matrix.clone());
+      }
     }
 
-    // 4. JOINTS (Floating geometric nodes connecting segments)
+    // 4. JOINTS (Knuckles)
     for (let i = 0; i < jointCount; i++) {
       const angle = (i / jointCount) * Math.PI * 2;
       const cRadius = 140 + Math.random() * 80;
@@ -241,30 +247,46 @@ export function ControlChamber() {
       const sign = isLeft ? -1 : 1;
       const localI = isLeft ? i : (i - 16);
 
-      if (localI < 12) {
-        // Place joints at the knuckles
-        const fingerIdx = Math.floor(localI / 3);
-        const jointIdx = localI % 3;
-        
-        const fingerPositions = [
-          [sign * 42, 2, 10],     
-          [sign * 42, 34, 0],    
-          [sign * 46, 22, 8],    
-          [sign * 44, 10, -6],   
-        ];
+      if (localI < 14) {
+        // Exact same rigging math as Spikes, but placing nodes AT the joints
+        const isThumb = localI >= 12;
+        const fingerIdx = isThumb ? 4 : Math.floor(localI / 3);
+        const jointIdx = isThumb ? (localI - 12) : (localI % 3);
         
         const rig = new THREE.Object3D();
+        const fingerPositions = [
+          [sign * 46, 28, 12],     
+          [sign * 48, 32, 4],      
+          [sign * 46, 26, -4],     
+          [sign * 44, 20, -10],    
+          [sign * 40, 10, 16],     
+        ];
+        
         const fp = fingerPositions[fingerIdx];
         rig.position.set(fp[0], fp[1], fp[2]);
-        rig.lookAt(0, fp[1] * 0.6, 0);
+        rig.lookAt(0, -10, 0);
+        
+        const fingerOrient = [
+          { pitch: 0.1, yaw: sign * 0.1 },      
+          { pitch: 0.0, yaw: sign * 0.0 },      
+          { pitch: -0.1, yaw: sign * -0.1 },    
+          { pitch: -0.2, yaw: sign * -0.2 },    
+          { pitch: 0.2, yaw: sign * 0.8 },      
+        ];
+        
+        rig.rotateX(fingerOrient[fingerIdx].pitch);
+        rig.rotateY(fingerOrient[fingerIdx].yaw);
 
         let currentJoint = rig;
-        const jointLength = 12;
-        
+        const jointLength = isThumb ? 10 : 12;
+        const curlAmounts = [0.25, 0.3, 0.35, 0.4, 0.15]; 
+        const curl = curlAmounts[fingerIdx];
+        const scales = [0.9, 1.1, 0.85, 0.7, 1.3]; 
+
         for (let j = 0; j <= jointIdx; j++) {
           const nextJoint = new THREE.Object3D();
-          if (j > 0) nextJoint.position.set(0, jointLength, 0);
-          nextJoint.rotation.set(0.25, 0, 0);
+          if (j > 0) nextJoint.position.set(0, 0, -jointLength * scales[fingerIdx]);
+          nextJoint.rotation.set(-curl, 0, 0); 
           currentJoint.add(nextJoint);
           currentJoint = nextJoint;
         }
@@ -272,11 +294,10 @@ export function ControlChamber() {
         currentJoint.updateMatrixWorld(true);
         dummyK.matrix.copy(currentJoint.matrixWorld);
         
-        const taper = 1 - (jointIdx * 0.15);
-        dummyK.matrix.multiply(new THREE.Matrix4().makeScale(0.8 * taper, 0.8 * taper, 0.8 * taper)); 
+        const taper = 1 - (jointIdx * 0.2);
+        dummyK.matrix.multiply(new THREE.Matrix4().makeScale(1.0 * taper, 1.0 * taper, 1.0 * taper)); 
         joints.canonical.push(dummyK.matrix.clone());
       } else {
-        // Hide unused joints in canonical state
         dummyK.position.set(0, -100, 0);
         dummyK.scale.set(0, 0, 0);
         dummyK.updateMatrix();
