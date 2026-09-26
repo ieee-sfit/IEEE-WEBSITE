@@ -61,7 +61,7 @@ export function ControlChamber() {
       dummyC.updateMatrix();
       pillars.chaotic.push(dummyC.matrix.clone());
 
-      // Canonical: Massive Fingers (4 per hand, 3 joints each)
+      // Canonical: Thick Industrial Robot Fingers (4 per hand, 3 joints each)
       const isLeft = i < 12;
       const sign = isLeft ? -1 : 1;
       const localI = isLeft ? i : (i - 12);
@@ -71,40 +71,40 @@ export function ControlChamber() {
       
       const rig = new THREE.Object3D();
       
-      // Connect the base of the fingers roughly around the wrists/palms (x: ±14, y: -2, z: -12)
+      // Wrists are at x: ±25, y: 15. The fingers anchor near here and reach inwards to the core.
       if (fingerIdx === 0) {
         // Thumb (Bottom front)
-        rig.position.set(sign * 11, -8, -2);
+        rig.position.set(sign * 18, -2, 5);
         rig.lookAt(0, 0, 0); // Z points at core, Y points roughly UP
-        rig.rotateX(Math.PI / 2.5); // Pitch Y towards core
+        rig.rotateX(Math.PI / 3); // Pitch Y towards core
         rig.rotateY(sign * 0.4); // Splay outwards
       } else if (fingerIdx === 1) {
         // Top finger
-        rig.position.set(sign * 12, 8, -8);
+        rig.position.set(sign * 20, 15, -4);
         rig.lookAt(0, 0, 0);
-        rig.rotateX(-Math.PI / 4); // Pitch Y downwards towards core
+        rig.rotateX(-Math.PI / 6); // Pitch Y downwards towards core
         rig.rotateY(sign * -0.1); 
       } else if (fingerIdx === 2) {
         // Mid finger
-        rig.position.set(sign * 16, 0, -4);
+        rig.position.set(sign * 23, 8, 2);
         rig.lookAt(0, 0, 0);
         rig.rotateZ(sign * Math.PI / 2); // Roll so Y points horizontally
         rig.rotateX(-Math.PI / 6); // Pitch Y inwards towards core
       } else {
         // Bottom finger
-        rig.position.set(sign * 13, -5, -10);
+        rig.position.set(sign * 21, 2, -6);
         rig.lookAt(0, 0, 0);
         rig.rotateX(Math.PI / 4);
         rig.rotateY(sign * 0.1);
       }
 
       let currentJoint = rig;
-      const jointLength = 18; // 3 joints = 54 units total (LONG mechanical fingers)
+      const jointLength = 10; // Short, thick industrial joints
       
       let curl = 0.4;
       if (fingerIdx === 0) curl = 0.5; // Thumb locks tight
-      if (fingerIdx === 1) curl = 0.45; // Top reaches over heavily
-      if (fingerIdx === 2) curl = 0.35; // Mid slightly more open
+      if (fingerIdx === 1) curl = 0.45; 
+      if (fingerIdx === 2) curl = 0.35; 
 
       for (let j = 0; j <= jointIdx; j++) {
         const nextJoint = new THREE.Object3D();
@@ -123,8 +123,8 @@ export function ControlChamber() {
       dummyK.matrix.copy(visual.matrixWorld);
       
       const taper = 1 - (jointIdx * 0.15);
-      // Ensure they look like thick, long robotic limbs, not planes or chunky cubes
-      dummyK.matrix.multiply(new THREE.Matrix4().makeScale(1.2 * taper, jointLength / 80, 1.2 * taper));
+      // Ensure they look like thick, heavy industrial pistons
+      dummyK.matrix.multiply(new THREE.Matrix4().makeScale(2.5 * taper, jointLength / 80, 2.5 * taper));
       
       pillars.canonical.push(dummyK.matrix.clone());
     }
@@ -140,15 +140,15 @@ export function ControlChamber() {
       dummyC.updateMatrix();
       beams.chaotic.push(dummyC.matrix.clone());
 
-      // Canonical: Massive cables forming the forearms sweeping from the deep darkness
+      // Canonical: Massive cables forming the forearms sweeping down from the sky
       const isLeft = i < 18;
       const sign = isLeft ? -1 : 1;
       const cableIdx = isLeft ? i : (i - 18);
       
-      // Arm origin far outside the frame from above and behind
-      const start = new THREE.Vector3(sign * 80, 50, -180); 
-      // Arm connection to the wrists
-      const end = new THREE.Vector3(sign * 14, -2, -12); 
+      // Origin: High up, off-screen to the left/right, coming downwards
+      const start = new THREE.Vector3(sign * 70, 120, -10); 
+      // End: Wrists hovering well outside the core
+      const end = new THREE.Vector3(sign * 25, 15, -5); 
       
       // Create a bundled cylinder of cables using 3 lengthwise segments of 6 bundled cables
       const segment = Math.floor(cableIdx / 6); // 0, 1, 2
@@ -161,15 +161,15 @@ export function ControlChamber() {
       const pEnd = new THREE.Vector3().lerpVectors(start, end, tEnd);
       const mid = new THREE.Vector3().lerpVectors(pStart, pEnd, 0.5);
       
-      // Taper the arm: extremely thick in the back, narrowing at the wrists
-      const bundleRadius = THREE.MathUtils.lerp(18, 5, tStart);
+      // Taper the arm: thickest at the top, narrowing at the wrists
+      const bundleRadius = THREE.MathUtils.lerp(12, 5, tStart);
       const bAngle = (bundleIdx / 6) * Math.PI * 2;
       
       const tempRig = new THREE.Object3D();
       tempRig.position.copy(mid);
       tempRig.lookAt(pEnd);
       
-      // Offset out from the center line to form a tube
+      // Offset out from the center line to form a solid tube
       tempRig.translateX(Math.cos(bAngle) * bundleRadius);
       tempRig.translateY(Math.sin(bAngle) * bundleRadius);
       
@@ -181,7 +181,7 @@ export function ControlChamber() {
       tempRig.rotateY(Math.PI / 2);
       
       dummyK.rotation.copy(tempRig.rotation);
-      dummyK.scale.set(1.5, 1.4, 1.5); 
+      dummyK.scale.set(1.5, 2.5, 2.5); // Thicker solid cables
       
       dummyK.updateMatrix();
       beams.canonical.push(dummyK.matrix.clone());
@@ -198,14 +198,14 @@ export function ControlChamber() {
       dummyC.updateMatrix();
       platforms.chaotic.push(dummyC.matrix.clone());
 
-      // Canonical: 4 plates heavily overlapping to form one huge armored palm structure
+      // Canonical: 4 plates heavily overlapping to form a solid wrist/palm base
       const isLeft = i < 4;
       const sign = isLeft ? -1 : 1;
       const plateIdx = i % 4;
       
       const rig = new THREE.Object3D();
-      // Attach them directly behind the core at the wrists where the forearms end
-      rig.position.set(sign * 14, -2 + (plateIdx - 1.5) * 3, -12 + (plateIdx % 2) * 1.5); 
+      // Attach them directly at the wrists where the forearms end (X = ±25)
+      rig.position.set(sign * 23, 10 + (plateIdx - 1.5) * 3, -4 + (plateIdx % 2) * 1.5); 
       rig.lookAt(0, 0, 0);
       
       // Platform is 12x1x12 (Flat on Y). We want the flat face to face the core (Z).
@@ -217,7 +217,7 @@ export function ControlChamber() {
       dummyK.position.copy(rig.position);
       dummyK.rotation.copy(rig.rotation);
       
-      // Keep them strictly as Palms. Scale them reasonably so they don't look like giant wings!
+      // Bulk up the wrist blocks
       dummyK.scale.set(1.5, 1.8, 1.5); // 18x1.8x18 thick armor plates
       
       dummyK.updateMatrix();
@@ -285,8 +285,8 @@ export function ControlChamber() {
 
         const claw = new THREE.Object3D();
         claw.position.set(0, jointLength, 0); 
-        // Snap the claw inward sharply
-        claw.rotation.set(0.9, 0, 0); 
+        // Snap the pad inward to face the core
+        claw.rotation.set(0.6, 0, 0); 
         currentJoint.add(claw);
 
         rig.updateMatrixWorld(true);
@@ -294,21 +294,21 @@ export function ControlChamber() {
         m.copy(claw.matrixWorld);
         
         // Stairs are 4 x 0.5 x 15 (Long along Z). 
-        // Claw needs to point along Local Y. So rotate X by 90deg.
+        // Pad needs to point along Local Y. So rotate X by 90deg.
         m.multiply(new THREE.Matrix4().makeRotationX(Math.PI / 2));
-        m.multiply(new THREE.Matrix4().makeScale(0.6, 1.5, 0.8)); // Thicker, sharper blades
+        // Flatten into square, blunt magnetic pressure pads instead of claws
+        m.multiply(new THREE.Matrix4().makeScale(1.5, 2.5, 0.4)); 
         dummyK.matrix.copy(m);
       } else {
         // 2 Knuckle armor plates on the back of the palm
         const knuckleIdx = localI - 4;
-        dummyK.position.set(sign * 14, knuckleIdx === 0 ? 5 : -7, -10);
+        dummyK.position.set(sign * 25, knuckleIdx === 0 ? 15 : 5, -8);
         
         dummyK.lookAt(0, 0, 0);
         dummyK.rotateX(Math.PI / 2);
         
         // Angled to cover the wrist joint
         dummyK.rotateX(knuckleIdx === 0 ? 0.3 : -0.3);
-        dummyK.rotateZ(sign * 0.2); // Add chaotic slant
         dummyK.scale.set(2.5, 3.0, 2.5);
         
         const m = new THREE.Matrix4();
