@@ -73,35 +73,36 @@ export function ControlChamber() {
         
         const rig = new THREE.Object3D();
         
-        // Base knuckles positioning on a delicate floating palm
+        // Base knuckles positioned in an arc
         const fingerPositions = [
-          [sign * 32, 16, 8],      // Index
-          [sign * 34, 18, 2],      // Middle
-          [sign * 33, 15, -4],     // Ring
-          [sign * 31, 11, -8],     // Pinky
-          [sign * 29, 6, 10],      // Thumb (lower, forward)
+          [sign * 25, 12, 14],     // Index
+          [sign * 27, 14, 4],      // Middle
+          [sign * 27, 12, -6],     // Ring
+          [sign * 25, 8, -14],     // Pinky
+          [sign * 20, 2, 16],      // Thumb (low, forward)
         ];
         
         const fp = fingerPositions[fingerIdx];
         rig.position.set(fp[0], fp[1], fp[2]);
-        rig.lookAt(0, -5, 0); // Point down towards core
+        rig.lookAt(0, 0, 0); // Point directly at core
         
+        // Splay the fingers outwards to form a wide grasp
         const fingerOrient = [
-          { pitch: 0.1, yaw: sign * 0.1 },      // Index
-          { pitch: 0.0, yaw: sign * 0.0 },      // Middle
-          { pitch: -0.1, yaw: sign * -0.1 },    // Ring
-          { pitch: -0.2, yaw: sign * -0.2 },    // Pinky
-          { pitch: 0.2, yaw: sign * 0.8 },      // Thumb heavily rotated inward
+          { pitch: 0.1, yaw: sign * -0.4 },     // Index (splay +Z)
+          { pitch: 0.0, yaw: 0.0 },             // Middle (straight)
+          { pitch: 0.1, yaw: sign * 0.4 },      // Ring (splay -Z)
+          { pitch: 0.2, yaw: sign * 0.8 },      // Pinky (splay heavy -Z)
+          { pitch: -0.4, yaw: sign * -1.2 },    // Thumb (opposing)
         ];
         
         rig.rotateX(fingerOrient[fingerIdx].pitch);
         rig.rotateY(fingerOrient[fingerIdx].yaw);
 
         let currentJoint = rig;
-        const jointLength = isThumb ? 12 : 16; // Long, slender fingers
-        const curlAmounts = [0.15, 0.2, 0.25, 0.3, 0.1]; // Gentle skeletal curl
+        const jointLength = isThumb ? 14 : 22; // Massive, long grasping fingers
+        const curlAmounts = [0.25, 0.3, 0.35, 0.4, 0.2]; // Tighter skeletal curl
         const curl = curlAmounts[fingerIdx];
-        const scales = [0.9, 1.1, 0.85, 0.7, 1.0]; 
+        const scales = [0.9, 1.1, 0.9, 0.75, 1.2]; 
 
         for (let j = 0; j <= jointIdx; j++) {
           const nextJoint = new THREE.Object3D();
@@ -260,34 +261,36 @@ export function ControlChamber() {
         const jointIdx = isThumb ? (localI - 12) : (localI % 3);
         
         const rig = new THREE.Object3D();
+        // Base knuckles positioned in an arc
         const fingerPositions = [
-          [sign * 32, 16, 8],     
-          [sign * 34, 18, 2],      
-          [sign * 33, 15, -4],     
-          [sign * 31, 11, -8],    
-          [sign * 29, 6, 10],     
+          [sign * 25, 12, 14],     
+          [sign * 27, 14, 4],      
+          [sign * 27, 12, -6],     
+          [sign * 25, 8, -14],    
+          [sign * 20, 2, 16],     
         ];
         
         const fp = fingerPositions[fingerIdx];
         rig.position.set(fp[0], fp[1], fp[2]);
-        rig.lookAt(0, -5, 0);
+        rig.lookAt(0, 0, 0);
         
+        // Splay the fingers outwards
         const fingerOrient = [
-          { pitch: 0.1, yaw: sign * 0.1 },      
-          { pitch: 0.0, yaw: sign * 0.0 },      
-          { pitch: -0.1, yaw: sign * -0.1 },    
-          { pitch: -0.2, yaw: sign * -0.2 },    
-          { pitch: 0.2, yaw: sign * 0.8 },      
+          { pitch: 0.1, yaw: sign * -0.4 },      
+          { pitch: 0.0, yaw: 0.0 },      
+          { pitch: 0.1, yaw: sign * 0.4 },    
+          { pitch: 0.2, yaw: sign * 0.8 },    
+          { pitch: -0.4, yaw: sign * -1.2 },      
         ];
         
         rig.rotateX(fingerOrient[fingerIdx].pitch);
         rig.rotateY(fingerOrient[fingerIdx].yaw);
 
         let currentJoint = rig;
-        const jointLength = isThumb ? 12 : 16;
-        const curlAmounts = [0.15, 0.2, 0.25, 0.3, 0.1]; 
+        const jointLength = isThumb ? 14 : 22;
+        const curlAmounts = [0.25, 0.3, 0.35, 0.4, 0.2]; 
         const curl = curlAmounts[fingerIdx];
-        const scales = [0.9, 1.1, 0.85, 0.7, 1.0]; 
+        const scales = [0.9, 1.1, 0.9, 0.75, 1.2]; 
 
         for (let j = 0; j <= jointIdx; j++) {
           const nextJoint = new THREE.Object3D();

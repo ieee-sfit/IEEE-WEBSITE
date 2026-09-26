@@ -757,11 +757,11 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
   // Once fully solved and user scrolls back up, use this cinematic spiral tour path
   const revealPath = useMemo(() => {
     return new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0, -50, 150),   // 0.0: The Hero Shot. Super low angle, MASSIVELY pulled back.
-      new THREE.Vector3(90, -10, 80),   // 0.2: Sweeping out right, wide orbit
-      new THREE.Vector3(120, 25, -20),  // 0.4: Deep orbit around the right forearm gauntlet
-      new THREE.Vector3(40, 50, -60),   // 0.6: Sweeping over the back and far above the arches
-      new THREE.Vector3(-80, 20, -20),  // 0.8: Coasting across the top left shoulder
+      new THREE.Vector3(0, -30, 100),   // 0.0: The Hero Shot. Low angle, towering hands grasping the massive core.
+      new THREE.Vector3(70, -10, 60),   // 0.2: Sweeping out right, wide orbit
+      new THREE.Vector3(90, 25, -20),   // 0.4: Deep orbit around the right forearm gauntlet
+      new THREE.Vector3(30, 40, -40),   // 0.6: Sweeping over the back and far above the arches
+      new THREE.Vector3(-60, 15, -20),  // 0.8: Coasting across the top left shoulder
       new THREE.Vector3(0, 0, 35),      // 1.0: End at the Clock (Matches the investigation end point)
     ], false, 'catmullrom', 0.5);
   }, []);
