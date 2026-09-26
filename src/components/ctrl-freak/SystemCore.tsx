@@ -579,17 +579,19 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
           
           const currentPhaseOffset = isTop ? 0 : targetPhaseOffset;
           
-          // 5B: Physical Response (Amplitude Instability & Turbulence)
-          const amplitudeJitter = (Math.random() - 0.5) * errorMagnitude * 2.0;
-          const amplitude = 2.0 + amplitudeJitter;
+          // 5B: Physical Response (Amplitude Instability & Turbulence) - SCALED UP
+          const amplitudeJitter = (Math.random() - 0.5) * errorMagnitude * 4.0;
+          const amplitude = 5.0 + amplitudeJitter;
           
-          const scatterX = (Math.random() - 0.5) * errorMagnitude * 0.5;
-          const scatterY = (Math.random() - 0.5) * errorMagnitude * 0.5;
-          const scatterZ = (Math.random() - 0.5) * errorMagnitude * 1.5;
+          const scatterX = (Math.random() - 0.5) * errorMagnitude * 2.0;
+          const scatterY = (Math.random() - 0.5) * errorMagnitude * 2.0;
+          const scatterZ = (Math.random() - 0.5) * errorMagnitude * 3.0;
 
+          // Spread out across X for a wider wave visualization
           x += scatterX * sineWeight;
-          y += (Math.sin(x * 1.5 + t * 2 + currentPhaseOffset) * amplitude + scatterY) * sineWeight;
-          z += (Math.sin(x * 2 + t) * 1.5 + scatterZ) * sineWeight;
+          // Wider frequency (0.5), taller amplitude
+          y += (Math.sin(x * 0.5 + t * 2 + currentPhaseOffset) * amplitude + scatterY) * sineWeight;
+          z += (Math.sin(x * 0.8 + t) * 2.5 + scatterZ) * sineWeight;
         }
       }
 
@@ -796,8 +798,8 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
   // Original cinematic spline for the investigation journey
   const cameraPath = useMemo(() => {
     return new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0, 40, 220),   // 0.0: Far back and lower - see entire arm structure
-      new THREE.Vector3(0, 5, 50),     // 0.2: Core Center (lower, slightly further back)
+      new THREE.Vector3(0, 0, 200),    // 0.0: Straight on, far back - core centered, arms overhead
+      new THREE.Vector3(0, 0, 50),     // 0.2: Core Center (lower, slightly further back)
       new THREE.Vector3(-35, -5, 25),  // 0.35: Station 1 (Left Low)
       new THREE.Vector3(35, -5, 20),   // 0.5: Station 2 (Right Lower)
       new THREE.Vector3(30, 25, -20),  // 0.65: Station 3 (Right High)
@@ -809,15 +811,16 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
   // Once fully solved and user scrolls back up, use this towering low-angle path
   const revealPath = useMemo(() => {
     return new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0, 5, 90),     // Ground level, far back - towering view UP at the arms
-      new THREE.Vector3(0, 8, 45),     // Approach from below
-      new THREE.Vector3(0, 10, 40),    // Final position looking up at the structure
+      new THREE.Vector3(0, -15, 80),   // Ground level, far back - towering view UP at the arms
+      new THREE.Vector3(0, -10, 45),   // Approach from below
+      new THREE.Vector3(0, -5, 40),    // Final position looking up at the structure
     ], false, 'catmullrom', 0.5);
   }, []);
 
   const hasSeenSolved = useRef(false);
+  const transitionRef = useRef(0); // For smooth blending between journey and reveal cameras
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     const progress = scrollProgress.get();
     
     const sysState = useCtrlFreakStore.getState();
@@ -826,29 +829,33 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
     // Track if user has ever reached fully solved state
     if (isFullySolved) hasSeenSolved.current = true;
 
-    let targetPosition: THREE.Vector3;
+    const isRevealMode = hasSeenSolved.current && isFullySolved && progress < 0.2;
+    // Smoothly blend between 0 (Investigation) and 1 (Reveal)
+    transitionRef.current = THREE.MathUtils.damp(transitionRef.current, isRevealMode ? 1 : 0, 4, delta);
 
-    // Once solved and scrolling back to the top (progress < 0.2), switch to towering reveal camera
-    if (hasSeenSolved.current && isFullySolved && progress < 0.2) {
-      // Map progress 0.0-0.2 to reveal path 0.0-1.0
-      const revealProgress = 1 - (progress / 0.2); // Inverted: top of page = end of reveal path
-      targetPosition = revealPath.getPoint(THREE.MathUtils.clamp(revealProgress, 0, 1));
-      
-      // Look UP at the structure
-      state.camera.position.lerp(targetPosition, 0.05);
-      state.camera.lookAt(0, 15, 0);
-    } else {
-      targetPosition = cameraPath.getPoint(progress);
-
-      // Cinematic Intro Reveal
-      if (!isFullySolved && progress < 0.0075) {
-        const revealP = progress / 0.0075;
-        targetPosition.set(0, 40, THREE.MathUtils.lerp(240, 200, revealP));
-      }
-      
-      state.camera.position.lerp(targetPosition, 0.05);
-      state.camera.lookAt(0, 0, 0);
+    // Calculate investigation position
+    const invPos = cameraPath.getPoint(progress);
+    
+    // Cinematic Intro Reveal: start pulled back slightly further behind the monolith
+    if (!isFullySolved && progress < 0.0075) {
+      const revealP = progress / 0.0075;
+      invPos.set(0, 0, THREE.MathUtils.lerp(220, 200, revealP));
     }
+
+    // Calculate reveal position (only if we need it)
+    let finalPos = invPos;
+    if (transitionRef.current > 0.001) {
+      // Map progress 0.0-0.2 to reveal path 0.0-1.0
+      const revealProgress = 1 - (progress / 0.2);
+      const revPos = revealPath.getPoint(THREE.MathUtils.clamp(revealProgress, 0, 1));
+      finalPos = invPos.clone().lerp(revPos, transitionRef.current);
+    }
+    
+    // Smoothly lerp the camera towards the target position
+    state.camera.position.lerp(finalPos, 0.05);
+    
+    // ALWAYS look at the core so it remains dead center
+    state.camera.lookAt(0, 0, 0);
   });
 
   return null;

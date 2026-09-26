@@ -119,7 +119,10 @@ export function ControlChamber() {
       dummyK.matrix.copy(visual.matrixWorld);
       
       const taper = 1 - (jointIdx * 0.12);
-      dummyK.matrix.multiply(new THREE.Matrix4().makeScale(2.0 * taper, jointLength / 80, 2.0 * taper));
+      // Flat, wide, angular plates like ancient stone mechanisms (instead of blocks)
+      dummyK.matrix.multiply(new THREE.Matrix4().makeScale(3.5 * taper, jointLength / 80, 0.8 * taper));
+      // Give each segment a slight structural tilt to feel interlocking
+      dummyK.matrix.multiply(new THREE.Matrix4().makeRotationZ(jointIdx % 2 === 0 ? 0.08 : -0.08));
       
       pillars.canonical.push(dummyK.matrix.clone());
     }
@@ -268,7 +271,8 @@ export function ControlChamber() {
         m.copy(claw.matrixWorld);
         
         m.multiply(new THREE.Matrix4().makeRotationX(Math.PI / 2));
-        m.multiply(new THREE.Matrix4().makeScale(1.2, 2.0, 0.5)); 
+        // Flat, sharp, ancient-mechanical tips
+        m.multiply(new THREE.Matrix4().makeScale(1.8, 3.0, 0.3)); 
         dummyK.matrix.copy(m);
       } else {
         const knuckleIdx = localI - 4;
@@ -401,7 +405,7 @@ export function ControlChamber() {
     <group>
       {/* The Monolith (Initial Camera Occlusion for Intro Reveal - 0.75% scroll) */}
       {(!ancSolved || !networkSolved || !visionSolved || !logicSolved) && (
-        <mesh position={[0, 50, 145]}>
+        <mesh position={[0, 0, 210]}>
           <boxGeometry args={[400, 400, 1]} />
           <meshBasicMaterial color="#020202" />
         </mesh>
