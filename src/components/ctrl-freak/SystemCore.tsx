@@ -596,17 +596,27 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       }
 
       // SPHERE EXPANSION & JITTER (Arrival)
-      if (shape1 === shapes.sphere && progress < 0.26) {
-        const chaos = Math.max(0, 1 - (progress * 5)); // peaks at 0, dies completely at 0.2
+      if ((shape1 === shapes.sphere || shape2 === shapes.sphere) && progress < 0.26) {
+        const state = useCtrlFreakStore.getState();
+        const isFullySolved = state.anc.solved && state.network.solved && state.vision.solved && state.logic.solved;
+        const sphereWeight = shape1 === shapes.sphere ? (1 - lerpFactor) : lerpFactor;
         
-        // Expand the core massively when at the very top of the page
-        const expansion = 1 + (chaos * 2.5); // 3.5x volume at 0 scroll
-        const glitch = chaos > 0.1 && Math.random() > 0.95 ? 1.2 : 1;
-        
-        // Apply expansion relative to origin
-        x = (x * expansion * glitch) + (Math.random() - 0.5) * 8 * chaos;
-        y = (y * expansion * glitch) + (Math.random() - 0.5) * 8 * chaos;
-        z = (z * expansion * glitch) + (Math.random() - 0.5) * 8 * chaos;
+        if (sphereWeight > 0) {
+          // No chaos if everything is solved. Otherwise, baseline chaos.
+          const chaos = isFullySolved ? 0 : 0.8; 
+          
+          // Starts tight at 0, slowly expands as you scroll towards 0.14
+          // Math.sin creates a hump that peaks at 0.14 (Math.PI/2) and goes to 0 at 0.28
+          const scrollExpansion = Math.sin(Math.min(1, progress / 0.28) * Math.PI);
+          const expansion = 1 + (scrollExpansion * 0.8); // Expands up to 1.8x at peak scroll
+          
+          const glitch = chaos > 0 && Math.random() > 0.95 ? 1.1 : 1;
+          
+          // Apply expansion relative to origin
+          x = (x * expansion * glitch) + (Math.random() - 0.5) * 6 * chaos;
+          y = (y * expansion * glitch) + (Math.random() - 0.5) * 6 * chaos;
+          z = (z * expansion * glitch) + (Math.random() - 0.5) * 6 * chaos;
+        }
       }
 
       // VAULT ANIMATION (Logic)
