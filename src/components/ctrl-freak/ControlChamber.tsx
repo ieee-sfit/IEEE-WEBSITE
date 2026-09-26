@@ -3,11 +3,15 @@ import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { useCtrlFreakStore } from '../../store/useCtrlFreakStore';
 
-// Procedural Vocabulary Geometry Sizes
-const PILLAR_SIZE: [number, number, number] = [3, 80, 3];
-const BEAM_SIZE: [number, number, number] = [40, 2, 2];
-const PLATFORM_SIZE: [number, number, number] = [12, 1, 12];
-const STAIR_SIZE: [number, number, number] = [4, 0.5, 15]; // Represented as a slanted box for silhouette
+// Procedural Vocabulary Geometries (Sharp, Abstract, Chitinous)
+// Carapace: Tapered 4-sided wedge (radiusTop, radiusBottom, height, radialSegments)
+const CARAPACE_ARGS: [number, number, number, number] = [1.5, 3.5, 10, 4];
+// Spike: Elongated 4-sided pyramid (radius, height, radialSegments)
+const SPIKE_ARGS: [number, number, number] = [1.8, 14, 4];
+// Joint: Sharp octahedron/diamond (radius, detail)
+const JOINT_ARGS: [number, number] = [2.5, 0];
+// ArchSegment: Sweeping massive blocks for the "hanger" (radiusTop, radiusBottom, height, radialSegments)
+const ARCH_ARGS: [number, number, number, number] = [3, 3, 20, 4];
 
 // The premium, dark sci-fi material
 const brutalistMaterial = new THREE.MeshStandardMaterial({
@@ -19,16 +23,16 @@ const brutalistMaterial = new THREE.MeshStandardMaterial({
 });
 
 export function ControlChamber() {
-  const pillarRef = useRef<THREE.InstancedMesh>(null);
-  const beamRef = useRef<THREE.InstancedMesh>(null);
-  const platformRef = useRef<THREE.InstancedMesh>(null);
-  const stairRef = useRef<THREE.InstancedMesh>(null);
+  const carapaceRef = useRef<THREE.InstancedMesh>(null);
+  const spikeRef = useRef<THREE.InstancedMesh>(null);
+  const jointRef = useRef<THREE.InstancedMesh>(null);
+  const archRef = useRef<THREE.InstancedMesh>(null);
 
   // Vocabulary limits
-  const pillarCount = 24;
-  const beamCount = 36;
-  const platformCount = 8;
-  const stairCount = 12;
+  const carapaceCount = 64;
+  const spikeCount = 64;
+  const jointCount = 48;
+  const archCount = 32;
 
   // React to solved states for lighting changes
   const ancSolved = useCtrlFreakStore(s => s.anc.solved);
@@ -43,262 +47,237 @@ export function ControlChamber() {
     const dummyC = new THREE.Object3D(); // Chaotic
     const dummyK = new THREE.Object3D(); // Canonical (Ordered)
     
-    const pillars = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
-    const beams = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
-    const platforms = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
-    const stairs = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
+    const carapaces = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
+    const spikes = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
+    const joints = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
+    const arches = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
 
-    // 1. PILLARS (24) -> Fingers
-    for (let i = 0; i < pillarCount; i++) {
-      const angle = (i / pillarCount) * Math.PI * 2;
-      
-      // Chaotic: Shattered debris floating far away in the void
-      const cRadius = 140 + Math.random() * 80; // Pushed far back
-      dummyC.position.set(Math.cos(angle) * cRadius, (Math.random() - 0.5) * 160, Math.sin(angle) * cRadius);
-      dummyC.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
-      // Scale down randomly so they don't block the screen
-      dummyC.scale.set(Math.random() * 0.8 + 0.5, Math.random() * 0.3 + 0.1, Math.random() * 0.8 + 0.5); 
-      dummyC.updateMatrix();
-      pillars.chaotic.push(dummyC.matrix.clone());
-
-      // Canonical: Thick fingers (4 per hand, 3 joints each)
-      // CRITICAL: These positions define the finger bases and MUST match the stair-claw FK chain
-      // KEY CONSTRAINT: Left hand stays X<0, Right hand stays X>0. They NEVER overlap.
-      const isLeft = i < 12;
-      const sign = isLeft ? -1 : 1;
-      const localI = isLeft ? i : (i - 12);
-      
-      const fingerIdx = Math.floor(localI / 3); // 0-3
-      const jointIdx = localI % 3; // 0, 1, 2
-      
-      const rig = new THREE.Object3D();
-      
-      // Fingers anchor at the wrist (X=±38) and reach inward but NEVER cross X=0
-      const fingerPositions = [
-        [sign * 36, 6, 8],     // 0: Bottom — cups under the core
-        [sign * 36, 30, 0],    // 1: Top — reaches over the top
-        [sign * 38, 22, 6],    // 2: Upper-mid
-        [sign * 36, 14, -4],   // 3: Lower-mid
-      ];
-      
-      const fp = fingerPositions[fingerIdx];
-      rig.position.set(fp[0], fp[1], fp[2]);
-      rig.lookAt(0, fp[1] * 0.5, 0);
-      
-      // Gentle wrap — fingers reach inward but don't cross center
-      const fingerOrient = [
-        { pitch: 0.5, yaw: sign * 0.1 },        // Bottom: curls up slightly
-        { pitch: -0.4, yaw: sign * -0.03 },      // Top: curls down slightly
-        { pitch: -0.1, yaw: sign * 0.03 },        // Upper-mid: nearly straight
-        { pitch: 0.3, yaw: sign * -0.03 },        // Lower-mid: curls up slightly
-      ];
-      
-      rig.rotateX(fingerOrient[fingerIdx].pitch);
-      rig.rotateY(fingerOrient[fingerIdx].yaw);
-
-      let currentJoint = rig;
-      const jointLength = 12;
-      
-      // REDUCED curl — fingers reach toward core but stop at ~X=±10
-      const curlAmounts = [0.28, 0.28, 0.25, 0.27];
-      const curl = curlAmounts[fingerIdx];
-
-      for (let j = 0; j <= jointIdx; j++) {
-        const nextJoint = new THREE.Object3D();
-        if (j > 0) nextJoint.position.set(0, jointLength, 0);
-        nextJoint.rotation.set(curl, 0, 0); 
-        currentJoint.add(nextJoint);
-        currentJoint = nextJoint;
-      }
-
-      const visual = new THREE.Object3D();
-      visual.position.set(0, jointLength / 2, 0);
-      currentJoint.add(visual);
-
-      rig.updateMatrixWorld(true);
-      dummyK.matrix.copy(visual.matrixWorld);
-      
-      const taper = 1 - (jointIdx * 0.12);
-      // Flat, wide, angular plates like ancient stone mechanisms (instead of blocks)
-      dummyK.matrix.multiply(new THREE.Matrix4().makeScale(3.5 * taper, jointLength / 80, 0.8 * taper));
-      // Give each segment a slight structural tilt to feel interlocking
-      dummyK.matrix.multiply(new THREE.Matrix4().makeRotationZ(jointIdx % 2 === 0 ? 0.08 : -0.08));
-      
-      pillars.canonical.push(dummyK.matrix.clone());
-    }
-
-    // 2. BEAMS (36) -> Two separate forearm trunks from the upper sides
-    for (let i = 0; i < beamCount; i++) {
-      const angle = (i / beamCount) * Math.PI * 2;
-      const cRadius = 150 + Math.random() * 100;
-      dummyC.position.set(Math.cos(angle) * cRadius, (Math.random() - 0.5) * 200, Math.sin(angle) * cRadius);
-      dummyC.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2); 
-      dummyC.scale.set(Math.random() * 0.5 + 0.5, Math.random() * 1.5 + 0.5, Math.random() * 1.5 + 0.5);
-      dummyC.updateMatrix();
-      beams.chaotic.push(dummyC.matrix.clone());
-
-      // Canonical: Arms come from the UPPER SIDES (like the reference)
-      const isLeft = i < 18;
-      const sign = isLeft ? -1 : 1;
-      const cableIdx = isLeft ? i : (i - 18);
-      
-      // Origin: Far up and wide to the sides
-      const start = new THREE.Vector3(sign * 80, 100, -15); 
-      // End: Wrists far from center
-      const end = new THREE.Vector3(sign * 40, 18, 0); 
-      
-      const segment = Math.floor(cableIdx / 6);
-      const bundleIdx = cableIdx % 6;
-      
-      const tStart = segment / 3;
-      const tEnd = (segment + 1) / 3;
-      
-      const pStart = new THREE.Vector3().lerpVectors(start, end, tStart);
-      const pEnd = new THREE.Vector3().lerpVectors(start, end, tEnd);
-      const mid = new THREE.Vector3().lerpVectors(pStart, pEnd, 0.5);
-      
-      const bundleRadius = THREE.MathUtils.lerp(14, 6, tStart);
-      const bAngle = (bundleIdx / 6) * Math.PI * 2;
-      
-      const tempRig = new THREE.Object3D();
-      tempRig.position.copy(mid);
-      tempRig.lookAt(pEnd);
-      
-      tempRig.translateX(Math.cos(bAngle) * bundleRadius);
-      tempRig.translateY(Math.sin(bAngle) * bundleRadius);
-      
-      dummyK.position.copy(tempRig.position);
-      
-      tempRig.lookAt(pEnd);
-      tempRig.rotateY(Math.PI / 2);
-      
-      dummyK.rotation.copy(tempRig.rotation);
-      dummyK.scale.set(1.2, 2.0, 2.0);
-      
-      dummyK.updateMatrix();
-      beams.canonical.push(dummyK.matrix.clone());
-    }
-
-    // 3. PLATFORMS (8) -> Wrist blocks at X=±40
-    for (let i = 0; i < platformCount; i++) {
-      const angle = (i / platformCount) * Math.PI * 2;
-      const cRadius = 130 + Math.random() * 70;
-      dummyC.position.set(Math.cos(angle) * cRadius, (Math.random() - 0.5) * 150, Math.sin(angle) * cRadius);
-      dummyC.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2); 
-      dummyC.scale.set(Math.random() * 2 + 1, Math.random() * 1.5 + 0.5, Math.random() * 2 + 1);
-      dummyC.updateMatrix();
-      platforms.chaotic.push(dummyC.matrix.clone());
-
-      const isLeft = i < 4;
-      const sign = isLeft ? -1 : 1;
-      const plateIdx = i % 4;
-      
-      const rig = new THREE.Object3D();
-      // Wrist casing at X=±40
-      rig.position.set(sign * 40, 16 + (plateIdx - 1.5) * 4, (plateIdx % 2) * 3 - 1.5); 
-      rig.lookAt(0, 10, 0);
-      
-      rig.rotateX(Math.PI / 2);
-      rig.rotateX((plateIdx - 1.5) * 0.12);
-      
-      dummyK.position.copy(rig.position);
-      dummyK.rotation.copy(rig.rotation);
-      
-      dummyK.scale.set(1.8, 2.0, 1.8);
-      
-      dummyK.updateMatrix();
-      platforms.canonical.push(dummyK.matrix.clone());
-    }
-
-    // 4. STAIRCASES (12) -> Claw tips + knuckle armor
-    for (let i = 0; i < stairCount; i++) {
-      const angle = (i / stairCount) * Math.PI * 2;
+    // 1. SPIKES (Fingers & Claws)
+    for (let i = 0; i < spikeCount; i++) {
+      const angle = (i / spikeCount) * Math.PI * 2;
       const cRadius = 140 + Math.random() * 80;
       dummyC.position.set(Math.cos(angle) * cRadius, (Math.random() - 0.5) * 160, Math.sin(angle) * cRadius);
-      dummyC.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2); 
-      dummyC.scale.set(Math.random() * 1.5 + 0.5, Math.random() * 1.5 + 0.5, Math.random() * 1.5 + 0.5);
+      dummyC.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
+      dummyC.scale.setScalar(Math.random() * 1.5 + 0.5); 
       dummyC.updateMatrix();
-      stairs.chaotic.push(dummyC.matrix.clone());
+      spikes.chaotic.push(dummyC.matrix.clone());
 
-      const isLeft = i < 6;
+      const isLeft = i < 16;
       const sign = isLeft ? -1 : 1;
-      const localI = isLeft ? i : (i - 6);
-
-      if (localI < 4) {
-        const fingerIdx = localI;
-        
-        // SAME positions as pillars
-        const fingerPositions = [
-          [sign * 36, 6, 8],
-          [sign * 36, 30, 0],
-          [sign * 38, 22, 6],
-          [sign * 36, 14, -4],
-        ];
-        const fingerOrient = [
-          { pitch: 0.5, yaw: sign * 0.1 },
-          { pitch: -0.4, yaw: sign * -0.03 },
-          { pitch: -0.1, yaw: sign * 0.03 },
-          { pitch: 0.3, yaw: sign * -0.03 },
-        ];
-        const curlAmounts = [0.28, 0.28, 0.25, 0.27];
+      const localI = isLeft ? i : (i - 16);
+      
+      if (localI < 12) {
+        // 4 Fingers, 3 joints each
+        const fingerIdx = Math.floor(localI / 3); 
+        const jointIdx = localI % 3; 
         
         const rig = new THREE.Object3D();
+        
+        // Push wrists far apart to X=±45
+        const fingerPositions = [
+          [sign * 42, 2, 10],     
+          [sign * 42, 34, 0],    
+          [sign * 46, 22, 8],    
+          [sign * 44, 10, -6],   
+        ];
+        
         const fp = fingerPositions[fingerIdx];
         rig.position.set(fp[0], fp[1], fp[2]);
-        rig.lookAt(0, fp[1] * 0.5, 0);
+        rig.lookAt(0, fp[1] * 0.6, 0); // Point toward a slightly higher center
+        
+        const fingerOrient = [
+          { pitch: 0.6, yaw: sign * 0.1 },      
+          { pitch: -0.5, yaw: sign * -0.05 },     
+          { pitch: -0.1, yaw: sign * 0.05 },      
+          { pitch: 0.4, yaw: sign * -0.05 },      
+        ];
+        
         rig.rotateX(fingerOrient[fingerIdx].pitch);
         rig.rotateY(fingerOrient[fingerIdx].yaw);
 
         let currentJoint = rig;
         const jointLength = 12;
+        const curlAmounts = [0.3, 0.3, 0.25, 0.25]; // Gentle inward curve
         const curl = curlAmounts[fingerIdx];
 
-        for (let j = 0; j <= 2; j++) {
+        for (let j = 0; j <= jointIdx; j++) {
           const nextJoint = new THREE.Object3D();
           if (j > 0) nextJoint.position.set(0, jointLength, 0);
-          nextJoint.rotation.set(curl, 0, 0);
+          nextJoint.rotation.set(curl, 0, 0); 
           currentJoint.add(nextJoint);
           currentJoint = nextJoint;
         }
 
-        const claw = new THREE.Object3D();
-        claw.position.set(0, jointLength, 0); 
-        claw.rotation.set(0.4, 0, 0); 
-        currentJoint.add(claw);
+        const visual = new THREE.Object3D();
+        visual.position.set(0, jointLength / 2, 0);
+        currentJoint.add(visual);
 
         rig.updateMatrixWorld(true);
-        const m = new THREE.Matrix4();
-        m.copy(claw.matrixWorld);
+        dummyK.matrix.copy(visual.matrixWorld);
         
-        m.multiply(new THREE.Matrix4().makeRotationX(Math.PI / 2));
-        // Flat, sharp, ancient-mechanical tips
-        m.multiply(new THREE.Matrix4().makeScale(1.8, 3.0, 0.3)); 
-        dummyK.matrix.copy(m);
+        const taper = 1 - (jointIdx * 0.15);
+        // Spikes rotate 45 deg so edges face outward (diamond profile)
+        dummyK.matrix.multiply(new THREE.Matrix4().makeRotationY(Math.PI / 4));
+        // Elongate the spike
+        dummyK.matrix.multiply(new THREE.Matrix4().makeScale(1.5 * taper, (jointLength / 14) * 1.5, 1.5 * taper));
+        
+        spikes.canonical.push(dummyK.matrix.clone());
       } else {
-        const knuckleIdx = localI - 4;
-        dummyK.position.set(sign * 42, knuckleIdx === 0 ? 26 : 12, -4);
-        
-        dummyK.lookAt(0, 10, 0);
-        dummyK.rotateX(Math.PI / 2);
-        
-        dummyK.rotateX(knuckleIdx === 0 ? 0.3 : -0.3);
-        dummyK.scale.set(2.0, 2.5, 2.0);
-        
-        const m = new THREE.Matrix4();
-        m.makeRotationFromEuler(dummyK.rotation);
-        m.setPosition(dummyK.position);
-        m.scale(dummyK.scale);
-        dummyK.matrix.copy(m);
+        // Extra scatter for spikes array
+        spikes.canonical.push(dummyC.matrix.clone());
       }
-      
-      stairs.canonical.push(dummyK.matrix.clone());
     }
 
-    return { pillars, beams, platforms, stairs };
+    // 2. CARAPACES (Layered Forearms)
+    for (let i = 0; i < carapaceCount; i++) {
+      const angle = (i / carapaceCount) * Math.PI * 2;
+      const cRadius = 150 + Math.random() * 100;
+      dummyC.position.set(Math.cos(angle) * cRadius, (Math.random() - 0.5) * 200, Math.sin(angle) * cRadius);
+      dummyC.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2); 
+      dummyC.scale.setScalar(Math.random() * 1.2 + 0.5);
+      dummyC.updateMatrix();
+      carapaces.chaotic.push(dummyC.matrix.clone());
+
+      const isLeft = i < 16;
+      const sign = isLeft ? -1 : 1;
+      const segmentIdx = isLeft ? i : (i - 16);
+      
+      if (segmentIdx < 6) {
+        // 6 massive overlapping armor plates for the forearm
+        const start = new THREE.Vector3(sign * 90, 110, -25); 
+        const end = new THREE.Vector3(sign * 48, 18, 0); 
+        
+        const t = segmentIdx / 5; // 0 to 1
+        
+        // Curved trajectory for the arm
+        const pMid = new THREE.Vector3(sign * 110, 60, -10);
+        
+        // Quadratic bezier
+        const point = new THREE.Vector3();
+        point.x = (1-t)*(1-t)*start.x + 2*(1-t)*t*pMid.x + t*t*end.x;
+        point.y = (1-t)*(1-t)*start.y + 2*(1-t)*t*pMid.y + t*t*end.y;
+        point.z = (1-t)*(1-t)*start.z + 2*(1-t)*t*pMid.z + t*t*end.z;
+
+        // Next point for lookAt
+        const t2 = Math.min(1, t + 0.1);
+        const nextPoint = new THREE.Vector3();
+        nextPoint.x = (1-t2)*(1-t2)*start.x + 2*(1-t2)*t2*pMid.x + t2*t2*end.x;
+        nextPoint.y = (1-t2)*(1-t2)*start.y + 2*(1-t2)*t2*pMid.y + t2*t2*end.y;
+        nextPoint.z = (1-t2)*(1-t2)*start.z + 2*(1-t2)*t2*pMid.z + t2*t2*end.z;
+
+        dummyK.position.copy(point);
+        dummyK.lookAt(nextPoint);
+        
+        // Rotate so flat side faces out
+        dummyK.rotateX(Math.PI / 2);
+        dummyK.rotateY(Math.PI / 4); // Diamond orientation
+        
+        // Plates get smaller toward the wrist
+        const scale = 1.5 - (t * 0.8);
+        dummyK.scale.set(scale * 1.5, scale * 1.2, scale * 2.5); // Wide and flat
+        
+        dummyK.updateMatrix();
+        carapaces.canonical.push(dummyK.matrix.clone());
+      } else {
+        carapaces.canonical.push(dummyC.matrix.clone());
+      }
+    }
+
+    // 3. ARCHES (The "Shirt Hanger" connecting the arms above)
+    for (let i = 0; i < archCount; i++) {
+      const angle = (i / archCount) * Math.PI * 2;
+      const cRadius = 130 + Math.random() * 70;
+      dummyC.position.set(Math.cos(angle) * cRadius, (Math.random() - 0.5) * 150, Math.sin(angle) * cRadius);
+      dummyC.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2); 
+      dummyC.scale.setScalar(Math.random() * 2 + 1);
+      dummyC.updateMatrix();
+      arches.chaotic.push(dummyC.matrix.clone());
+
+      // Canonical: Build a massive arched halo structure connecting the two arms
+      const t = i / (archCount - 1); // 0 to 1
+      const archAngle = t * Math.PI; // Half circle
+      
+      const archRadius = 90;
+      // Arch sits high up and slightly backward
+      const ax = Math.cos(archAngle) * archRadius;
+      const ay = 100 + Math.sin(archAngle) * (archRadius * 0.7); 
+      const az = -30 - Math.sin(archAngle) * 20;
+
+      dummyK.position.set(ax, ay, az);
+      
+      // Look along the tangent of the circle
+      const tx = -Math.sin(archAngle);
+      const ty = Math.cos(archAngle) * 0.7;
+      const tz = -Math.cos(archAngle) * 0.2;
+      
+      const target = new THREE.Vector3(ax + tx, ay + ty, az + tz);
+      dummyK.lookAt(target);
+      dummyK.rotateX(Math.PI / 2);
+      
+      dummyK.scale.set(1.5, 1.5, 0.5); // Flat ribbon/halo
+      
+      dummyK.updateMatrix();
+      arches.canonical.push(dummyK.matrix.clone());
+    }
+
+    // 4. JOINTS (Floating geometric nodes connecting segments)
+    for (let i = 0; i < jointCount; i++) {
+      const angle = (i / jointCount) * Math.PI * 2;
+      const cRadius = 140 + Math.random() * 80;
+      dummyC.position.set(Math.cos(angle) * cRadius, (Math.random() - 0.5) * 160, Math.sin(angle) * cRadius);
+      dummyC.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2); 
+      dummyC.scale.setScalar(Math.random() * 1.5 + 0.5);
+      dummyC.updateMatrix();
+      joints.chaotic.push(dummyC.matrix.clone());
+
+      const isLeft = i < 16;
+      const sign = isLeft ? -1 : 1;
+      const localI = isLeft ? i : (i - 16);
+
+      if (localI < 12) {
+        // Place joints at the knuckles
+        const fingerIdx = Math.floor(localI / 3);
+        const jointIdx = localI % 3;
+        
+        const fingerPositions = [
+          [sign * 42, 2, 10],     
+          [sign * 42, 34, 0],    
+          [sign * 46, 22, 8],    
+          [sign * 44, 10, -6],   
+        ];
+        
+        const rig = new THREE.Object3D();
+        const fp = fingerPositions[fingerIdx];
+        rig.position.set(fp[0], fp[1], fp[2]);
+        rig.lookAt(0, fp[1] * 0.6, 0);
+
+        let currentJoint = rig;
+        const jointLength = 12;
+        
+        for (let j = 0; j <= jointIdx; j++) {
+          const nextJoint = new THREE.Object3D();
+          if (j > 0) nextJoint.position.set(0, jointLength, 0);
+          nextJoint.rotation.set(0.25, 0, 0);
+          currentJoint.add(nextJoint);
+          currentJoint = nextJoint;
+        }
+
+        currentJoint.updateMatrixWorld(true);
+        dummyK.matrix.copy(currentJoint.matrixWorld);
+        
+        const taper = 1 - (jointIdx * 0.15);
+        dummyK.matrix.multiply(new THREE.Matrix4().makeScale(0.8 * taper, 0.8 * taper, 0.8 * taper)); 
+        joints.canonical.push(dummyK.matrix.clone());
+      } else {
+        joints.canonical.push(dummyC.matrix.clone());
+      }
+    }
+
+    return { carapaces, spikes, joints, arches };
   }, []);
 
   useFrame((_, delta) => {
-    if (!pillarRef.current || !beamRef.current || !platformRef.current || !stairRef.current) return;
+    if (!carapaceRef.current || !archRef.current || !jointRef.current || !spikeRef.current) return;
 
     // Calculate target stability (0.0 to 1.0)
     let solvedCount = 0;
@@ -351,29 +330,29 @@ export function ControlChamber() {
       const mapProgress = (val: number, start: number, end: number) => THREE.MathUtils.clamp((val - start) / (end - start), 0, 1);
       
       // STAGED ANIMATION: As stability increases, pieces assemble in sequence
-      const progressBeams = mapProgress(p, 0.0, 0.4);      // Forearms sweep in from the darkness
-      const progressPlatforms = mapProgress(p, 0.2, 0.6);  // Palms rotate into place behind the core
-      const progressPillars = mapProgress(p, 0.4, 0.85);   // Fingers close aggressively around the core
-      const progressStairs = mapProgress(p, 0.6, 1.0);     // Thumb and Claws lock into position
+      const progressArches = mapProgress(p, 0.0, 0.4);      // Arch sweeps in from the darkness
+      const progressCarapaces = mapProgress(p, 0.2, 0.6);  // Forearms lock into place
+      const progressJoints = mapProgress(p, 0.4, 0.85);   // Knuckles assemble
+      const progressSpikes = mapProgress(p, 0.6, 1.0);     // Aggressive fingers close in
 
-      interpolateInstances(beamRef, transforms.beams, beamCount, progressBeams);
-      interpolateInstances(platformRef, transforms.platforms, platformCount, progressPlatforms);
-      interpolateInstances(pillarRef, transforms.pillars, pillarCount, progressPillars);
-      interpolateInstances(stairRef, transforms.stairs, stairCount, progressStairs);
+      interpolateInstances(archRef, transforms.arches, archCount, progressArches);
+      interpolateInstances(carapaceRef, transforms.carapaces, carapaceCount, progressCarapaces);
+      interpolateInstances(jointRef, transforms.joints, jointCount, progressJoints);
+      interpolateInstances(spikeRef, transforms.spikes, spikeCount, progressSpikes);
     }
   });
 
   useEffect(() => {
-    if (!pillarRef.current || !beamRef.current || !platformRef.current || !stairRef.current) return;
+    if (!carapaceRef.current || !archRef.current || !jointRef.current || !spikeRef.current) return;
 
     // 5. Instanced Color Variation (Depth-based Tonal Hierarchy)
     const applyDepthColor = (ref: React.RefObject<THREE.InstancedMesh>, count: number) => {
       if (!ref.current) return;
       const tempMatrix = new THREE.Matrix4();
       const position = new THREE.Vector3();
-      const cForeground = new THREE.Color('#121519');
-      const cMidground = new THREE.Color('#0d1013');
-      const cBackground = new THREE.Color('#080a0c');
+      const cForeground = new THREE.Color('#202428'); // Subtle cool steel highlight
+      const cMidground = new THREE.Color('#0b0e12');  // Deep obsidian/chitin
+      const cBackground = new THREE.Color('#020304'); // Void black
       
       for (let i = 0; i < count; i++) {
         ref.current.getMatrixAt(i, tempMatrix);
@@ -383,21 +362,21 @@ export function ControlChamber() {
         const dist = position.length();
         
         let color = cMidground;
-        if (dist < 40) color = cForeground; // Closer objects are slightly brighter
-        else if (dist > 80) color = cBackground; // Far objects fade into the void
+        if (dist < 50) color = cForeground; // Closer objects are slightly brighter
+        else if (dist > 90) color = cBackground; // Far objects fade into the void
         
         // Add tiny bit of random variation so no two blocks are perfectly identical (~2% lightness variance)
-        const varColor = color.clone().offsetHSL(0, 0, (Math.random() - 0.5) * 0.02);
+        const varColor = color.clone().offsetHSL(0, 0, (Math.random() - 0.5) * 0.03);
         
         ref.current.setColorAt(i, varColor);
       }
       ref.current.instanceColor!.needsUpdate = true;
     };
 
-    applyDepthColor(pillarRef, pillarCount);
-    applyDepthColor(beamRef, beamCount);
-    applyDepthColor(platformRef, platformCount);
-    applyDepthColor(stairRef, stairCount);
+    applyDepthColor(archRef, archCount);
+    applyDepthColor(carapaceRef, carapaceCount);
+    applyDepthColor(jointRef, jointCount);
+    applyDepthColor(spikeRef, spikeCount);
 
   }, []);
 
@@ -433,24 +412,24 @@ export function ControlChamber() {
       
 
       
-      {/* The Instances */}
-      <instancedMesh ref={pillarRef} args={[undefined, undefined, pillarCount]} castShadow receiveShadow>
-        <boxGeometry args={PILLAR_SIZE} />
+      {/* The Instances (Replacing Boxes with Chitinous Geometries) */}
+      <instancedMesh ref={carapaceRef} args={[undefined, undefined, carapaceCount]} castShadow receiveShadow>
+        <cylinderGeometry args={CARAPACE_ARGS} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
-      <instancedMesh ref={beamRef} args={[undefined, undefined, beamCount]} castShadow receiveShadow>
-        <boxGeometry args={BEAM_SIZE} />
+      <instancedMesh ref={spikeRef} args={[undefined, undefined, spikeCount]} castShadow receiveShadow>
+        <coneGeometry args={SPIKE_ARGS} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
-      <instancedMesh ref={platformRef} args={[undefined, undefined, platformCount]} castShadow receiveShadow>
-        <boxGeometry args={PLATFORM_SIZE} />
+      <instancedMesh ref={jointRef} args={[undefined, undefined, jointCount]} castShadow receiveShadow>
+        <octahedronGeometry args={JOINT_ARGS} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
-      <instancedMesh ref={stairRef} args={[undefined, undefined, stairCount]} castShadow receiveShadow>
-        <boxGeometry args={STAIR_SIZE} />
+      <instancedMesh ref={archRef} args={[undefined, undefined, archCount]} castShadow receiveShadow>
+        <cylinderGeometry args={ARCH_ARGS} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
