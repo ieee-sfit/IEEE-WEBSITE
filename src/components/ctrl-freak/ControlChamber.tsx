@@ -274,7 +274,6 @@ export function ControlChamber() {
       joints.chaotic.push(dummyC.matrix.clone());
 
       const isLeft = i < 16;
-      const sign = isLeft ? -1 : 1;
       const localI = isLeft ? i : (i - 16);
 
       if (localI < 14) {
