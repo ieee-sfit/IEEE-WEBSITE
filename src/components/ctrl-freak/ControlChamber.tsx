@@ -63,7 +63,6 @@ export function ControlChamber() {
       spikes.chaotic.push(dummyC.matrix.clone());
 
       const isLeft = i < 16;
-      const sign = isLeft ? -1 : 1;
       const localI = isLeft ? i : (i - 16);
       
       if (localI < 14) { 
@@ -114,14 +113,14 @@ export function ControlChamber() {
 
         for (let j = 0; j <= jointIdx; j++) {
           const nextJoint = new THREE.Object3D();
-          if (j > 0) nextJoint.position.set(0, 0, -jointLength * scales[fingerIdx]);
+          if (j > 0) nextJoint.position.set(0, 0, -jointLength * jointScale);
           nextJoint.rotation.set(-curl, 0, 0); 
           currentJoint.add(nextJoint);
           currentJoint = nextJoint;
         }
 
         const visual = new THREE.Object3D();
-        visual.position.set(0, 0, (-jointLength * scales[fingerIdx]) / 2);
+        visual.position.set(0, 0, (-jointLength * jointScale) / 2);
         currentJoint.add(visual);
 
         rig.updateMatrixWorld(true);
@@ -135,7 +134,7 @@ export function ControlChamber() {
         
         // Beefy, dangerous sharp spikes
         const thickness = 0.8 * taper; 
-        const length = (jointLength / 14) * scales[fingerIdx] * 1.1; // 10% overlap
+        const length = (jointLength / 14) * jointScale * 1.1; // 10% overlap
         dummyK.matrix.multiply(new THREE.Matrix4().makeScale(thickness, length, thickness));
         
         spikes.canonical.push(dummyK.matrix.clone());
@@ -158,7 +157,6 @@ export function ControlChamber() {
       carapaces.chaotic.push(dummyC.matrix.clone());
 
       const isLeft = i < 16;
-      const sign = isLeft ? -1 : 1;
       const localI = isLeft ? i : (i - 16);
       
       if (localI < 4) {
@@ -318,7 +316,7 @@ export function ControlChamber() {
 
         for (let j = 0; j <= jointIdx; j++) {
           const nextJoint = new THREE.Object3D();
-          if (j > 0) nextJoint.position.set(0, 0, -jointLength * scales[fingerIdx]);
+          if (j > 0) nextJoint.position.set(0, 0, -jointLength * jointScale);
           nextJoint.rotation.set(-curl, 0, 0); 
           currentJoint.add(nextJoint);
           currentJoint = nextJoint;
