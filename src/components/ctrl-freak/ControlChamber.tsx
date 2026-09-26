@@ -84,23 +84,25 @@ export function ControlChamber() {
         
         const fp = fingerPositions[fingerIdx];
         rig.position.set(fp[0], fp[1], fp[2]);
-        rig.lookAt(0, 0, 0); // Point directly at core
         
-        // Splay the fingers outwards to form a wide grasp
+        // Orient the base of the finger inwards (towards the core)
+        rig.rotation.set(0, sign * -(Math.PI / 2), 0);
+        
+        // Splay the fingers outwards (Yaw) and Cup them (Pitch)
         const fingerOrient = [
-          { pitch: 0.1, yaw: sign * -0.4 },     // Index (splay +Z)
-          { pitch: 0.0, yaw: 0.0 },             // Middle (straight)
-          { pitch: 0.1, yaw: sign * 0.4 },      // Ring (splay -Z)
-          { pitch: 0.2, yaw: sign * 0.8 },      // Pinky (splay heavy -Z)
-          { pitch: -0.4, yaw: sign * -1.2 },    // Thumb (opposing)
+          { pitch: 0.1, yaw: sign * -0.4 },     // Index (splay out)
+          { pitch: 0.0, yaw: sign * -0.1 },     // Middle
+          { pitch: -0.1, yaw: sign * 0.2 },     // Ring (splay in)
+          { pitch: -0.2, yaw: sign * 0.5 },     // Pinky (splay heavy in)
+          { pitch: 0.4, yaw: sign * -1.2 },     // Thumb (opposing, angled up/across)
         ];
         
         rig.rotateX(fingerOrient[fingerIdx].pitch);
         rig.rotateY(fingerOrient[fingerIdx].yaw);
 
         let currentJoint = rig;
-        const jointLength = isThumb ? 14 : 22; // Massive, long grasping fingers
-        const curlAmounts = [0.25, 0.3, 0.35, 0.4, 0.2]; // Tighter skeletal curl
+        const jointLength = isThumb ? 16 : 24; // Massive, long grasping fingers
+        const curlAmounts = [0.6, 0.7, 0.75, 0.8, 0.3]; // Extreme organic claw curl (up to 45 deg per joint)
         const curl = curlAmounts[fingerIdx];
         const scales = [0.9, 1.1, 0.9, 0.75, 1.2]; 
 
@@ -125,9 +127,9 @@ export function ControlChamber() {
         // Diamond profile
         dummyK.matrix.multiply(new THREE.Matrix4().makeRotationY(Math.PI / 4));
         
-        // Scale correctly to be extremely thin and sharp
-        const thickness = 0.4 * taper; 
-        const length = (jointLength / 14) * scales[fingerIdx] * 1.05; // 5% overlap
+        // Beefy, dangerous sharp spikes
+        const thickness = 0.8 * taper; 
+        const length = (jointLength / 14) * scales[fingerIdx] * 1.1; // 10% overlap
         dummyK.matrix.multiply(new THREE.Matrix4().makeScale(thickness, length, thickness));
         
         spikes.canonical.push(dummyK.matrix.clone());
@@ -154,17 +156,17 @@ export function ControlChamber() {
       const localI = isLeft ? i : (i - 16);
       
       if (localI < 4) {
-        // Slender Palm Plates (Floating shards)
-        const pz = 6 - (localI * 4); 
+        // Imposing Palm Plates (Bulkier)
+        const pz = 10 - (localI * 6); 
         dummyK.position.set(sign * 36, 15, pz);
         dummyK.lookAt(0, 0, 0);
         dummyK.rotateX(Math.PI / 2);
         dummyK.rotateY(Math.PI / 4); // Diamond rotation
-        dummyK.scale.set(0.6, 1.2, 0.2); // Extremely thin and elegant
+        dummyK.scale.set(1.5, 1.6, 0.6); // Much thicker armored plates
         dummyK.updateMatrix();
         carapaces.canonical.push(dummyK.matrix.clone());
       } else {
-        // Skeletal Forearm Spine (12 trailing thin shards)
+        // Brutalist Forearm Spine (12 trailing massive shards)
         const fIdx = localI - 4; 
         const t = fIdx / 11; 
         
@@ -178,8 +180,8 @@ export function ControlChamber() {
         dummyK.rotateX(Math.PI / 2);
         dummyK.rotateY(Math.PI / 4);
         
-        const fScale = 1.0 - (t * 0.5); // Tapers off
-        dummyK.scale.set(fScale * 0.8, fScale * 1.5, fScale * 0.3); // Thin, flat shards
+        const fScale = 2.0 - (t * 1.0); // Thick base, tapers off
+        dummyK.scale.set(fScale * 1.2, fScale * 2.0, fScale * 0.8); // Beefy trailing shards
         dummyK.updateMatrix();
         carapaces.canonical.push(dummyK.matrix.clone());
       }
@@ -214,7 +216,7 @@ export function ControlChamber() {
         
         dummyK.lookAt(target);
         dummyK.rotateX(Math.PI / 2);
-        dummyK.scale.set(0.4, 1.5, 0.2); // Thin elegant ribbon
+        dummyK.scale.set(1.0, 2.0, 0.6); // Thicker imposing ribbon
         dummyK.updateMatrix();
         arches.canonical.push(dummyK.matrix.clone());
       } else {
@@ -225,7 +227,7 @@ export function ControlChamber() {
         const localW = isLeftWrist ? wIdx : (wIdx - 8); 
         
         const wAngle = (localW / 8) * Math.PI * 2;
-        const wRadius = 14;
+        const wRadius = 16; // Wrap around thicker forearm
         const wCenter = new THREE.Vector3(wSign * 55, 25, -10);
         
         dummyK.position.set(
@@ -235,7 +237,7 @@ export function ControlChamber() {
         );
         
         dummyK.lookAt(wCenter);
-        dummyK.scale.set(0.3, 0.8, 0.1); // Small intricate floating rings
+        dummyK.scale.set(0.6, 1.2, 0.3); // Solid structural rings
         dummyK.updateMatrix();
         arches.canonical.push(dummyK.matrix.clone());
       }
@@ -272,23 +274,22 @@ export function ControlChamber() {
         
         const fp = fingerPositions[fingerIdx];
         rig.position.set(fp[0], fp[1], fp[2]);
-        rig.lookAt(0, 0, 0);
+        rig.rotation.set(0, sign * -(Math.PI / 2), 0);
         
-        // Splay the fingers outwards
         const fingerOrient = [
-          { pitch: 0.1, yaw: sign * -0.4 },      
-          { pitch: 0.0, yaw: 0.0 },      
-          { pitch: 0.1, yaw: sign * 0.4 },    
-          { pitch: 0.2, yaw: sign * 0.8 },    
-          { pitch: -0.4, yaw: sign * -1.2 },      
+          { pitch: 0.1, yaw: sign * -0.4 },     
+          { pitch: 0.0, yaw: sign * -0.1 },     
+          { pitch: -0.1, yaw: sign * 0.2 },     
+          { pitch: -0.2, yaw: sign * 0.5 },     
+          { pitch: 0.4, yaw: sign * -1.2 },      
         ];
         
         rig.rotateX(fingerOrient[fingerIdx].pitch);
         rig.rotateY(fingerOrient[fingerIdx].yaw);
 
         let currentJoint = rig;
-        const jointLength = isThumb ? 14 : 22;
-        const curlAmounts = [0.25, 0.3, 0.35, 0.4, 0.2]; 
+        const jointLength = isThumb ? 16 : 24;
+        const curlAmounts = [0.6, 0.7, 0.75, 0.8, 0.3]; 
         const curl = curlAmounts[fingerIdx];
         const scales = [0.9, 1.1, 0.9, 0.75, 1.2]; 
 
@@ -304,8 +305,8 @@ export function ControlChamber() {
         dummyK.matrix.copy(currentJoint.matrixWorld);
         
         const taper = 1 - (jointIdx * 0.2);
-        // Small sharp intricate diamond knuckles
-        dummyK.matrix.multiply(new THREE.Matrix4().makeScale(0.35 * taper, 0.35 * taper, 0.35 * taper)); 
+        // Heavy, defined diamond knuckles
+        dummyK.matrix.multiply(new THREE.Matrix4().makeScale(0.8 * taper, 0.8 * taper, 0.8 * taper)); 
         joints.canonical.push(dummyK.matrix.clone());
       } else {
         dummyK.position.set(0, -100, 0);
