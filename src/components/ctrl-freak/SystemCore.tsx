@@ -796,8 +796,8 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
   // Original cinematic spline for the investigation journey
   const cameraPath = useMemo(() => {
     return new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0, 80, 160),   // 0.0: Arrival High
-      new THREE.Vector3(0, 0, 30),     // 0.2: Core Center
+      new THREE.Vector3(0, 40, 220),   // 0.0: Far back and lower - see entire arm structure
+      new THREE.Vector3(0, 5, 50),     // 0.2: Core Center (lower, slightly further back)
       new THREE.Vector3(-35, -5, 25),  // 0.35: Station 1 (Left Low)
       new THREE.Vector3(35, -5, 20),   // 0.5: Station 2 (Right Lower)
       new THREE.Vector3(30, 25, -20),  // 0.65: Station 3 (Right High)
@@ -843,7 +843,7 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
       // Cinematic Intro Reveal
       if (!isFullySolved && progress < 0.0075) {
         const revealP = progress / 0.0075;
-        targetPosition.set(0, 80, THREE.MathUtils.lerp(160, 130, revealP));
+        targetPosition.set(0, 40, THREE.MathUtils.lerp(240, 200, revealP));
       }
       
       state.camera.position.lerp(targetPosition, 0.05);
@@ -857,7 +857,7 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
 export const SystemCore = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) => {
   return (
     <div className="w-full h-full">
-      <Canvas shadows camera={{ position: [0, 50, 80], fov: 45 }}>
+      <Canvas shadows camera={{ position: [0, 40, 220], fov: 55 }}>
         <SceneExporter />
         <color attach="background" args={['#050505']} />
         <ambientLight intensity={0.15} />

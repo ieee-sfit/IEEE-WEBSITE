@@ -507,7 +507,7 @@ export function ControlChamber() {
       </mesh>
       
       {/* Dense fog pushed back to create cinematic atmosphere */}
-      <fog attach="fog" args={['#050505', 50, 190]} />
+      <fog attach="fog" args={['#050505', 80, 300]} />
     </group>
   );
 }
