@@ -448,10 +448,10 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
     let shape2 = shapes.sphere;
     let lerpFactor = 0;
 
-    if (progress < 0.05) {
+    if (progress < 0.14) {
       shape1 = shapes.sphere; shape2 = shapes.sphere; lerpFactor = 0;
-    } else if (progress < 0.24) {
-      shape1 = shapes.sphere; shape2 = shapes.wave; lerpFactor = smoothstep(0.05, 0.24, progress);
+    } else if (progress < 0.26) {
+      shape1 = shapes.sphere; shape2 = shapes.wave; lerpFactor = smoothstep(0.14, 0.26, progress);
     } else if (progress < 0.33) {
       shape1 = shapes.wave; shape2 = shapes.wave; lerpFactor = 0;
     } else if (progress < 0.38) {
@@ -589,17 +589,24 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
 
           // Spread out across X for a wider wave visualization
           x += scatterX * sineWeight;
-          // Wider frequency (0.5), taller amplitude
-          y += (Math.sin(x * 0.5 + t * 2 + currentPhaseOffset) * amplitude + scatterY) * sineWeight;
-          z += (Math.sin(x * 0.8 + t) * 2.5 + scatterZ) * sineWeight;
+          // Higher frequency (1.2) for more crests/troughs, taller amplitude (5.0)
+          y += (Math.sin(x * 1.2 + t * 2 + currentPhaseOffset) * amplitude + scatterY) * sineWeight;
+          z += (Math.sin(x * 1.5 + t) * 2.5 + scatterZ) * sineWeight;
         }
       }
 
-      // SPHERE JITTER (Arrival)
-      if (shape1 === shapes.sphere && progress < 0.25) {
-        const chaos = Math.max(0, 1 - (progress * 4));
+      // SPHERE EXPANSION & JITTER (Arrival)
+      if (shape1 === shapes.sphere && progress < 0.26) {
+        const chaos = Math.max(0, 1 - (progress * 5)); // peaks at 0, dies completely at 0.2
+        
+        // Expand the core massively when at the very top of the page
+        const expansion = 1 + (chaos * 2.5); // 3.5x volume at 0 scroll
         const glitch = chaos > 0.1 && Math.random() > 0.95 ? 1.2 : 1;
-        x *= glitch; y *= glitch; z *= glitch;
+        
+        // Apply expansion relative to origin
+        x = (x * expansion * glitch) + (Math.random() - 0.5) * 8 * chaos;
+        y = (y * expansion * glitch) + (Math.random() - 0.5) * 8 * chaos;
+        z = (z * expansion * glitch) + (Math.random() - 0.5) * 8 * chaos;
       }
 
       // VAULT ANIMATION (Logic)
