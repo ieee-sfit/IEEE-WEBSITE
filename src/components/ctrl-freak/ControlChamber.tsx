@@ -78,10 +78,10 @@ export function ControlChamber() {
         if (isLeft) {
           // Gold Arm - Reaching straight in
           const fpLeft = [
-            [-30, 16, 5], [-30, 10, 5], [-30, 4, 5], [-30, -2, 5], [-25, 18, -2]
+            [-30, 12, 5], [-30, 6, 5], [-30, 0, 5], [-30, -6, 5], [-25, 14, -2]
           ];
           const targetsLeft = [
-            [0, 16, 5], [0, 10, 5], [0, 4, 5], [0, -2, 5], [-15, 25, 10] // Thumb points up/forward
+            [0, 12, 5], [0, 6, 5], [0, 0, 5], [0, -6, 5], [-15, 20, 10] // Thumb points up/forward
           ];
           fp = fpLeft[fingerIdx];
           target = targetsLeft[fingerIdx];
@@ -91,14 +91,14 @@ export function ControlChamber() {
         } else {
           // Dark Purple Arm - Cupping from underneath, fingers splayed wildly
           const fpRight = [
-            [34, -5, -5], [35, -8, -2], [36, -11, 2], [37, -14, 8], [36, -5, -12]
+            [34, 4, -5], [35, 1, -2], [36, -2, 2], [37, -5, 8], [36, 4, -12]
           ];
           const targetsRight = [
-            [10, 25, -5],  // Index points high up and slightly left
-            [10, 15, -2],  // Middle points up and left
-            [10, 5, 5],    // Ring points left and slightly forward
-            [10, -10, 15], // Pinky points down and forward
-            [40, 15, -20]  // Thumb points UP and BACK (away from core)
+            [10, 24, -5],  // Index points high up and slightly left
+            [10, 14, -2],  // Middle points up and left
+            [10, 4, 5],    // Ring points left and slightly forward
+            [10, -11, 15], // Pinky points down and forward
+            [40, 14, -20]  // Thumb points UP and BACK (away from core)
           ];
           fp = fpRight[fingerIdx];
           target = targetsRight[fingerIdx];
@@ -109,6 +109,8 @@ export function ControlChamber() {
 
         rig.position.set(fp[0], fp[1], fp[2]);
         rig.lookAt(target[0], target[1], target[2]);
+        // Fix for fingers pointing completely backwards (outwards)
+        rig.rotateY(Math.PI);
         
         // Slightly curl the fingers "INWARD" relative to their local Up axis
         // Positive X pitches UP (towards local +Y)
@@ -171,11 +173,11 @@ export function ControlChamber() {
         // Imposing Palm Plates (Bulkier)
         const pz = 10 - (localI * 6); 
         if (isLeft) {
-          dummyK.position.set(-35, 10, pz);
-          dummyK.lookAt(0, 10, pz);
+          dummyK.position.set(-35, 4, pz);
+          dummyK.lookAt(0, 4, pz);
         } else {
-          dummyK.position.set(38, -15, pz);
-          dummyK.lookAt(0, 20, pz); // Looking up at the core
+          dummyK.position.set(38, -4, pz);
+          dummyK.lookAt(0, 14, pz); // Looking up at the core
         }
         dummyK.rotateX(Math.PI / 2);
         dummyK.rotateY(Math.PI / 4); // Diamond rotation
@@ -188,11 +190,11 @@ export function ControlChamber() {
         const t = fIdx / 11; 
         
         if (isLeft) {
-          dummyK.position.lerpVectors(new THREE.Vector3(-40, 10, 0), new THREE.Vector3(-110, 50, -40), t);
-          dummyK.lookAt(-110, 50, -40);
+          dummyK.position.lerpVectors(new THREE.Vector3(-40, 4, 0), new THREE.Vector3(-110, 40, -40), t);
+          dummyK.lookAt(-110, 40, -40);
         } else {
-          dummyK.position.lerpVectors(new THREE.Vector3(45, -20, 0), new THREE.Vector3(90, -50, -60), t);
-          dummyK.lookAt(90, -50, -60);
+          dummyK.position.lerpVectors(new THREE.Vector3(45, -8, 0), new THREE.Vector3(90, -40, -60), t);
+          dummyK.lookAt(90, -40, -60);
         }
         
         dummyK.position.y += Math.sin(t * Math.PI) * 10; 
@@ -288,10 +290,10 @@ export function ControlChamber() {
         if (isLeft) {
           // Gold Arm - Reaching straight in
           const fpLeft = [
-            [-30, 16, 5], [-30, 10, 5], [-30, 4, 5], [-30, -2, 5], [-25, 18, -2]
+            [-30, 12, 5], [-30, 6, 5], [-30, 0, 5], [-30, -6, 5], [-25, 14, -2]
           ];
           const targetsLeft = [
-            [0, 16, 5], [0, 10, 5], [0, 4, 5], [0, -2, 5], [-15, 25, 10]
+            [0, 12, 5], [0, 6, 5], [0, 0, 5], [0, -6, 5], [-15, 20, 10]
           ];
           fp = fpLeft[fingerIdx];
           target = targetsLeft[fingerIdx];
@@ -301,14 +303,14 @@ export function ControlChamber() {
         } else {
           // Dark Purple Arm - Cupping from underneath, fingers splayed wildly
           const fpRight = [
-            [34, -5, -5], [35, -8, -2], [36, -11, 2], [37, -14, 8], [36, -5, -12]
+            [34, 4, -5], [35, 1, -2], [36, -2, 2], [37, -5, 8], [36, 4, -12]
           ];
           const targetsRight = [
-            [10, 25, -5], 
-            [10, 15, -2], 
-            [10, 5, 5],   
-            [10, -10, 15],
-            [40, 15, -20] 
+            [10, 24, -5], 
+            [10, 14, -2], 
+            [10, 4, 5],   
+            [10, -11, 15],
+            [40, 14, -20] 
           ];
           fp = fpRight[fingerIdx];
           target = targetsRight[fingerIdx];
@@ -319,6 +321,8 @@ export function ControlChamber() {
 
         rig.position.set(fp[0], fp[1], fp[2]);
         rig.lookAt(target[0], target[1], target[2]);
+        // Fix for fingers pointing backwards
+        rig.rotateY(Math.PI);
         
         const curlDir = isLeft ? -1 : 1; 
 
