@@ -156,14 +156,14 @@ export function ControlChamber() {
       const fingers = isLeft ? [
         // splay: [X, Y, Z] relative direction. -Z points forward towards core.
         // Left hand +X is inner (thumb), -X is outer (pinky). +Y is back of hand.
-        { name: 'Thumb',  offset: new THREE.Vector3(6, -6, -2),  splay: [ 10, -10, -10], up: [1, 0, 0], length:  8.5, joints: 3, curl: -0.3,  scale: 1.6 },
+        { name: 'Thumb',  offset: new THREE.Vector3(6, -6, -2),  splay: [ 10, -10, -10], up: [1, 0, 0], length:  8.0, joints: 2, curl: -0.4,  scale: 1.8 },
         { name: 'Index',  offset: new THREE.Vector3(4, 6, 0),    splay: [  8,   8, -10], up: [0, 1, 0], length: 10.0, joints: 3, curl: -0.35, scale: 1.2 },
         { name: 'Middle', offset: new THREE.Vector3(0, 7, 2),    splay: [  0,  10, -10], up: [0, 1, 0], length: 12.0, joints: 4, curl: -0.3,  scale: 1.3 },
         { name: 'Ring',   offset: new THREE.Vector3(-4, 5, 4),   splay: [ -8,   8, -10], up: [0, 1, 0], length: 10.0, joints: 3, curl: -0.35, scale: 1.1 },
         { name: 'Pinky',  offset: new THREE.Vector3(-7, 2, 6),   splay: [-12,   0, -10], up: [0, 1, 0], length:  8.0, joints: 3, curl: -0.3,  scale: 0.9 },
       ] : [
         // Right hand -X is inner (thumb), +X is outer (pinky)
-        { name: 'Thumb',  offset: new THREE.Vector3(-6, -6, -2), splay: [-10, -10, -10], up: [-1, 0, 0], length:  8.5, joints: 3, curl: -0.3,  scale: 1.6 },
+        { name: 'Thumb',  offset: new THREE.Vector3(-6, -6, -2), splay: [-10, -10, -10], up: [-1, 0, 0], length:  8.0, joints: 2, curl: -0.4,  scale: 1.8 },
         { name: 'Index',  offset: new THREE.Vector3(-4, 6, 0),   splay: [ -8,   8, -10], up: [0, 1, 0], length: 10.0, joints: 3, curl: -0.35, scale: 1.2 },
         { name: 'Middle', offset: new THREE.Vector3(0, 7, 2),    splay: [  0,  10, -10], up: [0, 1, 0], length: 12.0, joints: 4, curl: -0.3,  scale: 1.3 },
         { name: 'Ring',   offset: new THREE.Vector3(4, 5, 4),    splay: [  8,   8, -10], up: [0, 1, 0], length: 10.0, joints: 3, curl: -0.35, scale: 1.1 },
