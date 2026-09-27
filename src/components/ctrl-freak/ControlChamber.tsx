@@ -87,7 +87,9 @@ export function ControlChamber() {
       palm.add(wrist);
 
       const arch = new THREE.Object3D();
-      arch.userData = { type: 'arch', scale: new THREE.Vector3(0.6, 0.6, 0.6) };
+      // Arch is a cylinder that we rotate so the ring faces the arm (Z axis)
+      arch.rotation.x = Math.PI / 2;
+      arch.userData = { type: 'arch', scale: new THREE.Vector3(0.6, 0.6, 1.2) };
       wrist.add(arch);
 
       // Forearm beams trailing backwards along local +Z
@@ -102,7 +104,7 @@ export function ControlChamber() {
         const tScale = 1.8 - (i * 0.15);
         shard.userData = { 
           type: 'carapace', 
-          scale: new THREE.Vector3(tScale * 0.6, tScale * 0.6, tScale * 1.5) 
+          scale: new THREE.Vector3(tScale * 0.8, tScale * 0.8, tScale * 0.8) 
         };
         wrist.add(shard);
       }
@@ -399,12 +401,12 @@ export function ControlChamber() {
       
       {/* The Instances (Replacing Boxes with Chitinous Geometries) */}
       <instancedMesh ref={carapaceRef} args={[undefined, undefined, carapaceCount]} castShadow receiveShadow>
-        <cylinderGeometry args={CARAPACE_ARGS} />
+        <boxGeometry args={[4, 4, 16]} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
       <instancedMesh ref={spikeRef} args={[undefined, undefined, spikeCount]} castShadow receiveShadow>
-        <coneGeometry args={SPIKE_ARGS} />
+        <coneGeometry args={[1.5, 14, 4]} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
