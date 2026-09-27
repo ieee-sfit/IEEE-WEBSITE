@@ -174,9 +174,10 @@ export function ControlChamber() {
         let currentJoint = fRoot;
         for (let j = 0; j <= fd.joints; j++) {
           const jointNode = new THREE.Object3D();
-          if (j > 0) jointNode.position.set(0, 0, -fd.length);
-          
-          jointNode.rotation.set(fd.curl, 0, 0);
+          if (j > 0) {
+            jointNode.position.set(0, 0, -fd.length);
+            jointNode.rotation.set(fd.curl, 0, 0);
+          }
           currentJoint.add(jointNode);
           
           // Knuckles remain as sharp joints

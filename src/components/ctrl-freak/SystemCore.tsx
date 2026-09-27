@@ -282,10 +282,10 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
 
-      // 1. SPHERE (Arrival / Chaos)
+      // 1. SPHERE (Arrival / Chaos) - Scaled down to fit the cupping hands
       const theta = Math.random() * 2 * Math.PI;
       const phi = Math.acos(Math.random() * 2 - 1);
-      const r = 2 + Math.random() * 2;
+      const r = 1.5 + Math.random() * 1.5; // Scaled down from 2-4 to 1.5-3
       sphere[i3] = r * Math.sin(phi) * Math.cos(theta);
       sphere[i3 + 1] = r * Math.sin(phi) * Math.sin(theta);
       sphere[i3 + 2] = r * Math.cos(phi);
@@ -517,8 +517,8 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
             const scrollExpansion = Math.sin(Math.min(1, progress / 0.28) * Math.PI);
             const expansion = 1 + (scrollExpansion * 0.5); // Subtle, controlled expansion
             
-            // Add a very calm, slow breathing effect so it feels alive but not chaotic
-            const breathe = 1 + Math.sin(t * 1.5 + (i % 10)) * 0.05;
+            // Add a very calm, slow breathing effect (uniform across the whole sphere, no slinky bands)
+            const breathe = 1 + Math.sin(t * 1.5) * 0.05;
             
             bx = bx * expansion * breathe;
             by = by * expansion * breathe;
