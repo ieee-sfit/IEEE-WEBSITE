@@ -9,7 +9,7 @@ import { useCtrlFreakStore } from '../../store/useCtrlFreakStore';
 // Spike: Elongated 4-sided pyramid (radius, height, radialSegments)
 // Removed SPIKE_ARGS
 // Joint: Sharp octahedron/diamond (radius, detail)
-const JOINT_ARGS: [number, number, number] = [4, 4, 2.5];
+const JOINT_ARGS: [number, number, number, number] = [2, 2, 1.5, 16];
 // ArchSegment: Sweeping massive blocks for the "hanger" (radiusTop, radiusBottom, height, radialSegments)
 const ARCH_ARGS: [number, number, number, number] = [3, 3, 20, 4];
 
@@ -235,9 +235,11 @@ export function ControlChamber() {
           }
           currentJoint.add(jointNode);
           
-          // Knuckles remain as sharp joints
+          // Knuckles become mechanical discs
           const knuckle = new THREE.Object3D();
           const kScale = fd.scale * (1.2 - (j * 0.2));
+          // Rotate knuckle 90deg so the cylinder acts as a horizontal hinge
+          knuckle.rotation.set(Math.PI / 2, 0, 0);
           knuckle.userData = { type: 'joint', scale: new THREE.Vector3(kScale, kScale, kScale) };
           jointNode.add(knuckle);
 
@@ -246,15 +248,16 @@ export function ControlChamber() {
             const bone = new THREE.Object3D();
             bone.position.set(0, 0, -fd.length / 2);
             
-            // Tapered, heavy mechanical bones (no longer thin wires!)
-            // Base bone (j=0) is thickest (~80% of kScale), tip bone is thinnest (~40% of kScale)
-            const taperFactor = 1 - (j * (0.6 / fd.joints));
-            // Carapace block is 4x4x16. We divide by 4 so thickness=1 means exactly 1 unit thick.
-            // Palm base is ~25 units thick, fingers should be around 5-6 units at the base.
-            const targetThickness = 5.0 * fd.scale * taperFactor; 
-            const thicknessScale = targetThickness / 4.0; // Divide by geometry width
+            // Goldilocks zone: not wire-thin, not claw-machine bricks.
+            // Base bone is ~2.5 units thick (vs palm's ~25 units), tapering to sharp 0.8 tip.
+            const taperFactor = 1 - (j * (0.7 / fd.joints));
+            const targetThickness = 2.5 * fd.scale * taperFactor; 
+            const thicknessScale = targetThickness / 4.0; // Divide by boxGeometry width
             
-            const bLenScale = fd.length / 16.0; // Divide by geometry length
+            const bLenScale = fd.length / 16.0; // Divide by boxGeometry length
+            
+            // Add a slight tilt to the bone to make it look sharp and diamond-cut
+            bone.rotation.set(0, 0, Math.PI / 4);
             
             bone.userData = { type: 'carapace', scale: new THREE.Vector3(thicknessScale, thicknessScale, bLenScale) };
             
@@ -498,7 +501,7 @@ export function ControlChamber() {
       </instancedMesh>
 
       <instancedMesh ref={jointRef} args={[undefined, undefined, jointCount]} castShadow receiveShadow>
-        <boxGeometry args={JOINT_ARGS} />
+        <cylinderGeometry args={JOINT_ARGS} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
