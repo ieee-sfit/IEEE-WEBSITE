@@ -44,316 +44,222 @@ export function ControlChamber() {
   const currentStability = useRef(0);
 
   const transforms = useMemo(() => {
-    const dummyC = new THREE.Object3D();
-    const dummyK = new THREE.Object3D();
-    
     const carapaces = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
     const spikes = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
     const joints = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
     const arches = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
 
-    // 1. SPIKES (Fingers & Thumbs)
-    for (let i = 0; i < spikeCount; i++) {
-      const angle = (i / spikeCount) * Math.PI * 2;
-      const cRadius = 140 + Math.random() * 80;
-      dummyC.position.set(Math.cos(angle) * cRadius, (Math.random() - 0.5) * 160, Math.sin(angle) * cRadius);
-      dummyC.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
-      dummyC.scale.setScalar(Math.random() * 1.5 + 0.5); 
-      dummyC.updateMatrix();
-      spikes.chaotic.push(dummyC.matrix.clone());
+    const skeleton = new THREE.Object3D();
+    const coreTarget = new THREE.Vector3(0, 0, 0);
 
-      const isLeft = i < 16;
-      const localI = isLeft ? i : (i - 16);
+    const buildArm = (isLeft: boolean) => {
+      const armRoot = new THREE.Object3D();
+      skeleton.add(armRoot);
+
+      // Position the Palm
+      const palm = new THREE.Object3D();
+      const pX = isLeft ? -25 : 25; // Closer to core
+      const pY = isLeft ? 10 : -10;
+      const pZ = isLeft ? 5 : -5;
+      palm.position.set(pX, pY, pZ);
       
-      if (localI < 14) { 
-        const isThumb = localI >= 12;
-        const fingerIdx = isThumb ? 4 : Math.floor(localI / 3);
-        const jointIdx = isThumb ? (localI - 12) : (localI % 3);
-        
-        const rig = new THREE.Object3D();
-        
-        // Base knuckles positioned in an asymmetric reaching pose
-        let fp, target, curl, jointScale;
-        
-        if (isLeft) {
-          // Gold Arm - Reaching straight in
-          const fpLeft = [
-            [-30, 12, 5], [-30, 6, 5], [-30, 0, 5], [-30, -6, 5], [-25, 14, -2]
-          ];
-          const targetsLeft = [
-            [0, 12, 5], [0, 6, 5], [0, 0, 5], [0, -6, 5], [-15, 20, 10] // Thumb points up/forward
-          ];
-          fp = fpLeft[fingerIdx];
-          target = targetsLeft[fingerIdx];
-          
-          curl = 0.05; // Almost perfectly straight fingers
-          jointScale = [1.0, 1.05, 0.95, 0.8, 1.2][fingerIdx];
-        } else {
-          // Dark Purple Arm - Cupping from underneath, fingers splayed wildly
-          const fpRight = [
-            [34, 4, -5], [35, 1, -2], [36, -2, 2], [37, -5, 8], [36, 4, -12]
-          ];
-          const targetsRight = [
-            [10, 24, -5],  // Index points high up and slightly left
-            [10, 14, -2],  // Middle points up and left
-            [10, 4, 5],    // Ring points left and slightly forward
-            [10, -11, 15], // Pinky points down and forward
-            [40, 14, -20]  // Thumb points UP and BACK (away from core)
-          ];
-          fp = fpRight[fingerIdx];
-          target = targetsRight[fingerIdx];
-          
-          curl = 0.15; // Slight elegant curve
-          jointScale = [1.0, 1.05, 0.95, 0.8, 1.2][fingerIdx];
-        }
+      // Palm directly faces the core, creating a proper gripping cavity
+      palm.lookAt(coreTarget);
+      armRoot.add(palm);
 
-        rig.position.set(fp[0], fp[1], fp[2]);
-        rig.lookAt(target[0], target[1], target[2]);
-        // Fix for fingers pointing completely backwards (outwards)
-        rig.rotateY(Math.PI);
+      // Build Palm Mass (Carapace shards wrapping a central volume)
+      for(let i = 0; i < 5; i++) {
+        const plate = new THREE.Object3D();
+        plate.position.set((Math.random() - 0.5) * 5, (Math.random() - 0.5) * 5, (Math.random() - 0.5) * 3);
+        plate.rotation.set(Math.random() * 0.2, Math.random() * 0.2, Math.random() * 0.2);
         
-        // Slightly curl the fingers "INWARD" relative to their local Up axis
-        // Positive X pitches UP (towards local +Y)
-        // We want them to curl gently towards their palms. 
-        // Right hand palm faces UP/LEFT. If fingers point UP/LEFT, curling +X curls them further UP.
-        const curlDir = isLeft ? -1 : 1; 
-
-        let currentJoint = rig;
-        const jointLength = isThumb ? 16 : 24; // Massive, long grasping fingers
-
-        for (let j = 0; j <= jointIdx; j++) {
-          const nextJoint = new THREE.Object3D();
-          if (j > 0) nextJoint.position.set(0, 0, -jointLength * jointScale);
-          nextJoint.rotation.set(curl * curlDir, 0, 0); 
-          currentJoint.add(nextJoint);
-          currentJoint = nextJoint;
-        }
-
-        const visual = new THREE.Object3D();
-        visual.position.set(0, 0, (-jointLength * jointScale) / 2);
-        currentJoint.add(visual);
-
-        rig.updateMatrixWorld(true);
-        dummyK.matrix.copy(visual.matrixWorld);
-        
-        const taper = 1 - (jointIdx * 0.25);
-        // Point the Cone (+Y) along the local -Z axis
-        dummyK.matrix.multiply(new THREE.Matrix4().makeRotationX(-Math.PI / 2));
-        // Diamond profile
-        dummyK.matrix.multiply(new THREE.Matrix4().makeRotationY(Math.PI / 4));
-        
-        // Beefy, dangerous sharp spikes
-        const thickness = 0.8 * taper; 
-        const length = (jointLength / 14) * jointScale * 1.1; // 10% overlap
-        dummyK.matrix.multiply(new THREE.Matrix4().makeScale(thickness, length, thickness));
-        
-        spikes.canonical.push(dummyK.matrix.clone());
-      } else {
-        dummyK.position.set(0, -100, 0);
-        dummyK.scale.set(0, 0, 0);
-        dummyK.updateMatrix();
-        spikes.canonical.push(dummyK.matrix.clone());
+        plate.userData = { 
+          type: 'carapace', 
+          scale: new THREE.Vector3(1.6, 2.0, 0.6) 
+        };
+        palm.add(plate);
       }
-    }
 
-    // 2. CARAPACES (Palms and Forearms - Thin Shards)
-    for (let i = 0; i < carapaceCount; i++) {
-      const angle = (i / carapaceCount) * Math.PI * 2;
-      const cRadius = 150 + Math.random() * 100;
-      dummyC.position.set(Math.cos(angle) * cRadius, (Math.random() - 0.5) * 200, Math.sin(angle) * cRadius);
-      dummyC.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2); 
-      dummyC.scale.setScalar(Math.random() * 1.2 + 0.5);
-      dummyC.updateMatrix();
-      carapaces.chaotic.push(dummyC.matrix.clone());
+      // Wrist & Forearm
+      const wrist = new THREE.Object3D();
+      // Wrist sits firmly behind the palm (local +Z)
+      wrist.position.set(0, 0, 8);
+      palm.add(wrist);
 
-      const isLeft = i < 16;
-      const localI = isLeft ? i : (i - 16);
-      
-      if (localI < 4) {
-        // Imposing Palm Plates (Bulkier)
-        const pz = 10 - (localI * 6); 
-        if (isLeft) {
-          dummyK.position.set(-35, 4, pz);
-          dummyK.lookAt(0, 4, pz);
-        } else {
-          dummyK.position.set(38, -4, pz);
-          dummyK.lookAt(0, 14, pz); // Looking up at the core
-        }
-        dummyK.rotateX(Math.PI / 2);
-        dummyK.rotateY(Math.PI / 4); // Diamond rotation
-        dummyK.scale.set(1.5, 1.6, 0.6); // Much thicker armored plates
-        dummyK.updateMatrix();
-        carapaces.canonical.push(dummyK.matrix.clone());
-      } else {
-        // Brutalist Forearm Spine (12 trailing massive shards)
-        const fIdx = localI - 4; 
-        const t = fIdx / 11; 
-        
-        if (isLeft) {
-          dummyK.position.lerpVectors(new THREE.Vector3(-40, 4, 0), new THREE.Vector3(-110, 40, -40), t);
-          dummyK.lookAt(-110, 40, -40);
-        } else {
-          dummyK.position.lerpVectors(new THREE.Vector3(45, -8, 0), new THREE.Vector3(90, -40, -60), t);
-          dummyK.lookAt(90, -40, -60);
-        }
-        
-        dummyK.position.y += Math.sin(t * Math.PI) * 10; 
-        
-        dummyK.rotateX(Math.PI / 2);
-        dummyK.rotateY(Math.PI / 4);
-        
-        const fScale = 2.0 - (t * 1.0); // Thick base, tapers off
-        dummyK.scale.set(fScale * 1.2, fScale * 2.0, fScale * 0.8); // Beefy trailing shards
-        dummyK.updateMatrix();
-        carapaces.canonical.push(dummyK.matrix.clone());
-      }
-    }
+      const arch = new THREE.Object3D();
+      arch.userData = { type: 'arch', scale: new THREE.Vector3(0.6, 0.6, 0.6) };
+      wrist.add(arch);
 
-    // 3. ARCHES (Shirt Hanger & Wrist Bracers)
-    for (let i = 0; i < archCount; i++) {
-      const angle = (i / archCount) * Math.PI * 2;
-      const cRadius = 130 + Math.random() * 70;
-      dummyC.position.set(Math.cos(angle) * cRadius, (Math.random() - 0.5) * 150, Math.sin(angle) * cRadius);
-      dummyC.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2); 
-      dummyC.scale.setScalar(Math.random() * 2 + 1);
-      dummyC.updateMatrix();
-      arches.chaotic.push(dummyC.matrix.clone());
-
-      if (i < 16) {
-        // Main Overhead Halo (Shirt Hanger)
-        const t = i / 15; 
-        const archAngle = t * Math.PI; 
-        const archRadius = 80; // Tighter halo
-        
-        const ax = Math.cos(archAngle) * archRadius;
-        const ay = 90 + Math.sin(archAngle) * (archRadius * 0.5); 
-        const az = -20 - Math.sin(archAngle) * 15;
-
-        dummyK.position.set(ax, ay, az);
-        
-        const tx = -Math.sin(archAngle);
-        const ty = Math.cos(archAngle) * 0.7;
-        const tz = -Math.cos(archAngle) * 0.2;
-        const target = new THREE.Vector3(ax + tx, ay + ty, az + tz);
-        
-        dummyK.lookAt(target);
-        dummyK.rotateX(Math.PI / 2);
-        dummyK.scale.set(1.0, 2.0, 0.6); // Thicker imposing ribbon
-        dummyK.updateMatrix();
-        arches.canonical.push(dummyK.matrix.clone());
-      } else {
-        // Mechanical Wrist Bracers (8 per wrist)
-        const wIdx = i - 16;
-        const isLeftWrist = wIdx < 8;
-        const wSign = isLeftWrist ? -1 : 1;
-        const localW = isLeftWrist ? wIdx : (wIdx - 8); 
-        
-        const wAngle = (localW / 8) * Math.PI * 2;
-        const wRadius = 16; // Wrap around thicker forearm
-        const wCenter = new THREE.Vector3(wSign * 55, 25, -10);
-        
-        dummyK.position.set(
-          wCenter.x + (Math.cos(wAngle) * wRadius * 0.2), 
-          wCenter.y + Math.sin(wAngle) * wRadius, 
-          wCenter.z + Math.cos(wAngle) * wRadius
+      // Forearm beams trailing backwards along local +Z
+      for (let i = 0; i < 8; i++) {
+        const shard = new THREE.Object3D();
+        shard.position.set(
+          (Math.random() - 0.5) * 4,
+          (Math.random() - 0.5) * 4,
+          6 + (i * 8)
         );
-        
-        dummyK.lookAt(wCenter);
-        dummyK.scale.set(0.6, 1.2, 0.3); // Solid structural rings
-        dummyK.updateMatrix();
-        arches.canonical.push(dummyK.matrix.clone());
+        // Taper the forearm as it goes back
+        const tScale = 1.8 - (i * 0.15);
+        shard.userData = { 
+          type: 'carapace', 
+          scale: new THREE.Vector3(tScale * 0.6, tScale * 0.6, tScale * 1.5) 
+        };
+        wrist.add(shard);
       }
-    }
 
-    // 4. JOINTS (Knuckles)
-    for (let i = 0; i < jointCount; i++) {
-      const angle = (i / jointCount) * Math.PI * 2;
-      const cRadius = 140 + Math.random() * 80;
-      dummyC.position.set(Math.cos(angle) * cRadius, (Math.random() - 0.5) * 160, Math.sin(angle) * cRadius);
-      dummyC.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2); 
-      dummyC.scale.setScalar(Math.random() * 1.5 + 0.5);
-      dummyC.updateMatrix();
-      joints.chaotic.push(dummyC.matrix.clone());
+      // Build Hierarchical Fingers
+      // Local -Z is Forward (towards core). Local +Y is Up.
+      // Left Hand looks from X=-25 to 0. So local -Z points Right (+X). Local +Y is Up (+Y).
+      // Left Hand local -X points Back (+Z). Local +X points Forward (-Z).
+      const fingers = isLeft ? [
+        // LEFT HAND
+        // Thumb reaches UP and IN to enclose the cavity
+        { name: 'Thumb', offset: new THREE.Vector3(4, 4, 2), rotX: 0.4, rotY: 0.6, length: 8, joints: 2, curl: -0.2, scale: 1.3 },
+        { name: 'Index', offset: new THREE.Vector3(3, 5, -2), rotX: -0.1, rotY: 0.15, length: 11, joints: 3, curl: -0.2, scale: 1.0 },
+        { name: 'Middle', offset: new THREE.Vector3(0, 6, -2), rotX: -0.1, rotY: 0, length: 12, joints: 3, curl: -0.25, scale: 1.1 },
+        { name: 'Ring', offset: new THREE.Vector3(-3, 5, -2), rotX: -0.1, rotY: -0.15, length: 11, joints: 3, curl: -0.3, scale: 0.9 },
+        { name: 'Pinky', offset: new THREE.Vector3(-5, 2, -1), rotX: 0, rotY: -0.3, length: 8, joints: 3, curl: -0.35, scale: 0.8 },
+      ] : [
+        // RIGHT HAND (Palm on +X side, facing -X. Local +X is away from Camera)
+        { name: 'Thumb', offset: new THREE.Vector3(-4, 4, 2), rotX: 0.4, rotY: -0.6, length: 8, joints: 2, curl: -0.2, scale: 1.3 },
+        { name: 'Index', offset: new THREE.Vector3(-3, 5, -2), rotX: -0.1, rotY: -0.15, length: 11, joints: 3, curl: -0.2, scale: 1.0 },
+        { name: 'Middle', offset: new THREE.Vector3(0, 6, -2), rotX: -0.1, rotY: 0, length: 12, joints: 3, curl: -0.25, scale: 1.1 },
+        { name: 'Ring', offset: new THREE.Vector3(3, 5, -2), rotX: -0.1, rotY: 0.15, length: 11, joints: 3, curl: -0.3, scale: 0.9 },
+        { name: 'Pinky', offset: new THREE.Vector3(5, 2, -1), rotX: 0, rotY: 0.3, length: 8, joints: 3, curl: -0.35, scale: 0.8 },
+      ];
 
-      const isLeft = i < 16;
-      const localI = isLeft ? i : (i - 16);
+      fingers.forEach(fd => {
+        const fRoot = new THREE.Object3D();
+        fRoot.position.copy(fd.offset);
+        // Fan out angles
+        fRoot.rotation.set(fd.rotX, fd.rotY, 0);
+        palm.add(fRoot);
 
-      if (localI < 14) {
-        const isThumb = localI >= 12;
-        const fingerIdx = isThumb ? 4 : Math.floor(localI / 3);
-        const jointIdx = isThumb ? (localI - 12) : (localI % 3);
-        
-        const rig = new THREE.Object3D();
-        // Base knuckles positioned in an asymmetric reaching pose
-        let fp, target, curl, jointScale;
-        
-        if (isLeft) {
-          // Gold Arm - Reaching straight in
-          const fpLeft = [
-            [-30, 12, 5], [-30, 6, 5], [-30, 0, 5], [-30, -6, 5], [-25, 14, -2]
-          ];
-          const targetsLeft = [
-            [0, 12, 5], [0, 6, 5], [0, 0, 5], [0, -6, 5], [-15, 20, 10]
-          ];
-          fp = fpLeft[fingerIdx];
-          target = targetsLeft[fingerIdx];
+        let currentJoint = fRoot;
+        for (let j = 0; j <= fd.joints; j++) {
+          const jointNode = new THREE.Object3D();
           
-          curl = 0.05; 
-          jointScale = [1.0, 1.05, 0.95, 0.8, 1.2][fingerIdx];
-        } else {
-          // Dark Purple Arm - Cupping from underneath, fingers splayed wildly
-          const fpRight = [
-            [34, 4, -5], [35, 1, -2], [36, -2, 2], [37, -5, 8], [36, 4, -12]
-          ];
-          const targetsRight = [
-            [10, 24, -5], 
-            [10, 14, -2], 
-            [10, 4, 5],   
-            [10, -11, 15],
-            [40, 14, -20] 
-          ];
-          fp = fpRight[fingerIdx];
-          target = targetsRight[fingerIdx];
+          // Move forward along local -Z to stack joints
+          if (j > 0) {
+            jointNode.position.set(0, 0, -fd.length);
+          }
           
-          curl = 0.15; 
-          jointScale = [1.0, 1.05, 0.95, 0.8, 1.2][fingerIdx];
+          // Curl inwards towards the palm cavity (negative pitch)
+          jointNode.rotation.set(fd.curl, 0, 0);
+          currentJoint.add(jointNode);
+
+          // Knuckle geometry (Joint)
+          const knuckle = new THREE.Object3D();
+          const kScale = fd.scale * (1.2 - (j * 0.25));
+          knuckle.userData = { type: 'joint', scale: new THREE.Vector3(kScale, kScale, kScale) };
+          jointNode.add(knuckle);
+
+          // Bone geometry (Spike) - stretches to the NEXT joint
+          if (j < fd.joints) {
+            const bone = new THREE.Object3D();
+            bone.position.set(0, 0, -fd.length / 2);
+            
+            // ConeGeometry points +Y. Rotate -90 on X so it points -Z.
+            bone.rotation.x = -Math.PI / 2;
+            // Diamond profile
+            bone.rotation.y = Math.PI / 4;
+            
+            const thickness = 0.5 * kScale;
+            const bLen = (fd.length / 14) * 1.15; // 14 is the base cone height, 15% overlap
+            bone.userData = { type: 'spike', scale: new THREE.Vector3(thickness, bLen, thickness) };
+            
+            jointNode.add(bone);
+          }
+
+          currentJoint = jointNode;
+        }
+      });
+    };
+
+    buildArm(true);
+    buildArm(false);
+
+    // Force global matrix calculation for the entire skeleton
+    skeleton.updateMatrixWorld(true);
+
+    // Traverse and extract generated matrices
+    const pos = new THREE.Vector3();
+    const rot = new THREE.Quaternion();
+    const scale = new THREE.Vector3();
+
+    skeleton.traverse((node) => {
+      if (node.userData && node.userData.type) {
+        // 1. Store Canonical Matrix (Perfect Assembly)
+        const canonicalMatrix = node.matrixWorld.clone();
+        if (node.userData.scale) {
+          canonicalMatrix.scale(node.userData.scale);
         }
 
-        rig.position.set(fp[0], fp[1], fp[2]);
-        rig.lookAt(target[0], target[1], target[2]);
-        // Fix for fingers pointing backwards
-        rig.rotateY(Math.PI);
+        // 2. Generate Chaotic Matrix (Exploded Debris)
+        // Extract exact position so we know where it belongs
+        canonicalMatrix.decompose(pos, rot, scale);
         
-        const curlDir = isLeft ? -1 : 1; 
+        const chaoticMatrix = new THREE.Matrix4();
+        
+        // Explode outward away from core
+        const explosionDir = pos.clone().normalize();
+        // Add strong random scatter
+        explosionDir.x += (Math.random() - 0.5) * 1.5;
+        explosionDir.y += (Math.random() - 0.5) * 1.5;
+        explosionDir.z += (Math.random() - 0.5) * 1.5;
+        explosionDir.normalize();
+        
+        // Push pieces far out into space (100 to 250 units away)
+        const explodeDist = 100 + Math.random() * 150;
+        const cPos = pos.clone().add(explosionDir.multiplyScalar(explodeDist));
+        
+        // Wild random rotation for the broken state
+        const cRot = new THREE.Quaternion().setFromEuler(
+          new THREE.Euler(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2)
+        );
 
-        let currentJoint = rig;
-        const jointLength = isThumb ? 16 : 24;
+        // Recompose chaotic matrix keeping the SAME scale as the canonical piece
+        chaoticMatrix.compose(cPos, cRot, scale);
 
-        for (let j = 0; j <= jointIdx; j++) {
-          const nextJoint = new THREE.Object3D();
-          if (j > 0) nextJoint.position.set(0, 0, -jointLength * jointScale);
-          nextJoint.rotation.set(curl * curlDir, 0, 0); 
-          currentJoint.add(nextJoint);
-          currentJoint = nextJoint;
+        switch(node.userData.type) {
+          case 'carapace': 
+            carapaces.canonical.push(canonicalMatrix); 
+            carapaces.chaotic.push(chaoticMatrix);
+            break;
+          case 'spike': 
+            spikes.canonical.push(canonicalMatrix); 
+            spikes.chaotic.push(chaoticMatrix);
+            break;
+          case 'joint': 
+            joints.canonical.push(canonicalMatrix); 
+            joints.chaotic.push(chaoticMatrix);
+            break;
+          case 'arch': 
+            arches.canonical.push(canonicalMatrix); 
+            arches.chaotic.push(chaoticMatrix);
+            break;
         }
-
-        currentJoint.updateMatrixWorld(true);
-        dummyK.matrix.copy(currentJoint.matrixWorld);
-        
-        const taper = 1 - (jointIdx * 0.2);
-        // Heavy, defined diamond knuckles
-        dummyK.matrix.multiply(new THREE.Matrix4().makeScale(0.8 * taper, 0.8 * taper, 0.8 * taper)); 
-        joints.canonical.push(dummyK.matrix.clone());
-      } else {
-        dummyK.position.set(0, -100, 0);
-        dummyK.scale.set(0, 0, 0);
-        dummyK.updateMatrix();
-        joints.canonical.push(dummyK.matrix.clone());
       }
-    }
+    });
+
+    // Pad arrays up to maximum instance counts to avoid InstancedMesh draw range warnings
+    const padArray = (arr: THREE.Matrix4[], max: number) => {
+      const dummy = new THREE.Matrix4().makeScale(0,0,0);
+      while(arr.length < max) arr.push(dummy);
+    };
+
+    padArray(carapaces.canonical, carapaceCount);
+    padArray(carapaces.chaotic, carapaceCount);
+    padArray(spikes.canonical, spikeCount);
+    padArray(spikes.chaotic, spikeCount);
+    padArray(joints.canonical, jointCount);
+    padArray(joints.chaotic, jointCount);
+    padArray(arches.canonical, archCount);
+    padArray(arches.chaotic, archCount);
 
     return { carapaces, spikes, joints, arches };
   }, []);
+
 
   useFrame((_, delta) => {
     if (!carapaceRef.current || !archRef.current || !jointRef.current || !spikeRef.current) return;
