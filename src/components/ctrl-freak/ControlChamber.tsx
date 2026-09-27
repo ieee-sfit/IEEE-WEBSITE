@@ -143,24 +143,24 @@ export function ControlChamber() {
       // 7. The Fingers
       // Left hand: +X is OUT of screen. Thumb should be +X.
       const fingers = isLeft ? [
-        { name: 'Thumb', offset: new THREE.Vector3(7, 0, 1),  rotX: 0.2,  rotY: 0.6,  length: 6.5, joints: 3, curl: -0.5, scale: 1.6 },
-        { name: 'Index', offset: new THREE.Vector3(4, 5, -1), rotX: -0.1, rotY: 0.2,  length: 8,   joints: 3, curl: -0.6, scale: 1.2 },
-        { name: 'Middle', offset: new THREE.Vector3(0, 6, -2), rotX: -0.2, rotY: 0.0,  length: 9,   joints: 4, curl: -0.5, scale: 1.3 },
-        { name: 'Ring', offset: new THREE.Vector3(-4, 5, -1), rotX: -0.1, rotY: -0.2, length: 8,   joints: 3, curl: -0.6, scale: 1.1 },
-        { name: 'Pinky', offset: new THREE.Vector3(-7, 2, 0), rotX: 0.0,  rotY: -0.5, length: 6.5, joints: 3, curl: -0.5, scale: 0.9 },
+        { name: 'Thumb', offset: new THREE.Vector3(8, 0, 2),   rotX: 0.2,  rotY: 0.8,  rotZ: -1.2, length: 6.5, joints: 3, curl: -0.5, scale: 1.6 },
+        { name: 'Index', offset: new THREE.Vector3(5, 6, 0),   rotX: -0.1, rotY: 0.4,  rotZ: -0.6, length: 8,   joints: 3, curl: -0.6, scale: 1.2 },
+        { name: 'Middle', offset: new THREE.Vector3(0, 8, -2), rotX: -0.2, rotY: 0.0,  rotZ: 0.0,  length: 9,   joints: 4, curl: -0.5, scale: 1.3 },
+        { name: 'Ring', offset: new THREE.Vector3(-5, 6, 0),   rotX: -0.1, rotY: -0.4, rotZ: 0.6,  length: 8,   joints: 3, curl: -0.6, scale: 1.1 },
+        { name: 'Pinky', offset: new THREE.Vector3(-8, 2, 1),  rotX: 0.1,  rotY: -0.8, rotZ: 1.2,  length: 6.5, joints: 3, curl: -0.5, scale: 0.9 },
       ] : [
         // Right hand: -X is OUT of screen. Thumb should be -X.
-        { name: 'Thumb', offset: new THREE.Vector3(-7, 0, 1), rotX: 0.2,  rotY: -0.6, length: 6.5, joints: 3, curl: -0.5, scale: 1.6 },
-        { name: 'Index', offset: new THREE.Vector3(-4, 5, -1), rotX: -0.1, rotY: -0.2, length: 8,   joints: 3, curl: -0.6, scale: 1.2 },
-        { name: 'Middle', offset: new THREE.Vector3(0, 6, -2), rotX: -0.2, rotY: 0.0,  length: 9,   joints: 4, curl: -0.5, scale: 1.3 },
-        { name: 'Ring', offset: new THREE.Vector3(4, 5, -1),  rotX: -0.1, rotY: 0.2,  length: 8,   joints: 3, curl: -0.6, scale: 1.1 },
-        { name: 'Pinky', offset: new THREE.Vector3(7, 2, 0),  rotX: 0.0,  rotY: 0.5,  length: 6.5, joints: 3, curl: -0.5, scale: 0.9 },
+        { name: 'Thumb', offset: new THREE.Vector3(-8, 0, 2),  rotX: 0.2,  rotY: -0.8, rotZ: 1.2,  length: 6.5, joints: 3, curl: -0.5, scale: 1.6 },
+        { name: 'Index', offset: new THREE.Vector3(-5, 6, 0),  rotX: -0.1, rotY: -0.4, rotZ: 0.6,  length: 8,   joints: 3, curl: -0.6, scale: 1.2 },
+        { name: 'Middle', offset: new THREE.Vector3(0, 8, -2), rotX: -0.2, rotY: 0.0,  rotZ: 0.0,  length: 9,   joints: 4, curl: -0.5, scale: 1.3 },
+        { name: 'Ring', offset: new THREE.Vector3(5, 6, 0),    rotX: -0.1, rotY: 0.4,  rotZ: -0.6, length: 8,   joints: 3, curl: -0.6, scale: 1.1 },
+        { name: 'Pinky', offset: new THREE.Vector3(8, 2, 1),   rotX: 0.1,  rotY: 0.8,  rotZ: -1.2, length: 6.5, joints: 3, curl: -0.5, scale: 0.9 },
       ];
 
       fingers.forEach(fd => {
         const fRoot = new THREE.Object3D();
         fRoot.position.copy(fd.offset);
-        fRoot.rotation.set(fd.rotX, fd.rotY, 0);
+        fRoot.rotation.set(fd.rotX, fd.rotY, fd.rotZ || 0);
         palm.add(fRoot);
 
         let currentJoint = fRoot;
