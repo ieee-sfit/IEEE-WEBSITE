@@ -211,7 +211,12 @@ export function ControlChamber() {
         const dummyLooker = new THREE.Object3D();
         dummyLooker.position.copy(worldRootPos);
         dummyLooker.up.copy(wUp);
-        dummyLooker.lookAt(worldTarget);
+        // Object3D.lookAt aligns the +Z axis with the target.
+        // We want the finger tip (which is mapped to -Z) to point at the target.
+        // So we must point the +Z axis AWAY from the target!
+        const vDir = worldTarget.clone().sub(worldRootPos);
+        const fAwayTarget = worldRootPos.clone().sub(vDir);
+        dummyLooker.lookAt(fAwayTarget);
 
         // Final world quaternion: look at target, then apply the corrective qToZ
         const finalWorldQuat = dummyLooker.quaternion.multiply(qToZ);
