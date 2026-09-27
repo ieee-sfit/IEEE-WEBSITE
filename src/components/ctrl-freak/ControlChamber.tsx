@@ -5,9 +5,9 @@ import { useCtrlFreakStore } from '../../store/useCtrlFreakStore';
 
 // Procedural Vocabulary Geometries (Sharp, Abstract, Chitinous)
 // Carapace: Tapered 4-sided wedge (radiusTop, radiusBottom, height, radialSegments)
-const CARAPACE_ARGS: [number, number, number, number] = [1.5, 3.5, 10, 4];
+// Removed CARAPACE_ARGS
 // Spike: Elongated 4-sided pyramid (radius, height, radialSegments)
-const SPIKE_ARGS: [number, number, number] = [1.8, 14, 4];
+// Removed SPIKE_ARGS
 // Joint: Sharp octahedron/diamond (radius, detail)
 const JOINT_ARGS: [number, number] = [2.5, 0];
 // ArchSegment: Sweeping massive blocks for the "hanger" (radiusTop, radiusBottom, height, radialSegments)
