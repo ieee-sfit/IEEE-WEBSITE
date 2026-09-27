@@ -155,17 +155,19 @@ export function ControlChamber() {
       // Targets are pushed in a wide 25-unit radius ring around the core (0, 15, -5) to force fingers to fan out
       const fingers = isLeft ? [
         // Explicit FK control: yaw (splay), pitch (elevation), roll (knuckle twist)
-        { name: 'Thumb',  offset: new THREE.Vector3(6, -6, -2),  length: 7.0, joints: 3, curl: -0.5, scale: 1.6, yaw: 0, pitch: 0, roll: 0 },
-        { name: 'Index',  offset: new THREE.Vector3(4, 6, 0),    length: 8.5, joints: 3, curl: -0.6, scale: 1.2, yaw: 0, pitch: 0, roll: 0 },
-        { name: 'Middle', offset: new THREE.Vector3(0, 7, 2),    length: 9.5, joints: 4, curl: -0.5, scale: 1.3, yaw: 0, pitch: 0, roll: 0 },
-        { name: 'Ring',   offset: new THREE.Vector3(-4, 5, 4),   length: 8.0, joints: 3, curl: -0.6, scale: 1.1, yaw: 0, pitch: 0, roll: 0 },
-        { name: 'Pinky',  offset: new THREE.Vector3(-7, 2, 6),   length: 6.5, joints: 3, curl: -0.5, scale: 0.9, yaw: 0, pitch: 0, roll: 0 },
+        // Left Hand: +X is Inner (Thumb), -X is Outer (Pinky).
+        { name: 'Thumb',  offset: new THREE.Vector3(6, -6, -2),  length: 7.0, joints: 3, curl: -0.5, scale: 1.6, yaw: 0.4, pitch: 0.2, roll: 1.5 },
+        { name: 'Index',  offset: new THREE.Vector3(4, 6, 0),    length: 8.5, joints: 3, curl: -0.6, scale: 1.2, yaw: 0.1, pitch: 0.0, roll: -0.1 },
+        { name: 'Middle', offset: new THREE.Vector3(0, 7, 2),    length: 9.5, joints: 4, curl: -0.5, scale: 1.3, yaw: 0.0, pitch: -0.1, roll: 0.0 },
+        { name: 'Ring',   offset: new THREE.Vector3(-4, 5, 4),   length: 8.0, joints: 3, curl: -0.6, scale: 1.1, yaw: -0.1, pitch: -0.2, roll: 0.1 },
+        { name: 'Pinky',  offset: new THREE.Vector3(-7, 2, 6),   length: 6.5, joints: 3, curl: -0.5, scale: 0.9, yaw: -0.2, pitch: -0.3, roll: 0.2 },
       ] : [
-        { name: 'Thumb',  offset: new THREE.Vector3(-6, -6, -2), length: 7.0, joints: 3, curl: -0.5, scale: 1.6, yaw: 0, pitch: 0, roll: 0 },
-        { name: 'Index',  offset: new THREE.Vector3(-4, 6, 0),   length: 8.5, joints: 3, curl: -0.6, scale: 1.2, yaw: 0, pitch: 0, roll: 0 },
-        { name: 'Middle', offset: new THREE.Vector3(0, 7, 2),    length: 9.5, joints: 4, curl: -0.5, scale: 1.3, yaw: 0, pitch: 0, roll: 0 },
-        { name: 'Ring',   offset: new THREE.Vector3(4, 5, 4),    length: 8.0, joints: 3, curl: -0.6, scale: 1.1, yaw: 0, pitch: 0, roll: 0 },
-        { name: 'Pinky',  offset: new THREE.Vector3(7, 2, 6),    length: 6.5, joints: 3, curl: -0.5, scale: 0.9, yaw: 0, pitch: 0, roll: 0 },
+        // Right Hand: -X is Inner (Thumb), +X is Outer (Pinky).
+        { name: 'Thumb',  offset: new THREE.Vector3(-6, -6, -2), length: 7.0, joints: 3, curl: -0.5, scale: 1.6, yaw: -0.4, pitch: 0.2, roll: -1.5 },
+        { name: 'Index',  offset: new THREE.Vector3(-4, 6, 0),   length: 8.5, joints: 3, curl: -0.6, scale: 1.2, yaw: -0.1, pitch: 0.0, roll: 0.1 },
+        { name: 'Middle', offset: new THREE.Vector3(0, 7, 2),    length: 9.5, joints: 4, curl: -0.5, scale: 1.3, yaw: 0.0, pitch: -0.1, roll: 0.0 },
+        { name: 'Ring',   offset: new THREE.Vector3(4, 5, 4),    length: 8.0, joints: 3, curl: -0.6, scale: 1.1, yaw: 0.1, pitch: -0.2, roll: -0.1 },
+        { name: 'Pinky',  offset: new THREE.Vector3(7, 2, 6),    length: 6.5, joints: 3, curl: -0.5, scale: 0.9, yaw: 0.2, pitch: -0.3, roll: -0.2 },
       ];
 
       // Update palm matrix so we can do world-space calculations
