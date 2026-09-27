@@ -9,7 +9,7 @@ import { useCtrlFreakStore } from '../../store/useCtrlFreakStore';
 // Spike: Elongated 4-sided pyramid (radius, height, radialSegments)
 // Removed SPIKE_ARGS
 // Joint: Sharp octahedron/diamond (radius, detail)
-const JOINT_ARGS: [number, number] = [2.5, 0];
+const JOINT_ARGS: [number, number, number] = [4, 4, 2.5];
 // ArchSegment: Sweeping massive blocks for the "hanger" (radiusTop, radiusBottom, height, radialSegments)
 const ARCH_ARGS: [number, number, number, number] = [3, 3, 20, 4];
 
@@ -246,10 +246,17 @@ export function ControlChamber() {
             const bone = new THREE.Object3D();
             bone.position.set(0, 0, -fd.length / 2);
             
-            // Base carapace is 10x10x10. We want thickness around 2-3 units, length = fd.length.
-            const thickness = (1.2 * kScale) / 10;
-            const bLen = fd.length / 10; 
-            bone.userData = { type: 'carapace', scale: new THREE.Vector3(thickness, thickness, bLen) };
+            // Tapered, heavy mechanical bones (no longer thin wires!)
+            // Base bone (j=0) is thickest (~80% of kScale), tip bone is thinnest (~40% of kScale)
+            const taperFactor = 1 - (j * (0.6 / fd.joints));
+            // Carapace block is 4x4x16. We divide by 4 so thickness=1 means exactly 1 unit thick.
+            // Palm base is ~25 units thick, fingers should be around 5-6 units at the base.
+            const targetThickness = 5.0 * fd.scale * taperFactor; 
+            const thicknessScale = targetThickness / 4.0; // Divide by geometry width
+            
+            const bLenScale = fd.length / 16.0; // Divide by geometry length
+            
+            bone.userData = { type: 'carapace', scale: new THREE.Vector3(thicknessScale, thicknessScale, bLenScale) };
             
             jointNode.add(bone);
           }
@@ -491,7 +498,7 @@ export function ControlChamber() {
       </instancedMesh>
 
       <instancedMesh ref={jointRef} args={[undefined, undefined, jointCount]} castShadow receiveShadow>
-        <octahedronGeometry args={JOINT_ARGS} />
+        <boxGeometry args={JOINT_ARGS} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
