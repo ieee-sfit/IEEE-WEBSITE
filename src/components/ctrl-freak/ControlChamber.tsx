@@ -50,8 +50,7 @@ export function ControlChamber() {
     const arches = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
 
     const skeleton = new THREE.Object3D();
-    const coreTarget = new THREE.Vector3(0, 0, 0);
-
+  
     const buildArm = (isLeft: boolean) => {
       const armRoot = new THREE.Object3D();
       skeleton.add(armRoot);
