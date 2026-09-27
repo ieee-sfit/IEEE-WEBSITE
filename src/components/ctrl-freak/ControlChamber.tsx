@@ -68,19 +68,18 @@ export function ControlChamber() {
       // Target for fingers: (0, 15, -5)
       // Vector V = Target - Palm
       // Object3D.lookAt points the local +Z axis toward the target. 
-      // If we want fingers (-Z) to aim towards the core, we should point the palm slightly past or directly at it.
-      // Wait, Object3D.lookAt makes local +Z face the target.
-      // If +Z faces target, then -Z faces AWAY from target.
-      // So to make -Z face the target, we DO want to lookAt(awayTarget)!
-      // BUT if we lookAt(awayTarget), the palm's +Z faces away, and its -Z faces the core!
-      // Let's just fix it by making it look directly at the core and flip it if needed. 
-      // Actually, if we use lookAt(awayTarget), -Z faces the core. That was correct all along if fingers grow on -Z!
-      // But the user specifically said: "palm.lookAt(awayTarget) is backwards relative to the comment and the intended -Z finger direction. That's not an aesthetic judgement — that's literally an axis-direction error."
-      // If the user says it's backwards, I will make it look directly at the core!
+      // Since the forearm is built along the local +Z axis (z = 0 to 45), we WANT +Z to point AWAY from the core!
+      // This means -Z (the front of the palm) will point exactly AT the core!
+      // Therefore, the original awayTarget logic was mathematically correct for the arm's construction!
       const targetX = 0;
       const targetY = 15;
       const targetZ = -5;
-      palm.lookAt(targetX, targetY, targetZ);
+      const vX = targetX - pX;
+      const vY = targetY - pY;
+      const vZ = targetZ - pZ;
+      
+      const awayTarget = new THREE.Vector3(pX - vX, pY - vY, pZ - vZ);
+      palm.lookAt(awayTarget);
       
       // Add a slight roll so palms face each other more
       palm.rotateZ(isLeft ? 0.3 : -0.3);
