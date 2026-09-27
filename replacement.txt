@@ -1,0 +1,141 @@
+    const buildArm = (isLeft: boolean) => {
+      const armRoot = new THREE.Object3D();
+      skeleton.add(armRoot);
+
+      // 1. Spacing: Hands are wide, slightly below core, slightly in front
+      const pX = isLeft ? -30 : 30; 
+      const pY = -5;
+      const pZ = 10;
+      
+      const palm = new THREE.Object3D();
+      palm.position.set(pX, pY, pZ);
+      
+      // 2. True Anatomical Cupping Orientation
+      // We want the fingers (-Z) to aim ABOVE and BEHIND the core, so they can curl DOWN over it.
+      // Target for fingers: (0, 15, -5)
+      // Vector V = Target - Palm
+      // +Z must point exactly opposite to V.
+      // awayTarget = Palm - V
+      const targetX = 0;
+      const targetY = 15;
+      const targetZ = -5;
+      const vX = targetX - pX;
+      const vY = targetY - pY;
+      const vZ = targetZ - pZ;
+      
+      const awayTarget = new THREE.Vector3(pX - vX, pY - vY, pZ - vZ);
+      palm.lookAt(awayTarget);
+      
+      // Add a slight roll so palms face each other more
+      palm.rotateZ(isLeft ? 0.3 : -0.3);
+      
+      armRoot.add(palm);
+
+      // 3. Intricate Palm Structure (wider for spread fingers)
+      const palmPlate1 = new THREE.Object3D();
+      palmPlate1.userData = { type: 'carapace', scale: new THREE.Vector3(4.5, 4.5, 0.6) };
+      palm.add(palmPlate1);
+      
+      const palmPlate2 = new THREE.Object3D();
+      palmPlate2.position.set(0, 0, 1.5);
+      palmPlate2.userData = { type: 'carapace', scale: new THREE.Vector3(3.5, 3.5, 0.8) };
+      palm.add(palmPlate2);
+
+      // 4. The Wrist
+      const wrist = new THREE.Object3D();
+      wrist.position.set(0, 0, 6); 
+      palm.add(wrist);
+
+      // 5. The Elaborate Forearm
+      const elbow = new THREE.Object3D();
+      elbow.position.set(0, 0, 45); 
+      // Angle the elbow so the upper arm reaches into the void
+      elbow.rotation.x = -0.3; 
+      elbow.rotation.y = isLeft ? 0.4 : -0.4; 
+      wrist.add(elbow);
+
+      // Fill the forearm
+      for(let i=0; i<8; i++) {
+         const zPos = 2 + i * 5;
+         const fShard = new THREE.Object3D();
+         fShard.position.set((Math.random() - 0.5)*3, (Math.random() - 0.5)*3, zPos);
+         fShard.rotation.z = (Math.random() - 0.5);
+         const s = 1.0 + (i * 0.15); 
+         fShard.userData = { type: 'carapace', scale: new THREE.Vector3(s*1.8, s*2.2, 1.5) };
+         wrist.add(fShard);
+
+         if (i % 2 === 0) {
+            const fArch = new THREE.Object3D();
+            fArch.position.set(0, 0, zPos);
+            fArch.rotation.x = Math.PI/2;
+            fArch.rotation.z = Math.random();
+            fArch.userData = { type: 'arch', scale: new THREE.Vector3(s*1.6, s*1.6, 0.8) };
+            wrist.add(fArch);
+         }
+      }
+
+      // 6. The Upper Arm (Stretching deep into the void)
+      for(let i=0; i<12; i++) {
+         const zPos = i * 18; 
+         const uShard = new THREE.Object3D();
+         uShard.position.set((Math.random() - 0.5)*5, (Math.random() - 0.5)*5, zPos);
+         uShard.rotation.z = Math.random() * Math.PI;
+         uShard.rotation.x = (Math.random() - 0.5) * 0.2;
+         
+         const s = 2.5 + (i * 0.4); 
+         uShard.userData = { type: 'carapace', scale: new THREE.Vector3(s*2.5, s*2.5, 3.5) };
+         elbow.add(uShard);
+      }
+
+      // 7. The Fingers
+      // Left hand: +X is OUT of screen. Thumb should be +X.
+      const fingers = isLeft ? [
+        { name: 'Thumb', offset: new THREE.Vector3(7, 0, 1),  rotX: 0.2,  rotY: 0.6,  length: 6.5, joints: 3, curl: -0.5, scale: 1.6 },
+        { name: 'Index', offset: new THREE.Vector3(4, 5, -1), rotX: -0.1, rotY: 0.2,  length: 8,   joints: 3, curl: -0.6, scale: 1.2 },
+        { name: 'Middle', offset: new THREE.Vector3(0, 6, -2), rotX: -0.2, rotY: 0.0,  length: 9,   joints: 4, curl: -0.5, scale: 1.3 },
+        { name: 'Ring', offset: new THREE.Vector3(-4, 5, -1), rotX: -0.1, rotY: -0.2, length: 8,   joints: 3, curl: -0.6, scale: 1.1 },
+        { name: 'Pinky', offset: new THREE.Vector3(-7, 2, 0), rotX: 0.0,  rotY: -0.5, length: 6.5, joints: 3, curl: -0.5, scale: 0.9 },
+      ] : [
+        // Right hand: -X is OUT of screen. Thumb should be -X.
+        { name: 'Thumb', offset: new THREE.Vector3(-7, 0, 1), rotX: 0.2,  rotY: -0.6, length: 6.5, joints: 3, curl: -0.5, scale: 1.6 },
+        { name: 'Index', offset: new THREE.Vector3(-4, 5, -1), rotX: -0.1, rotY: -0.2, length: 8,   joints: 3, curl: -0.6, scale: 1.2 },
+        { name: 'Middle', offset: new THREE.Vector3(0, 6, -2), rotX: -0.2, rotY: 0.0,  length: 9,   joints: 4, curl: -0.5, scale: 1.3 },
+        { name: 'Ring', offset: new THREE.Vector3(4, 5, -1),  rotX: -0.1, rotY: 0.2,  length: 8,   joints: 3, curl: -0.6, scale: 1.1 },
+        { name: 'Pinky', offset: new THREE.Vector3(7, 2, 0),  rotX: 0.0,  rotY: 0.5,  length: 6.5, joints: 3, curl: -0.5, scale: 0.9 },
+      ];
+
+      fingers.forEach(fd => {
+        const fRoot = new THREE.Object3D();
+        fRoot.position.copy(fd.offset);
+        fRoot.rotation.set(fd.rotX, fd.rotY, 0);
+        palm.add(fRoot);
+
+        let currentJoint = fRoot;
+        for (let j = 0; j <= fd.joints; j++) {
+          const jointNode = new THREE.Object3D();
+          if (j > 0) jointNode.position.set(0, 0, -fd.length);
+          
+          jointNode.rotation.set(fd.curl, 0, 0);
+          currentJoint.add(jointNode);
+          
+          const knuckle = new THREE.Object3D();
+          const kScale = fd.scale * (1.2 - (j * 0.2));
+          knuckle.userData = { type: 'joint', scale: new THREE.Vector3(kScale, kScale, kScale) };
+          jointNode.add(knuckle);
+
+          if (j < fd.joints) {
+            const bone = new THREE.Object3D();
+            bone.position.set(0, 0, -fd.length / 2);
+            bone.rotation.x = -Math.PI / 2;
+            bone.rotation.y = Math.PI / 4;
+            
+            const thickness = 0.55 * kScale;
+            const bLen = (fd.length / 14) * 1.15; 
+            bone.userData = { type: 'spike', scale: new THREE.Vector3(thickness, bLen, thickness) };
+            
+            jointNode.add(bone);
+          }
+          currentJoint = jointNode;
+        }
+      });
+    };

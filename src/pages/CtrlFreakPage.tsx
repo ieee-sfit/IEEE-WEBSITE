@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { useScroll } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { SystemCore } from '../components/ctrl-freak/SystemCore';
@@ -7,8 +7,12 @@ import { NetworkStationUI } from '../components/ctrl-freak/NetworkStationUI';
 import { VisionStationUI } from '../components/ctrl-freak/VisionStationUI';
 import { LogicStationUI } from '../components/ctrl-freak/LogicStationUI';
 
+import { useCtrlFreakStore } from '../store/useCtrlFreakStore';
+
 const CtrlFreakPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { hideUI, hideCore } = useCtrlFreakStore(s => s.devSettings);
+  const setDevSetting = useCtrlFreakStore(s => s.setDevSetting);
   
   // Track the scroll progress of the entire page
   const { scrollYProgress } = useScroll({
@@ -45,6 +49,7 @@ const CtrlFreakPage = () => {
       </div>
 
       {/* NARRATIVE HTML OVERLAYS (Heads Up Display) */}
+      {!hideUI && (
       <div className="relative z-10 w-full px-8 md:px-24 pointer-events-none">
         
         {/* 00 - ARRIVAL (Hero) */}
@@ -128,6 +133,22 @@ const CtrlFreakPage = () => {
         <section className="h-screen w-full pointer-events-none relative z-20"></section>
 
       </div>
+      )}
+      
+      {/* DEV MENU (Hidden for production) 
+      <div className="fixed bottom-4 left-4 z-50 bg-black/80 backdrop-blur-md border border-gray-800 p-4 font-mono text-[10px] text-gray-400 flex flex-col gap-2">
+        <div className="font-bold text-white mb-2 uppercase tracking-widest border-b border-gray-800 pb-2">Dev Tools</div>
+        <label className="flex items-center gap-2 cursor-pointer hover:text-white">
+          <input type="checkbox" checked={hideUI} onChange={(e) => setDevSetting('hideUI', e.target.checked)} className="accent-[#FF3333]" />
+          Hide UI Overlay
+        </label>
+        <label className="flex items-center gap-2 cursor-pointer hover:text-white">
+          <input type="checkbox" checked={hideCore} onChange={(e) => setDevSetting('hideCore', e.target.checked)} className="accent-[#FF3333]" />
+          Hide System Core
+        </label>
+      </div>
+      */}
+
     </div>
   );
 };

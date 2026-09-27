@@ -3,11 +3,15 @@ import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { useCtrlFreakStore } from '../../store/useCtrlFreakStore';
 
-// Procedural Vocabulary Geometry Sizes
-const PILLAR_SIZE: [number, number, number] = [3, 80, 3];
-const BEAM_SIZE: [number, number, number] = [40, 2, 2];
-const PLATFORM_SIZE: [number, number, number] = [12, 1, 12];
-const STAIR_SIZE: [number, number, number] = [4, 0.5, 15]; // Represented as a slanted box for silhouette
+// Procedural Vocabulary Geometries (Sharp, Abstract, Chitinous)
+// Carapace: Tapered 4-sided wedge (radiusTop, radiusBottom, height, radialSegments)
+// Removed CARAPACE_ARGS
+// Spike: Elongated 4-sided pyramid (radius, height, radialSegments)
+// Removed SPIKE_ARGS
+// Joint: Sharp octahedron/diamond (radius, detail)
+const JOINT_ARGS: [number, number, number, number] = [2, 2, 1.5, 16];
+// ArchSegment: Sweeping massive blocks for the "hanger" (radiusTop, radiusBottom, height, radialSegments)
+const ARCH_ARGS: [number, number, number, number] = [3, 3, 20, 4];
 
 // The premium, dark sci-fi material
 const brutalistMaterial = new THREE.MeshStandardMaterial({
@@ -19,16 +23,16 @@ const brutalistMaterial = new THREE.MeshStandardMaterial({
 });
 
 export function ControlChamber() {
-  const pillarRef = useRef<THREE.InstancedMesh>(null);
-  const beamRef = useRef<THREE.InstancedMesh>(null);
-  const platformRef = useRef<THREE.InstancedMesh>(null);
-  const stairRef = useRef<THREE.InstancedMesh>(null);
+  const carapaceRef = useRef<THREE.InstancedMesh>(null);
+  const spikeRef = useRef<THREE.InstancedMesh>(null);
+  const jointRef = useRef<THREE.InstancedMesh>(null);
+  const archRef = useRef<THREE.InstancedMesh>(null);
 
   // Vocabulary limits
-  const pillarCount = 24;
-  const beamCount = 36;
-  const platformCount = 8;
-  const stairCount = 12;
+  const carapaceCount = 256;
+  const spikeCount = 128;
+  const jointCount = 128;
+  const archCount = 64;
 
   // React to solved states for lighting changes
   const ancSolved = useCtrlFreakStore(s => s.anc.solved);
@@ -40,186 +44,286 @@ export function ControlChamber() {
   const currentStability = useRef(0);
 
   const transforms = useMemo(() => {
-    const dummyC = new THREE.Object3D(); // Chaotic
-    const dummyK = new THREE.Object3D(); // Canonical (Ordered)
-    
-    const pillars = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
-    const beams = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
-    const platforms = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
-    const stairs = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
+    const carapaces = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
+    const spikes = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
+    const joints = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
+    const arches = { chaotic: [] as THREE.Matrix4[], canonical: [] as THREE.Matrix4[] };
 
-    // 1. PILLARS (24) -> The Perimeter Trench & Anchor Towers
-    for (let i = 0; i < pillarCount; i++) {
-      const angle = (i / pillarCount) * Math.PI * 2;
+    const skeleton = new THREE.Object3D();
+  
+    const buildArm = (isLeft: boolean) => {
+      const armRoot = new THREE.Object3D();
+      skeleton.add(armRoot);
+
+      // 1. Spacing: Hands are wide, slightly below core, slightly in front
+      const pX = isLeft ? -30 : 30; 
+      const pY = -5;
+      const pZ = 10;
       
-      // Chaotic: Blasted into an outer ring, tilted outward like a blown-open wall
-      const cRadius = 100 + (i % 2) * 15; 
-      let cPx = Math.cos(angle) * cRadius;
-      let cPz = Math.sin(angle) * cRadius;
-      dummyC.position.set(cPx, -30, cPz);
-      dummyC.rotation.set(Math.PI / 2.2, angle + Math.PI/2, 0); // Lay them almost flat
-      dummyC.scale.set(1.5, 1.5, 1.5);
-      dummyC.updateMatrix();
-      pillars.chaotic.push(dummyC.matrix.clone());
-
-      // Canonical: NO BIRDCAGE. Massive walls and distant anchors.
-      if (i < 4) {
-        // 4 Massive Anchor Towers placed far away in the corners
-        const a = (i / 4) * Math.PI * 2 + (Math.PI / 4);
-        dummyK.position.set(Math.cos(a) * 120, 10, Math.sin(a) * 120);
-        dummyK.rotation.set(0, a, 0);
-        dummyK.scale.set(4, 2, 4); // Extremely thick (12x160x12)
-      } else if (i < 12) {
-        // 8 Pillars laid flat to form a heavy octagonal floor boundary
-        const a = ((i - 4) / 8) * Math.PI * 2;
-        dummyK.position.set(Math.cos(a) * 85, -20, Math.sin(a) * 85);
-        dummyK.rotation.set(Math.PI / 2, a + Math.PI/2, 0); // Laid flat, tangential
-        dummyK.scale.set(2, 1.05, 2); // Length matches octagonal edge
-      } else if (i < 20) {
-        // 8 Pillars laid flat to form a second stacked ring on top of the first
-        const a = ((i - 12) / 8) * Math.PI * 2;
-        dummyK.position.set(Math.cos(a) * 85, -14, Math.sin(a) * 85);
-        dummyK.rotation.set(Math.PI / 2, a + Math.PI/2, 0); 
-        dummyK.scale.set(2, 1.05, 2); 
-      } else {
-        // Last 4 pillars acting as heavy horizontal cross-beams high in the ceiling
-        const a = ((i - 20) / 4) * Math.PI * 2;
-        dummyK.position.set(Math.cos(a) * 40, 50, Math.sin(a) * 40);
-        dummyK.rotation.set(Math.PI / 2, a, 0); // Flat, pointing towards center
-        dummyK.scale.set(2, 1.2, 2); 
-      }
-      dummyK.updateMatrix();
-      pillars.canonical.push(dummyK.matrix.clone());
-    }
-
-    // 2. BEAMS (30) -> The Overhead Vault Lock
-    for (let i = 0; i < beamCount; i++) {
-      // Chaotic: Sheared and frozen mid-air far away
-      const angle = (i / beamCount) * Math.PI * 2;
-      const cRadius = 80 + (i % 3) * 25;
-      dummyC.position.set(Math.cos(angle) * cRadius, 40 + (i % 2) * 20, Math.sin(angle) * cRadius);
-      dummyC.rotation.set(0, angle + Math.PI/4, Math.PI / 4); // Angled spin
-      dummyC.scale.set(1, 1, 1);
-      dummyC.updateMatrix();
-      beams.chaotic.push(dummyC.matrix.clone());
-
-      // Canonical: A rigid, brutalist overhead locking grid (No stray floating pieces)
-      if (i < 8) {
-         // Inner Octagon Aperture over the core
-         const a1 = (i / 8) * Math.PI * 2;
-         const a2 = ((i + 1) / 8) * Math.PI * 2;
-         const mid = (a1 + a2) / 2;
-         const apothem = 25 * Math.cos(Math.PI / 8);
-         dummyK.position.set(Math.cos(mid) * apothem, 30, Math.sin(mid) * apothem);
-         dummyK.rotation.set(0, mid + Math.PI/2, 0);
-         dummyK.scale.set(0.48, 2, 2); // Exact length for r=25
-      } else if (i < 16) {
-         // Outer Octagon Frame
-         const a1 = ((i - 8) / 8) * Math.PI * 2;
-         const a2 = ((i - 7) / 8) * Math.PI * 2;
-         const mid = (a1 + a2) / 2;
-         const apothem = 65 * Math.cos(Math.PI / 8);
-         dummyK.position.set(Math.cos(mid) * apothem, 30, Math.sin(mid) * apothem);
-         dummyK.rotation.set(0, mid + Math.PI/2, 0);
-         dummyK.scale.set(1.24, 2, 2);
-      } else if (i < 24) {
-         // 8 Radial Spokes connecting inner and outer octagons
-         const a = ((i - 16) / 8) * Math.PI * 2;
-         dummyK.position.set(Math.cos(a) * 45, 30, Math.sin(a) * 45);
-         dummyK.rotation.set(0, a, 0);
-         dummyK.scale.set(1, 2, 2); // Connects r=25 to r=65
-      } else {
-         // 6 Heavy vertical drop-struts anchoring the overhead grid to the pedestal
-         const a = ((i - 24) / 6) * Math.PI * 2;
-         dummyK.position.set(Math.cos(a) * 45, 10, Math.sin(a) * 45);
-         dummyK.rotation.set(0, a, Math.PI / 2); // Vertical
-         dummyK.scale.set(1, 3, 3);
-      }
-      dummyK.updateMatrix();
-      beams.canonical.push(dummyK.matrix.clone());
-    }
-
-    // 3. PLATFORMS (15) -> Solid Ziggurat Base
-    for (let i = 0; i < platformCount; i++) {
-      // Chaotic: Pushed to the ground layer far out
-      const angle = (i / platformCount) * Math.PI * 2;
-      const cRadius = 70 + (i % 2) * 20;
-      dummyC.position.set(Math.cos(angle) * cRadius, -40 + (i % 3) * 10, Math.sin(angle) * cRadius);
-      dummyC.rotation.set(0, angle, Math.PI / 8); 
-      dummyC.scale.set(1.5, 1, 1.5);
-      dummyC.updateMatrix();
-      platforms.chaotic.push(dummyC.matrix.clone());
-
-      // Canonical: Monolithic solid base (ZERO floating pieces)
-      if (i === 0) {
-        // Center core pedestal
-        dummyK.position.set(0, -10, 0);
-        dummyK.rotation.set(0, 0, 0);
-        dummyK.scale.set(3, 2, 3); // 45x4x45 solid block
-      } else if (i < 5) {
-        // 4 Cardinal extensions overlapping the center
-        const a = ((i - 1) / 4) * Math.PI * 2;
-        dummyK.position.set(Math.cos(a) * 35, -12, Math.sin(a) * 35);
-        dummyK.rotation.set(0, a, 0);
-        dummyK.scale.set(2, 1.5, 3); 
-      } else if (i < 9) {
-        // 4 Corner fills completing the solid 90x90 square
-        const a = ((i - 5) / 4) * Math.PI * 2 + (Math.PI / 4);
-        dummyK.position.set(Math.cos(a) * 35, -14, Math.sin(a) * 35);
-        dummyK.rotation.set(0, a, 0);
-        dummyK.scale.set(2.5, 1, 2.5);
-      } else if (i < 13) {
-        // 4 Secondary raised platforms wrapping the core
-        const a = ((i - 9) / 4) * Math.PI * 2 + (Math.PI / 4);
-        dummyK.position.set(Math.cos(a) * 15, -7, Math.sin(a) * 15);
-        dummyK.rotation.set(0, a, 0);
-        dummyK.scale.set(1, 2, 1);
-      } else {
-        // Last 2 platforms acting as heavy vertical blast shields right beside the core
-        const sign = i === 13 ? 1 : -1;
-        dummyK.position.set(sign * 12, -2, 0);
-        dummyK.rotation.set(0, 0, Math.PI / 2); // Standing upright
-        dummyK.scale.set(1, 1.5, 1.5);
-      }
-      dummyK.updateMatrix();
-      platforms.canonical.push(dummyK.matrix.clone());
-    }
-
-    // 4. STAIRCASES (12) -> Heavy Buttresses & Ramps
-    for (let i = 0; i < stairCount; i++) {
-      const angle = (i / stairCount) * Math.PI * 2;
+      const palm = new THREE.Object3D();
+      palm.position.set(pX, pY, pZ);
       
-      // Chaotic: Disconnected bridges hanging in the void
-      const cRadius = 90;
-      dummyC.position.set(Math.cos(angle) * cRadius, -10 + (i % 2) * 20, Math.sin(angle) * cRadius);
-      dummyC.rotation.set(Math.PI / 6, angle, Math.PI / 2); // Twisted
-      dummyC.scale.set(1, 1, 1);
-      dummyC.updateMatrix();
-      stairs.chaotic.push(dummyC.matrix.clone());
+      // 2. True Anatomical Cupping Orientation
+      // We want the fingers (-Z) to aim ABOVE and BEHIND the core, so they can curl DOWN over it.
+      // Target for fingers: (0, 15, -5)
+      // Vector V = Target - Palm
+      // Object3D.lookAt points the local +Z axis toward the target. 
+      // Since the forearm is built along the local +Z axis (z = 0 to 45), we WANT +Z to point AWAY from the core!
+      // This means -Z (the front of the palm) will point exactly AT the core!
+      // Therefore, the original awayTarget logic was mathematically correct for the arm's construction!
+      const targetX = 0;
+      const targetY = 15;
+      const targetZ = -5;
+      const vX = targetX - pX;
+      const vY = targetY - pY;
+      const vZ = targetZ - pZ;
+      
+      const awayTarget = new THREE.Vector3(pX - vX, pY - vY, pZ - vZ);
+      palm.lookAt(awayTarget);
+      
+      // Add a slight roll so palms face each other more
+      palm.rotateZ(isLeft ? 0.3 : -0.3);
+      
+      armRoot.add(palm);
 
-      // Canonical: Anchoring the Ziggurat to the floor
-      if (i < 4) {
-        // 4 Main access ramps on cardinal axes leading to the pedestal
-        const a = (i / 4) * Math.PI * 2;
-        dummyK.position.set(Math.cos(a) * 55, -16, Math.sin(a) * 55);
-        dummyK.rotation.set(Math.PI / 6, a, 0);
-        dummyK.scale.set(1.5, 2, 1.5); // Wide, heavy ramps
-      } else {
-        // 8 Tangential buttresses securing the corners of the base
-        const a = ((i - 4) / 8) * Math.PI * 2 + (Math.PI / 8);
-        dummyK.position.set(Math.cos(a) * 50, -15, Math.sin(a) * 50);
-        dummyK.rotation.set(Math.PI / 4, a + Math.PI/2, 0);
-        dummyK.scale.set(1, 3, 1); // Thick structural wedges
+      // 3. Intricate, Massive Palm Structure (Stepped for edge stemming)
+      // Front Plate: Thinner, exactly matches finger spread so they stem from the edges
+      const palmPlate1 = new THREE.Object3D();
+      palmPlate1.userData = { type: 'carapace', scale: new THREE.Vector3(1.8, 1.8, 0.2) };
+      palm.add(palmPlate1);
+      
+      // Mid Block: The massive "sledgehammer" bulk, pushed slightly back so it doesn't swallow fingers
+      const palmPlate2 = new THREE.Object3D();
+      palmPlate2.position.set(0, 0, 3);
+      palmPlate2.userData = { type: 'carapace', scale: new THREE.Vector3(3.2, 3.2, 0.8) };
+      palm.add(palmPlate2);
+
+      // Heel Block: Connects the bulk to the wrist smoothly
+      const palmPlate3 = new THREE.Object3D();
+      palmPlate3.position.set(0, 0, 6);
+      palmPlate3.userData = { type: 'carapace', scale: new THREE.Vector3(2.0, 2.0, 0.6) };
+      palm.add(palmPlate3);
+
+      // 4. The Wrist
+      const wrist = new THREE.Object3D();
+      wrist.position.set(0, 0, 8); 
+      palm.add(wrist);
+
+      // 5. The Elaborate Forearm
+      const elbow = new THREE.Object3D();
+      elbow.position.set(0, 0, 45); 
+      // Angle the elbow so the upper arm reaches into the void
+      elbow.rotation.x = -0.3; 
+      elbow.rotation.y = isLeft ? 0.4 : -0.4; 
+      wrist.add(elbow);
+
+      // Fill the forearm
+      for(let i=0; i<8; i++) {
+         const zPos = 2 + i * 5;
+         const fShard = new THREE.Object3D();
+         fShard.position.set((Math.random() - 0.5)*3, (Math.random() - 0.5)*3, zPos);
+         fShard.rotation.z = (Math.random() - 0.5);
+         const s = 1.0 + (i * 0.15); 
+         fShard.userData = { type: 'carapace', scale: new THREE.Vector3(s*1.8, s*2.2, 1.5) };
+         wrist.add(fShard);
+
+         if (i % 2 === 0) {
+            const fArch = new THREE.Object3D();
+            fArch.position.set(0, 0, zPos);
+            fArch.rotation.x = Math.PI/2;
+            fArch.rotation.z = Math.random();
+            fArch.userData = { type: 'arch', scale: new THREE.Vector3(s*1.6, s*1.6, 0.8) };
+            wrist.add(fArch);
+         }
       }
-      dummyK.updateMatrix();
-      stairs.canonical.push(dummyK.matrix.clone());
-    }
 
-    return { pillars, beams, platforms, stairs };
+      // 6. The Upper Arm (Stretching deep into the void)
+      for(let i=0; i<12; i++) {
+         const zPos = i * 18; 
+         const uShard = new THREE.Object3D();
+         uShard.position.set((Math.random() - 0.5)*5, (Math.random() - 0.5)*5, zPos);
+         uShard.rotation.z = Math.random() * Math.PI;
+         uShard.rotation.x = (Math.random() - 0.5) * 0.2;
+         
+         const s = 2.5 + (i * 0.4); 
+         uShard.userData = { type: 'carapace', scale: new THREE.Vector3(s*2.5, s*2.5, 3.5) };
+         elbow.add(uShard);
+      }
+
+      // 7. The Fingers
+      // Target based FK orientation
+      // Targets are pushed in a wide 25-unit radius ring around the core (0, 15, -5) to force fingers to fan out
+      const fingers = isLeft ? [
+        // splay: [X, Y, Z] relative direction. -Z points forward towards core.
+        // Left hand +X is inner (thumb), -X is outer (pinky). +Y is back of hand.
+        { name: 'Thumb',  offset: new THREE.Vector3(6, -5, 0), splay: [ 10, -8, -10], up: [1, 0, 0], length:  8.0, joints: 2, curl: -0.4,  scale: 1.6 },
+        { name: 'Index',  offset: new THREE.Vector3(4, 6, 2),    splay: [  3,  10, -10], up: [0, 1, 0], length: 10.0, joints: 3, curl: -0.35, scale: 1.2 },
+        { name: 'Middle', offset: new THREE.Vector3(0, 7, 4),    splay: [ -2,  11, -10], up: [0, 1, 0], length: 12.0, joints: 4, curl: -0.3,  scale: 1.3 },
+        { name: 'Ring',   offset: new THREE.Vector3(-4, 5, 2),   splay: [ -7,   9, -10], up: [0, 1, 0], length: 10.0, joints: 3, curl: -0.35, scale: 1.1 },
+        { name: 'Pinky',  offset: new THREE.Vector3(-7, 2, 0),   splay: [-12,   1, -10], up: [0, 1, 0], length:  8.0, joints: 3, curl: -0.3,  scale: 0.9 },
+      ] : [
+        // Right hand -X is inner (thumb), +X is outer (pinky)
+        { name: 'Thumb',  offset: new THREE.Vector3(-6, -5, 0), splay: [-10, -8, -10], up: [-1, 0, 0], length:  8.0, joints: 2, curl: -0.4,  scale: 1.6 },
+        { name: 'Index',  offset: new THREE.Vector3(-4, 6, 2),     splay: [ -3,  10, -10], up: [0, 1, 0], length: 10.0, joints: 3, curl: -0.35, scale: 1.2 },
+        { name: 'Middle', offset: new THREE.Vector3(0, 7, 4),      splay: [  2,  11, -10], up: [0, 1, 0], length: 12.0, joints: 4, curl: -0.3,  scale: 1.3 },
+        { name: 'Ring',   offset: new THREE.Vector3(4, 5, 2),      splay: [  7,   9, -10], up: [0, 1, 0], length: 10.0, joints: 3, curl: -0.35, scale: 1.1 },
+        { name: 'Pinky',  offset: new THREE.Vector3(7, 2, 0),      splay: [ 12,   1, -10], up: [0, 1, 0], length:  8.0, joints: 3, curl: -0.3,  scale: 0.9 },
+      ];
+
+      // Update palm matrix so we can do world-space calculations
+      palm.updateMatrixWorld(true);
+
+      fingers.forEach(fd => {
+        const fRoot = new THREE.Object3D();
+        fRoot.position.copy(fd.offset);
+        palm.add(fRoot);
+
+        // Use a dummy object in world origin to calculate pure local orientation
+        const dummy = new THREE.Object3D();
+        dummy.position.copy(fd.offset);
+        dummy.up.set(fd.up[0], fd.up[1], fd.up[2]);
+        
+        // Define local target path directly in front of the finger base
+        const localTarget = new THREE.Vector3(fd.splay[0], fd.splay[1], fd.splay[2]).add(fd.offset);
+        
+        // We want the local -Z axis to point AT the target, so we point +Z AWAY from it
+        const vDir = localTarget.clone().sub(fd.offset);
+        const awayTarget = fd.offset.clone().sub(vDir);
+        dummy.lookAt(awayTarget);
+        
+        // Copy this pure local rotation directly to the finger root
+        fRoot.quaternion.copy(dummy.quaternion);
+
+        // Build the actual visual joints
+        let currentJoint = fRoot;
+        for (let j = 0; j <= fd.joints; j++) {
+          const jointNode = new THREE.Object3D();
+          if (j > 0) {
+            jointNode.position.set(0, 0, -fd.length);
+            jointNode.rotation.set(fd.curl, 0, 0);
+          }
+          currentJoint.add(jointNode);
+          
+          // Knuckles become mechanical discs
+          const knuckle = new THREE.Object3D();
+          const kScale = fd.scale * (1.2 - (j * 0.2));
+          // Rotate knuckle 90deg so the cylinder acts as a horizontal hinge
+          knuckle.rotation.set(Math.PI / 2, 0, 0);
+          knuckle.userData = { type: 'joint', scale: new THREE.Vector3(kScale, kScale, kScale) };
+          jointNode.add(knuckle);
+
+          if (j < fd.joints) {
+            // Bones are now massive brutalist blocks (carapace) instead of thin spikes
+            const bone = new THREE.Object3D();
+            bone.position.set(0, 0, -fd.length / 2);
+            
+            // Goldilocks zone: not wire-thin, not claw-machine bricks.
+            // Base bone is ~2.5 units thick (vs palm's ~25 units), tapering to sharp 0.8 tip.
+            const taperFactor = 1 - (j * (0.7 / fd.joints));
+            const targetThickness = 2.5 * fd.scale * taperFactor; 
+            const thicknessScale = targetThickness / 4.0; // Divide by boxGeometry width
+            
+            const bLenScale = fd.length / 16.0; // Divide by boxGeometry length
+            
+            // Add a slight tilt to the bone to make it look sharp and diamond-cut
+            bone.rotation.set(0, 0, Math.PI / 4);
+            
+            bone.userData = { type: 'carapace', scale: new THREE.Vector3(thicknessScale, thicknessScale, bLenScale) };
+            
+            jointNode.add(bone);
+          }
+          currentJoint = jointNode;
+        }
+      });
+    };
+
+        buildArm(true);
+    buildArm(false);
+
+    // Force global matrix calculation for the entire skeleton
+    skeleton.updateMatrixWorld(true);
+
+    // Traverse and extract generated matrices
+    const pos = new THREE.Vector3();
+    const rot = new THREE.Quaternion();
+    const scale = new THREE.Vector3();
+
+    skeleton.traverse((node) => {
+      if (node.userData && node.userData.type) {
+        // 1. Store Canonical Matrix (Perfect Assembly)
+        const canonicalMatrix = node.matrixWorld.clone();
+        if (node.userData.scale) {
+          canonicalMatrix.scale(node.userData.scale);
+        }
+
+        // 2. Generate Chaotic Matrix (Exploded Debris)
+        // Extract exact position so we know where it belongs
+        canonicalMatrix.decompose(pos, rot, scale);
+        
+        const chaoticMatrix = new THREE.Matrix4();
+        
+        // Explode outward away from core
+        const explosionDir = pos.clone().normalize();
+        // Add strong random scatter
+        explosionDir.x += (Math.random() - 0.5) * 1.5;
+        explosionDir.y += (Math.random() - 0.5) * 1.5;
+        explosionDir.z += (Math.random() - 0.5) * 1.5;
+        explosionDir.normalize();
+        
+        // Push pieces far out into space (100 to 250 units away)
+        const explodeDist = 100 + Math.random() * 150;
+        const cPos = pos.clone().add(explosionDir.multiplyScalar(explodeDist));
+        
+        // Wild random rotation for the broken state
+        const cRot = new THREE.Quaternion().setFromEuler(
+          new THREE.Euler(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2)
+        );
+
+        // Recompose chaotic matrix keeping the SAME scale as the canonical piece
+        chaoticMatrix.compose(cPos, cRot, scale);
+
+        switch(node.userData.type) {
+          case 'carapace': 
+            carapaces.canonical.push(canonicalMatrix); 
+            carapaces.chaotic.push(chaoticMatrix);
+            break;
+          case 'spike': 
+            spikes.canonical.push(canonicalMatrix); 
+            spikes.chaotic.push(chaoticMatrix);
+            break;
+          case 'joint': 
+            joints.canonical.push(canonicalMatrix); 
+            joints.chaotic.push(chaoticMatrix);
+            break;
+          case 'arch': 
+            arches.canonical.push(canonicalMatrix); 
+            arches.chaotic.push(chaoticMatrix);
+            break;
+        }
+      }
+    });
+
+    // Pad arrays up to maximum instance counts to avoid InstancedMesh draw range warnings
+    const padArray = (arr: THREE.Matrix4[], max: number) => {
+      const dummy = new THREE.Matrix4().makeScale(0,0,0);
+      while(arr.length < max) arr.push(dummy);
+    };
+
+    padArray(carapaces.canonical, carapaceCount);
+    padArray(carapaces.chaotic, carapaceCount);
+    padArray(spikes.canonical, spikeCount);
+    padArray(spikes.chaotic, spikeCount);
+    padArray(joints.canonical, jointCount);
+    padArray(joints.chaotic, jointCount);
+    padArray(arches.canonical, archCount);
+    padArray(arches.chaotic, archCount);
+
+    return { carapaces, spikes, joints, arches };
   }, []);
 
+
   useFrame((_, delta) => {
-    if (!pillarRef.current || !beamRef.current || !platformRef.current || !stairRef.current) return;
+    if (!carapaceRef.current || !archRef.current || !jointRef.current || !spikeRef.current) return;
 
     // Calculate target stability (0.0 to 1.0)
     let solvedCount = 0;
@@ -248,15 +352,19 @@ export function ControlChamber() {
       const interpolateInstances = (
         ref: React.RefObject<THREE.InstancedMesh>, 
         data: { chaotic: THREE.Matrix4[], canonical: THREE.Matrix4[] }, 
-        count: number
+        count: number,
+        localProgress: number
       ) => {
         for (let i = 0; i < count; i++) {
           data.chaotic[i].decompose(posC, quatC, scaleC);
           data.canonical[i].decompose(posK, quatK, scaleK);
 
-          dummy.position.lerpVectors(posC, posK, currentStability.current);
-          dummy.quaternion.slerpQuaternions(quatC, quatK, currentStability.current);
-          dummy.scale.lerpVectors(scaleC, scaleK, currentStability.current);
+          // Use a custom easing function to make the snapping feel weighty and mechanical
+          const easeProgress = 1 - Math.pow(1 - localProgress, 3); // Cubic Out
+
+          dummy.position.lerpVectors(posC, posK, easeProgress);
+          dummy.quaternion.slerpQuaternions(quatC, quatK, easeProgress);
+          dummy.scale.lerpVectors(scaleC, scaleK, easeProgress);
           
           dummy.updateMatrix();
           ref.current!.setMatrixAt(i, dummy.matrix);
@@ -264,24 +372,33 @@ export function ControlChamber() {
         ref.current!.instanceMatrix.needsUpdate = true;
       };
 
-      interpolateInstances(pillarRef, transforms.pillars, pillarCount);
-      interpolateInstances(beamRef, transforms.beams, beamCount);
-      interpolateInstances(platformRef, transforms.platforms, platformCount);
-      interpolateInstances(stairRef, transforms.stairs, stairCount);
+      const p = currentStability.current;
+      const mapProgress = (val: number, start: number, end: number) => THREE.MathUtils.clamp((val - start) / (end - start), 0, 1);
+      
+      // STAGED ANIMATION: As stability increases, pieces assemble in sequence
+      const progressArches = mapProgress(p, 0.0, 0.4);      // Arch sweeps in from the darkness
+      const progressCarapaces = mapProgress(p, 0.2, 0.6);  // Forearms lock into place
+      const progressJoints = mapProgress(p, 0.4, 0.85);   // Knuckles assemble
+      const progressSpikes = mapProgress(p, 0.6, 1.0);     // Aggressive fingers close in
+
+      interpolateInstances(archRef, transforms.arches, archCount, progressArches);
+      interpolateInstances(carapaceRef, transforms.carapaces, carapaceCount, progressCarapaces);
+      interpolateInstances(jointRef, transforms.joints, jointCount, progressJoints);
+      interpolateInstances(spikeRef, transforms.spikes, spikeCount, progressSpikes);
     }
   });
 
   useEffect(() => {
-    if (!pillarRef.current || !beamRef.current || !platformRef.current || !stairRef.current) return;
+    if (!carapaceRef.current || !archRef.current || !jointRef.current || !spikeRef.current) return;
 
     // 5. Instanced Color Variation (Depth-based Tonal Hierarchy)
     const applyDepthColor = (ref: React.RefObject<THREE.InstancedMesh>, count: number) => {
       if (!ref.current) return;
       const tempMatrix = new THREE.Matrix4();
       const position = new THREE.Vector3();
-      const cForeground = new THREE.Color('#121519');
-      const cMidground = new THREE.Color('#0d1013');
-      const cBackground = new THREE.Color('#080a0c');
+      const cForeground = new THREE.Color('#202428'); // Subtle cool steel highlight
+      const cMidground = new THREE.Color('#0b0e12');  // Deep obsidian/chitin
+      const cBackground = new THREE.Color('#020304'); // Void black
       
       for (let i = 0; i < count; i++) {
         ref.current.getMatrixAt(i, tempMatrix);
@@ -291,21 +408,21 @@ export function ControlChamber() {
         const dist = position.length();
         
         let color = cMidground;
-        if (dist < 40) color = cForeground; // Closer objects are slightly brighter
-        else if (dist > 80) color = cBackground; // Far objects fade into the void
+        if (dist < 50) color = cForeground; // Closer objects are slightly brighter
+        else if (dist > 90) color = cBackground; // Far objects fade into the void
         
         // Add tiny bit of random variation so no two blocks are perfectly identical (~2% lightness variance)
-        const varColor = color.clone().offsetHSL(0, 0, (Math.random() - 0.5) * 0.02);
+        const varColor = color.clone().offsetHSL(0, 0, (Math.random() - 0.5) * 0.03);
         
         ref.current.setColorAt(i, varColor);
       }
       ref.current.instanceColor!.needsUpdate = true;
     };
 
-    applyDepthColor(pillarRef, pillarCount);
-    applyDepthColor(beamRef, beamCount);
-    applyDepthColor(platformRef, platformCount);
-    applyDepthColor(stairRef, stairCount);
+    applyDepthColor(archRef, archCount);
+    applyDepthColor(carapaceRef, carapaceCount);
+    applyDepthColor(jointRef, jointCount);
+    applyDepthColor(spikeRef, spikeCount);
 
   }, []);
 
@@ -313,14 +430,14 @@ export function ControlChamber() {
     <group>
       {/* The Monolith (Initial Camera Occlusion for Intro Reveal - 0.75% scroll) */}
       {(!ancSolved || !networkSolved || !visionSolved || !logicSolved) && (
-        <mesh position={[0, 50, 145]}>
+        <mesh position={[0, 0, 210]}>
           <boxGeometry args={[400, 400, 1]} />
           <meshBasicMaterial color="#020202" />
         </mesh>
       )}
 
       {/* Floor & Deep Void */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -60, 0]}>
+      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, -60, 0]}>
         <circleGeometry args={[250, 32]} />
         <meshStandardMaterial color="#020202" roughness={1} />
       </mesh>
@@ -341,34 +458,45 @@ export function ControlChamber() {
       
 
       
-      {/* The Instances */}
-      <instancedMesh ref={pillarRef} args={[undefined, undefined, pillarCount]}>
-        <boxGeometry args={PILLAR_SIZE} />
+      {/* The Instances (Replacing Boxes with Chitinous Geometries) */}
+
+        <instancedMesh ref={carapaceRef} args={[undefined, undefined, carapaceCount]} castShadow receiveShadow>
+        <boxGeometry args={[4, 4, 16]} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
-      <instancedMesh ref={beamRef} args={[undefined, undefined, beamCount]}>
-        <boxGeometry args={BEAM_SIZE} />
+      <instancedMesh ref={spikeRef} args={[undefined, undefined, spikeCount]} castShadow receiveShadow>
+        <coneGeometry args={[1.5, 14, 4]} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
-      <instancedMesh ref={platformRef} args={[undefined, undefined, platformCount]}>
-        <boxGeometry args={PLATFORM_SIZE} />
+      <instancedMesh ref={jointRef} args={[undefined, undefined, jointCount]} castShadow receiveShadow>
+        <cylinderGeometry args={JOINT_ARGS} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
-      <instancedMesh ref={stairRef} args={[undefined, undefined, stairCount]}>
-        <boxGeometry args={STAIR_SIZE} />
+      <instancedMesh ref={archRef} args={[undefined, undefined, archCount]} castShadow receiveShadow>
+        <cylinderGeometry args={ARCH_ARGS} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
 
-      {/* Basic Architecture Lighting (Shadows removed for mobile performance) */}
+
+      {/* Basic Architecture Lighting (Restored cinematic shadows) */}
       
       {/* Key spotlight shining down on the brutalist geometry */}
       <directionalLight 
+        castShadow
         position={[40, 100, 60]} 
         intensity={ancSolved ? 4.5 : 3.0} 
         color="#ffffff" 
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-camera-far={250}
+        shadow-camera-left={-120}
+        shadow-camera-right={120}
+        shadow-camera-top={120}
+        shadow-camera-bottom={-120}
+        shadow-bias={-0.0005}
       />
       
       {/* Harsh stark rim light from the opposite side (Emergency Lockdown) */}
@@ -398,7 +526,7 @@ export function ControlChamber() {
       </mesh>
       
       {/* Dense fog pushed back to create cinematic atmosphere */}
-      <fog attach="fog" args={['#050505', 50, 190]} />
+      <fog attach="fog" args={['#050505', 80, 300]} />
     </group>
   );
 }
