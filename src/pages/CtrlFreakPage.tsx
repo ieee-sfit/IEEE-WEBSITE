@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import { useScroll } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { SystemCore } from '../components/ctrl-freak/SystemCore';
@@ -11,8 +11,7 @@ import { useCtrlFreakStore } from '../store/useCtrlFreakStore';
 
 const CtrlFreakPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { hideUI, hideCore } = useCtrlFreakStore(s => s.devSettings);
-  const setDevSetting = useCtrlFreakStore(s => s.setDevSetting);
+  const { hideUI } = useCtrlFreakStore(s => s.devSettings);
   
   // Track the scroll progress of the entire page
   const { scrollYProgress } = useScroll({
