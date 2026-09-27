@@ -154,19 +154,20 @@ export function ControlChamber() {
       // Target based FK orientation
       // Targets are pushed in a wide 25-unit radius ring around the core (0, 15, -5) to force fingers to fan out
       const fingers = isLeft ? [
-        // Dyson Sphere Targets around Core (0, 15, -5)
-        { name: 'Thumb',  offset: new THREE.Vector3(6, -6, -2),  target: [ 10,  5,   5], length: 7.0, joints: 3, curl: -0.5, scale: 1.6 },
-        { name: 'Index',  offset: new THREE.Vector3(4, 6, 0),    target: [ 12, 25,   0], length: 8.5, joints: 3, curl: -0.6, scale: 1.2 },
-        { name: 'Middle', offset: new THREE.Vector3(0, 7, 2),    target: [  0, 27, -17], length: 9.5, joints: 4, curl: -0.5, scale: 1.3 },
-        { name: 'Ring',   offset: new THREE.Vector3(-4, 5, 4),   target: [-10, 25, -15], length: 8.0, joints: 3, curl: -0.6, scale: 1.1 },
-        { name: 'Pinky',  offset: new THREE.Vector3(-7, 2, 6),   target: [-15, 17, -10], length: 6.5, joints: 3, curl: -0.5, scale: 0.9 },
+        // splay: [X, Y, Z] relative direction. -Z points forward towards core.
+        // Left hand +X is inner (thumb), -X is outer (pinky). +Y is back of hand.
+        { name: 'Thumb',  offset: new THREE.Vector3(6, -6, -2),  splay: [ 5, -5, -10], up: [1, 0, 0], length: 7.0, joints: 3, curl: -0.5, scale: 1.6 },
+        { name: 'Index',  offset: new THREE.Vector3(4, 6, 0),    splay: [ 2,  2, -10], up: [0, 1, 0], length: 8.5, joints: 3, curl: -0.6, scale: 1.2 },
+        { name: 'Middle', offset: new THREE.Vector3(0, 7, 2),    splay: [ 0,  3, -10], up: [0, 1, 0], length: 9.5, joints: 4, curl: -0.5, scale: 1.3 },
+        { name: 'Ring',   offset: new THREE.Vector3(-4, 5, 4),   splay: [-2,  2, -10], up: [0, 1, 0], length: 8.0, joints: 3, curl: -0.6, scale: 1.1 },
+        { name: 'Pinky',  offset: new THREE.Vector3(-7, 2, 6),   splay: [-4,  0, -10], up: [0, 1, 0], length: 6.5, joints: 3, curl: -0.5, scale: 0.9 },
       ] : [
-        // Mirrored for Right Hand
-        { name: 'Thumb',  offset: new THREE.Vector3(-6, -6, -2), target: [-10,  5,   5], length: 7.0, joints: 3, curl: -0.5, scale: 1.6 },
-        { name: 'Index',  offset: new THREE.Vector3(-4, 6, 0),   target: [-12, 25,   0], length: 8.5, joints: 3, curl: -0.6, scale: 1.2 },
-        { name: 'Middle', offset: new THREE.Vector3(0, 7, 2),    target: [  0, 27, -17], length: 9.5, joints: 4, curl: -0.5, scale: 1.3 },
-        { name: 'Ring',   offset: new THREE.Vector3(4, 5, 4),    target: [ 10, 25, -15], length: 8.0, joints: 3, curl: -0.6, scale: 1.1 },
-        { name: 'Pinky',  offset: new THREE.Vector3(7, 2, 6),    target: [ 15, 17, -10], length: 6.5, joints: 3, curl: -0.5, scale: 0.9 },
+        // Right hand -X is inner (thumb), +X is outer (pinky)
+        { name: 'Thumb',  offset: new THREE.Vector3(-6, -6, -2), splay: [-5, -5, -10], up: [-1, 0, 0], length: 7.0, joints: 3, curl: -0.5, scale: 1.6 },
+        { name: 'Index',  offset: new THREE.Vector3(-4, 6, 0),   splay: [-2,  2, -10], up: [0, 1, 0], length: 8.5, joints: 3, curl: -0.6, scale: 1.2 },
+        { name: 'Middle', offset: new THREE.Vector3(0, 7, 2),    splay: [ 0,  3, -10], up: [0, 1, 0], length: 9.5, joints: 4, curl: -0.5, scale: 1.3 },
+        { name: 'Ring',   offset: new THREE.Vector3(4, 5, 4),    splay: [ 2,  2, -10], up: [0, 1, 0], length: 8.0, joints: 3, curl: -0.6, scale: 1.1 },
+        { name: 'Pinky',  offset: new THREE.Vector3(7, 2, 6),    splay: [ 4,  0, -10], up: [0, 1, 0], length: 6.5, joints: 3, curl: -0.5, scale: 0.9 },
       ];
 
       // Update palm matrix so we can do world-space calculations
@@ -177,54 +178,21 @@ export function ControlChamber() {
         fRoot.position.copy(fd.offset);
         palm.add(fRoot);
 
-        // Calculate local endpoint of the curled finger
-        const dummyRoot = new THREE.Object3D();
-        let currentDummy = dummyRoot;
-        for (let j = 0; j <= fd.joints; j++) {
-          const dNode = new THREE.Object3D();
-          if (j > 0) {
-            dNode.position.set(0, 0, -fd.length);
-            dNode.rotation.set(fd.curl, 0, 0);
-          }
-          currentDummy.add(dNode);
-          currentDummy = dNode;
-        }
-        dummyRoot.updateMatrixWorld(true);
-        const localTip = new THREE.Vector3();
-        currentDummy.getWorldPosition(localTip);
-
-        // Rotation needed to map the curled tip onto the local -Z axis
-        const tipDir = localTip.clone().normalize();
-        const qToZ = new THREE.Quaternion().setFromUnitVectors(tipDir, new THREE.Vector3(0, 0, -1));
-
-        // Get fRoot's world position
-        fRoot.updateMatrixWorld(true);
-        const worldRootPos = new THREE.Vector3();
-        fRoot.getWorldPosition(worldRootPos);
-
-        // World target for the fingertip (Dyson sphere point)
-        const worldTarget = new THREE.Vector3(...fd.target);
-
-        // Up vector: point AWAY from the core to ensure curl wraps INWARD organically
-        const corePos = new THREE.Vector3(0, 15, -5);
-        const wUp = worldRootPos.clone().sub(corePos).normalize();
-
-        // Create a dummy looker in world space
-        const dummyLooker = new THREE.Object3D();
-        dummyLooker.position.copy(worldRootPos);
-        dummyLooker.up.copy(wUp);
+        // Use a dummy object in world origin to calculate pure local orientation
+        const dummy = new THREE.Object3D();
+        dummy.position.copy(fd.offset);
+        dummy.up.set(fd.up[0], fd.up[1], fd.up[2]);
         
-        // Point the +Z axis AWAY from the target, so -Z points AT the target
-        const vDir = worldTarget.clone().sub(worldRootPos);
-        const fAwayTarget = worldRootPos.clone().sub(vDir);
-        dummyLooker.lookAt(fAwayTarget);
-
-        // Final world quaternion: look at target, then apply the corrective qToZ
-        const finalWorldQuat = dummyLooker.quaternion.multiply(qToZ);
-
-        // Convert world quaternion back to palm's local space
-        const palmInvQuat = palm.quaternion.clone().invert();
-        fRoot.quaternion.copy(palmInvQuat.multiply(finalWorldQuat));
+        // Define local target path directly in front of the finger base
+        const localTarget = new THREE.Vector3(fd.splay[0], fd.splay[1], fd.splay[2]).add(fd.offset);
+        
+        // We want the local -Z axis to point AT the target, so we point +Z AWAY from it
+        const vDir = localTarget.clone().sub(fd.offset);
+        const awayTarget = fd.offset.clone().sub(vDir);
+        dummy.lookAt(awayTarget);
+        
+        // Copy this pure local rotation directly to the finger root
+        fRoot.quaternion.copy(dummy.quaternion);
 
         // Build the actual visual joints
         let currentJoint = fRoot;
