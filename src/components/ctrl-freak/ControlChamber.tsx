@@ -84,19 +84,27 @@ export function ControlChamber() {
       
       armRoot.add(palm);
 
-      // 3. Intricate Palm Structure (wider for spread fingers)
+      // 3. Intricate, Massive Palm Structure (Stepped for edge stemming)
+      // Front Plate: Thinner, exactly matches finger spread so they stem from the edges
       const palmPlate1 = new THREE.Object3D();
-      palmPlate1.userData = { type: 'carapace', scale: new THREE.Vector3(4.5, 4.5, 0.6) };
+      palmPlate1.userData = { type: 'carapace', scale: new THREE.Vector3(1.8, 1.8, 0.2) };
       palm.add(palmPlate1);
       
+      // Mid Block: The massive "sledgehammer" bulk, pushed slightly back so it doesn't swallow fingers
       const palmPlate2 = new THREE.Object3D();
-      palmPlate2.position.set(0, 0, 1.5);
-      palmPlate2.userData = { type: 'carapace', scale: new THREE.Vector3(3.5, 3.5, 0.8) };
+      palmPlate2.position.set(0, 0, 3);
+      palmPlate2.userData = { type: 'carapace', scale: new THREE.Vector3(3.2, 3.2, 0.8) };
       palm.add(palmPlate2);
+
+      // Heel Block: Connects the bulk to the wrist smoothly
+      const palmPlate3 = new THREE.Object3D();
+      palmPlate3.position.set(0, 0, 6);
+      palmPlate3.userData = { type: 'carapace', scale: new THREE.Vector3(2.0, 2.0, 0.6) };
+      palm.add(palmPlate3);
 
       // 4. The Wrist
       const wrist = new THREE.Object3D();
-      wrist.position.set(0, 0, 6); 
+      wrist.position.set(0, 0, 8); 
       palm.add(wrist);
 
       // 5. The Elaborate Forearm
@@ -171,20 +179,21 @@ export function ControlChamber() {
           jointNode.rotation.set(fd.curl, 0, 0);
           currentJoint.add(jointNode);
           
+          // Knuckles remain as sharp joints
           const knuckle = new THREE.Object3D();
           const kScale = fd.scale * (1.2 - (j * 0.2));
           knuckle.userData = { type: 'joint', scale: new THREE.Vector3(kScale, kScale, kScale) };
           jointNode.add(knuckle);
 
           if (j < fd.joints) {
+            // Bones are now massive brutalist blocks (carapace) instead of thin spikes
             const bone = new THREE.Object3D();
             bone.position.set(0, 0, -fd.length / 2);
-            bone.rotation.x = -Math.PI / 2;
-            bone.rotation.y = Math.PI / 4;
             
-            const thickness = 0.55 * kScale;
-            const bLen = (fd.length / 14) * 1.15; 
-            bone.userData = { type: 'spike', scale: new THREE.Vector3(thickness, bLen, thickness) };
+            // Base carapace is 10x10x10. We want thickness around 2-3 units, length = fd.length.
+            const thickness = (1.2 * kScale) / 10;
+            const bLen = fd.length / 10; 
+            bone.userData = { type: 'carapace', scale: new THREE.Vector3(thickness, thickness, bLen) };
             
             jointNode.add(bone);
           }
