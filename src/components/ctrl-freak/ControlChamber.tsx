@@ -492,7 +492,8 @@ export function ControlChamber() {
 
       
       {/* The Instances (Replacing Boxes with Chitinous Geometries) */}
-      <instancedMesh ref={carapaceRef} args={[undefined, undefined, carapaceCount]} castShadow receiveShadow>
+      <group rotation={[0, -0.20, 0]}>
+        <instancedMesh ref={carapaceRef} args={[undefined, undefined, carapaceCount]} castShadow receiveShadow>
         <boxGeometry args={[4, 4, 16]} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
@@ -511,6 +512,7 @@ export function ControlChamber() {
         <cylinderGeometry args={ARCH_ARGS} />
         <primitive object={brutalistMaterial} attach="material" />
       </instancedMesh>
+      </group>
 
       {/* Basic Architecture Lighting (Restored cinematic shadows) */}
       
