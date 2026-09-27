@@ -154,17 +154,18 @@ export function ControlChamber() {
       // Target based FK orientation
       // Targets are pushed in a wide 25-unit radius ring around the core (0, 15, -5) to force fingers to fan out
       const fingers = isLeft ? [
-        { name: 'Thumb', offset: new THREE.Vector3(8, 0, 2),   target: [-5, -5, 5],   length: 6.5, joints: 3, curl: -0.5, scale: 1.6 },
-        { name: 'Index', offset: new THREE.Vector3(5, 6, 0),   target: [-5, 35, 5],   length: 8,   joints: 3, curl: -0.6, scale: 1.2 },
-        { name: 'Middle', offset: new THREE.Vector3(0, 8, -2), target: [-5, 40, -20], length: 9,   joints: 4, curl: -0.5, scale: 1.3 },
-        { name: 'Ring', offset: new THREE.Vector3(-5, 6, 0),   target: [-5, 20, -30], length: 8,   joints: 3, curl: -0.6, scale: 1.1 },
-        { name: 'Pinky', offset: new THREE.Vector3(-8, 2, 1),  target: [-5, 0, -20],  length: 6.5, joints: 3, curl: -0.5, scale: 0.9 },
+        // Anatomical Cascade: Thumb opposes deeply in front, Pinky drops deeply in back.
+        { name: 'Thumb', offset: new THREE.Vector3(8, -4, 8),    target: [-5, -5, 15],  length: 7.0, joints: 3, curl: -0.5, scale: 1.6 },
+        { name: 'Index', offset: new THREE.Vector3(5, 6, 2),     target: [-5, 30, 0],   length: 8.5, joints: 3, curl: -0.6, scale: 1.2 },
+        { name: 'Middle', offset: new THREE.Vector3(0, 8, -5),   target: [-5, 35, -15], length: 9.5, joints: 4, curl: -0.5, scale: 1.3 },
+        { name: 'Ring', offset: new THREE.Vector3(-5, 5, -10),   target: [-5, 20, -25], length: 8.0, joints: 3, curl: -0.6, scale: 1.1 },
+        { name: 'Pinky', offset: new THREE.Vector3(-8, 1, -15),  target: [-5, 5, -35],  length: 6.5, joints: 3, curl: -0.5, scale: 0.9 },
       ] : [
-        { name: 'Thumb', offset: new THREE.Vector3(-8, 0, 2),  target: [ 5, -5, 5],   length: 6.5, joints: 3, curl: -0.5, scale: 1.6 },
-        { name: 'Index', offset: new THREE.Vector3(-5, 6, 0),  target: [ 5, 35, 5],   length: 8,   joints: 3, curl: -0.6, scale: 1.2 },
-        { name: 'Middle', offset: new THREE.Vector3(0, 8, -2), target: [ 5, 40, -20], length: 9,   joints: 4, curl: -0.5, scale: 1.3 },
-        { name: 'Ring', offset: new THREE.Vector3(5, 6, 0),    target: [ 5, 20, -30], length: 8,   joints: 3, curl: -0.6, scale: 1.1 },
-        { name: 'Pinky', offset: new THREE.Vector3(8, 2, 1),   target: [ 5, 0, -20],  length: 6.5, joints: 3, curl: -0.5, scale: 0.9 },
+        { name: 'Thumb', offset: new THREE.Vector3(-8, -4, 8),   target: [ 5, -5, 15],  length: 7.0, joints: 3, curl: -0.5, scale: 1.6 },
+        { name: 'Index', offset: new THREE.Vector3(-5, 6, 2),    target: [ 5, 30, 0],   length: 8.5, joints: 3, curl: -0.6, scale: 1.2 },
+        { name: 'Middle', offset: new THREE.Vector3(0, 8, -5),   target: [ 5, 35, -15], length: 9.5, joints: 4, curl: -0.5, scale: 1.3 },
+        { name: 'Ring', offset: new THREE.Vector3(5, 5, -10),    target: [ 5, 20, -25], length: 8.0, joints: 3, curl: -0.6, scale: 1.1 },
+        { name: 'Pinky', offset: new THREE.Vector3(8, 1, -15),   target: [ 5, 5, -35],  length: 6.5, joints: 3, curl: -0.5, scale: 0.9 },
       ];
 
       // Update palm matrix so we can do world-space calculations
