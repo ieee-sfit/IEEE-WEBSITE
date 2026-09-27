@@ -264,6 +264,7 @@ const SceneExporter = () => {
 const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) => {
   const pointsRef = useRef<THREE.Points>(null);
   const count = 8000; // Restored to 8k for maximum visual density
+  const hideCore = useCtrlFreakStore(s => s.devSettings.hideCore);
   
   // Pre-calculate all target shapes
   const shapes = useMemo(() => {
@@ -282,10 +283,10 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
 
-      // 1. SPHERE (Arrival / Chaos) - Scaled down to fit the cupping hands
+      // 1. SPHERE (Arrival / Chaos) - Scaled down for maximum density
       const theta = Math.random() * 2 * Math.PI;
       const phi = Math.acos(Math.random() * 2 - 1);
-      const r = 1.5 + Math.random() * 1.5; // Scaled down from 2-4 to 1.5-3
+      const r = 1.5 + Math.random() * 1.5;
       sphere[i3] = r * Math.sin(phi) * Math.cos(theta);
       sphere[i3 + 1] = r * Math.sin(phi) * Math.sin(theta);
       sphere[i3 + 2] = r * Math.cos(phi);
@@ -495,9 +496,9 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
             const theta = Math.PI * (1 + Math.sqrt(5)) * i;
             
             // Create 3 distinct nested shells
-            let r = 8; // Middle layer
-            if (i % 3 === 0) r = 4; // Dense inner core
-            else if (i % 3 === 1) r = 13; // Outer atmospheric shell
+            let r = 24; // Middle layer
+            if (i % 3 === 0) r = 12; // Dense inner core
+            else if (i % 3 === 1) r = 36; // Outer atmospheric shell
             
             // Add a beautiful pulsing energy effect
             r += Math.sin(t * 3.0 + (i % 100) * 0.1) * 0.4;
@@ -670,8 +671,22 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
     // Removed idle wobble to keep the UI stations and alignment puzzles rock solid
     pointsRef.current.quaternion.copy(targetQuaternion);
 
-    // --- COLOR LOGIC ---
+    // --- COLOR LOGIC & DEPTH & SIZE ---
     const material = pointsRef.current.material as THREE.PointsMaterial;
+    
+    // Only occlude the core behind the 3D hands when fully solved to preserve UI bleed-through
+    const isFullySolvedState = useCtrlFreakStore.getState().anc.solved && 
+                               useCtrlFreakStore.getState().network.solved && 
+                               useCtrlFreakStore.getState().vision.solved && 
+                               useCtrlFreakStore.getState().logic.solved;
+    material.depthTest = isFullySolvedState;
+
+    // Dynamic Particle Size: Blazing dense core ONLY when fully solved, crisp 0.06 otherwise
+    const targetSize = isFullySolvedState ? 0.15 : 0.06;
+    
+    // Smoothly transition the particle size
+    material.size += (targetSize - material.size) * 0.1;
+
     if (timeState <= 0) {
       // Solid Emergency Red when counting up
       material.color.setRGB(1, 0, 0);
@@ -735,11 +750,11 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
   });
 
   return (
-    <Points ref={pointsRef} positions={positions} stride={3} frustumCulled={false} scale={0.6}>
+    <Points ref={pointsRef} positions={positions} stride={3} frustumCulled={false} scale={0.6} visible={!hideCore}>
       <PointMaterial
         transparent
         color="#ff3333"
-        size={0.06}
+        size={0.15}
         sizeAttenuation={true}
         depthWrite={false}
         depthTest={false}

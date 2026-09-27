@@ -27,7 +27,14 @@ export interface CtrlFreakState {
     slot1Correct: boolean;
     slot2Correct: boolean;
   };
+  devSettings: {
+    hideUI: boolean;
+    hideCore: boolean;
+  };
   
+  // DEV ACTIONS
+  setDevSetting: (key: 'hideUI' | 'hideCore', value: boolean) => void;
+
   // ANC ACTIONS
   setAncPhase: (val: number) => void;
   checkAncSolved: () => void;
@@ -71,7 +78,16 @@ export const useCtrlFreakStore = create<CtrlFreakState>((set) => ({
     slot1Correct: false,
     slot2Correct: false,
   },
+  devSettings: {
+    hideUI: false,
+    hideCore: false,
+  },
   
+  // DEV ACTIONS
+  setDevSetting: (key, value) => set((state) => ({
+    devSettings: { ...state.devSettings, [key]: value }
+  })),
+
   // ANC ACTIONS
   setAncPhase: (val) => set((state) => ({
     anc: { ...state.anc, phase: val }
