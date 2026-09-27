@@ -29,10 +29,10 @@ export function ControlChamber() {
   const archRef = useRef<THREE.InstancedMesh>(null);
 
   // Vocabulary limits
-  const carapaceCount = 64;
-  const spikeCount = 64;
-  const jointCount = 48;
-  const archCount = 32;
+  const carapaceCount = 256;
+  const spikeCount = 128;
+  const jointCount = 128;
+  const archCount = 64;
 
   // React to solved states for lighting changes
   const ancSolved = useCtrlFreakStore(s => s.anc.solved);
