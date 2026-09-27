@@ -488,26 +488,35 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
           const isFullySolved = state.anc.solved && state.network.solved && state.vision.solved && state.logic.solved;
           
           if (isFullySolved) {
-            // VISUAL PAYOFF: Glorious Golden Ratio / Sacred Geometry Torus Knot
+            // VISUAL PAYOFF: Nested Golden Ratio Spheres (Dyson Sphere)
             const pRatio = i / count;
-            const u = pRatio * Math.PI * 2 * 7; // 7 loops
-            const v = pRatio * Math.PI * 2 * 3; // 3 loops
+            // Fibonacci sphere distribution
+            const phi = Math.acos(1 - 2 * pRatio);
+            const theta = Math.PI * (1 + Math.sqrt(5)) * i;
             
-            // Torus Knot parametric equation (Massively scaled up)
-            const r = 25 + 8 * Math.cos(v);
-            bx = r * Math.cos(u);
-            by = r * Math.sin(u);
-            bz = 8 * Math.sin(v);
+            // Create 3 distinct nested shells
+            let r = 8; // Middle layer
+            if (i % 3 === 0) r = 4; // Dense inner core
+            else if (i % 3 === 1) r = 13; // Outer atmospheric shell
             
-            // Majestic slow rotation on multiple axes
-            const sY = Math.sin(t * 0.4);
-            const cY = Math.cos(t * 0.4);
+            // Add a beautiful pulsing energy effect
+            r += Math.sin(t * 3.0 + (i % 100) * 0.1) * 0.4;
+
+            bx = r * Math.sin(phi) * Math.cos(theta);
+            by = r * Math.sin(phi) * Math.sin(theta);
+            bz = r * Math.cos(phi);
+            
+            // Majestic slow rotation on multiple axes to make the nested spheres slip past each other
+            const rotSpeed = (i % 3 === 0) ? -0.8 : (i % 3 === 1) ? 0.4 : 0.2;
+            
+            const sY = Math.sin(t * rotSpeed);
+            const cY = Math.cos(t * rotSpeed);
             const tempX = bx * cY - bz * sY;
             bz = bx * sY + bz * cY;
             bx = tempX;
             
-            const sZ = Math.sin(t * 0.2);
-            const cZ = Math.cos(t * 0.2);
+            const sZ = Math.sin(t * (rotSpeed * 0.5));
+            const cZ = Math.cos(t * (rotSpeed * 0.5));
             const tempY = by * cZ - bx * sZ;
             bx = by * sZ + bx * cZ;
             by = tempY;
