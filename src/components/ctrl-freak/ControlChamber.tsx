@@ -56,129 +56,119 @@ export function ControlChamber() {
       const armRoot = new THREE.Object3D();
       skeleton.add(armRoot);
 
-      // Position the Palm
+      // In the reference, hands cradle the core from below
+      const pX = isLeft ? -22 : 22; 
+      const pY = isLeft ? -12 : -10;
+      const pZ = isLeft ? 15 : 15;
+      
       const palm = new THREE.Object3D();
-      const pX = isLeft ? -25 : 25; // Closer to core
-      const pY = isLeft ? 10 : -10;
-      const pZ = isLeft ? 5 : -5;
       palm.position.set(pX, pY, pZ);
       
-      // Palm directly faces the core, creating a proper gripping cavity
+      // Look at the core (0,0,0)
       palm.lookAt(coreTarget);
+      
+      // Roll the hands so palms face upwards more
+      palm.rotation.z = isLeft ? -0.4 : 0.4;
+      
       armRoot.add(palm);
 
-      // Build Palm Mass (Carapace shards wrapping a central volume)
-      for(let i = 0; i < 5; i++) {
-        const plate = new THREE.Object3D();
-        plate.position.set((Math.random() - 0.5) * 5, (Math.random() - 0.5) * 5, (Math.random() - 0.5) * 3);
-        plate.rotation.set(Math.random() * 0.2, Math.random() * 0.2, Math.random() * 0.2);
-        
-        plate.userData = { 
-          type: 'carapace', 
-          scale: new THREE.Vector3(1.6, 2.0, 0.6) 
-        };
-        palm.add(plate);
-      }
+      // Build structured Palm
+      const palmPlate = new THREE.Object3D();
+      palmPlate.userData = { type: 'carapace', scale: new THREE.Vector3(2.5, 2.5, 0.4) };
+      palm.add(palmPlate);
+      
+      const backPlate = new THREE.Object3D();
+      backPlate.position.set(0, 0, 2); 
+      backPlate.userData = { type: 'carapace', scale: new THREE.Vector3(2.0, 2.0, 0.6) };
+      palm.add(backPlate);
 
-      // Wrist & Forearm
+      // Build articulated Wrist & Forearm
       const wrist = new THREE.Object3D();
-      // Wrist sits firmly behind the palm (local +Z)
-      wrist.position.set(0, 0, 8);
+      wrist.position.set(0, 0, 4); 
       palm.add(wrist);
 
       const arch = new THREE.Object3D();
-      // Arch is a cylinder that we rotate so the ring faces the arm (Z axis)
       arch.rotation.x = Math.PI / 2;
-      arch.userData = { type: 'arch', scale: new THREE.Vector3(0.6, 0.6, 1.2) };
+      arch.userData = { type: 'arch', scale: new THREE.Vector3(1.2, 1.2, 0.8) };
       wrist.add(arch);
 
-      // Forearm beams trailing backwards along local +Z
-      for (let i = 0; i < 8; i++) {
-        const shard = new THREE.Object3D();
-        shard.position.set(
-          (Math.random() - 0.5) * 4,
-          (Math.random() - 0.5) * 4,
-          6 + (i * 8)
-        );
-        // Taper the forearm as it goes back
-        const tScale = 1.8 - (i * 0.15);
-        shard.userData = { 
-          type: 'carapace', 
-          scale: new THREE.Vector3(tScale * 0.8, tScale * 0.8, tScale * 0.8) 
-        };
-        wrist.add(shard);
-      }
+      // Forearm drops down and away
+      const elbow = new THREE.Object3D();
+      elbow.position.set(0, 0, 0);
+      elbow.rotation.x = 0.5; // Bend wrist down 
+      elbow.rotation.y = isLeft ? -0.3 : 0.3; // Splay outward
+      wrist.add(elbow);
 
-      // Build Hierarchical Fingers
-      // Local -Z is Forward (towards core). Local +Y is Up.
-      // Left Hand looks from X=-25 to 0. So local -Z points Right (+X). Local +Y is Up (+Y).
-      // Left Hand local -X points Back (+Z). Local +X points Forward (-Z).
+      // Solid Forearm blocks
+      const forearmUpper = new THREE.Object3D();
+      forearmUpper.position.set(0, 0, 10);
+      forearmUpper.userData = { type: 'carapace', scale: new THREE.Vector3(2.2, 2.2, 1.8) };
+      elbow.add(forearmUpper);
+      
+      const forearmLower = new THREE.Object3D();
+      forearmLower.position.set(0, 0, 24);
+      forearmLower.userData = { type: 'carapace', scale: new THREE.Vector3(2.8, 2.8, 2.0) };
+      elbow.add(forearmLower);
+      
+      // A massive shoulder block trailing off
+      const shoulder = new THREE.Object3D();
+      shoulder.position.set(0, 0, 45);
+      shoulder.userData = { type: 'carapace', scale: new THREE.Vector3(4.0, 4.0, 3.0) };
+      elbow.add(shoulder);
+
+      // Deeply cupped Fingers
       const fingers = isLeft ? [
-        // LEFT HAND
-        // Thumb reaches UP and IN to enclose the cavity
-        { name: 'Thumb', offset: new THREE.Vector3(4, 4, 2), rotX: 0.4, rotY: 0.6, length: 8, joints: 2, curl: -0.2, scale: 1.3 },
-        { name: 'Index', offset: new THREE.Vector3(3, 5, -2), rotX: -0.1, rotY: 0.15, length: 11, joints: 3, curl: -0.2, scale: 1.0 },
-        { name: 'Middle', offset: new THREE.Vector3(0, 6, -2), rotX: -0.1, rotY: 0, length: 12, joints: 3, curl: -0.25, scale: 1.1 },
-        { name: 'Ring', offset: new THREE.Vector3(-3, 5, -2), rotX: -0.1, rotY: -0.15, length: 11, joints: 3, curl: -0.3, scale: 0.9 },
-        { name: 'Pinky', offset: new THREE.Vector3(-5, 2, -1), rotX: 0, rotY: -0.3, length: 8, joints: 3, curl: -0.35, scale: 0.8 },
+        { name: 'Thumb', offset: new THREE.Vector3(4, 2, 2), rotX: -0.2, rotY: 0.8, length: 7, joints: 2, curl: -0.5, scale: 1.4 },
+        { name: 'Index', offset: new THREE.Vector3(3, 4, -1), rotX: -0.2, rotY: 0.15, length: 9, joints: 3, curl: -0.45, scale: 1.1 },
+        { name: 'Middle', offset: new THREE.Vector3(0, 5, -1.5), rotX: -0.3, rotY: 0, length: 11, joints: 3, curl: -0.5, scale: 1.2 },
+        { name: 'Ring', offset: new THREE.Vector3(-3, 4, -1), rotX: -0.2, rotY: -0.15, length: 9, joints: 3, curl: -0.45, scale: 1.0 },
+        { name: 'Pinky', offset: new THREE.Vector3(-4, 1, 0), rotX: 0, rotY: -0.3, length: 7, joints: 3, curl: -0.5, scale: 0.8 },
       ] : [
-        // RIGHT HAND (Palm on +X side, facing -X. Local +X is away from Camera)
-        { name: 'Thumb', offset: new THREE.Vector3(-4, 4, 2), rotX: 0.4, rotY: -0.6, length: 8, joints: 2, curl: -0.2, scale: 1.3 },
-        { name: 'Index', offset: new THREE.Vector3(-3, 5, -2), rotX: -0.1, rotY: -0.15, length: 11, joints: 3, curl: -0.2, scale: 1.0 },
-        { name: 'Middle', offset: new THREE.Vector3(0, 6, -2), rotX: -0.1, rotY: 0, length: 12, joints: 3, curl: -0.25, scale: 1.1 },
-        { name: 'Ring', offset: new THREE.Vector3(3, 5, -2), rotX: -0.1, rotY: 0.15, length: 11, joints: 3, curl: -0.3, scale: 0.9 },
-        { name: 'Pinky', offset: new THREE.Vector3(5, 2, -1), rotX: 0, rotY: 0.3, length: 8, joints: 3, curl: -0.35, scale: 0.8 },
+        { name: 'Thumb', offset: new THREE.Vector3(-4, 2, 2), rotX: -0.2, rotY: -0.8, length: 7, joints: 2, curl: -0.5, scale: 1.4 },
+        { name: 'Index', offset: new THREE.Vector3(-3, 4, -1), rotX: -0.2, rotY: -0.15, length: 9, joints: 3, curl: -0.45, scale: 1.1 },
+        { name: 'Middle', offset: new THREE.Vector3(0, 5, -1.5), rotX: -0.3, rotY: 0, length: 11, joints: 3, curl: -0.5, scale: 1.2 },
+        { name: 'Ring', offset: new THREE.Vector3(3, 4, -1), rotX: -0.2, rotY: 0.15, length: 9, joints: 3, curl: -0.45, scale: 1.0 },
+        { name: 'Pinky', offset: new THREE.Vector3(4, 1, 0), rotX: 0, rotY: 0.3, length: 7, joints: 3, curl: -0.5, scale: 0.8 },
       ];
 
       fingers.forEach(fd => {
         const fRoot = new THREE.Object3D();
         fRoot.position.copy(fd.offset);
-        // Fan out angles
         fRoot.rotation.set(fd.rotX, fd.rotY, 0);
         palm.add(fRoot);
 
         let currentJoint = fRoot;
         for (let j = 0; j <= fd.joints; j++) {
           const jointNode = new THREE.Object3D();
+          if (j > 0) jointNode.position.set(0, 0, -fd.length);
           
-          // Move forward along local -Z to stack joints
-          if (j > 0) {
-            jointNode.position.set(0, 0, -fd.length);
-          }
-          
-          // Curl inwards towards the palm cavity (negative pitch)
           jointNode.rotation.set(fd.curl, 0, 0);
           currentJoint.add(jointNode);
-
-          // Knuckle geometry (Joint)
+          
           const knuckle = new THREE.Object3D();
           const kScale = fd.scale * (1.2 - (j * 0.25));
           knuckle.userData = { type: 'joint', scale: new THREE.Vector3(kScale, kScale, kScale) };
           jointNode.add(knuckle);
 
-          // Bone geometry (Spike) - stretches to the NEXT joint
           if (j < fd.joints) {
             const bone = new THREE.Object3D();
             bone.position.set(0, 0, -fd.length / 2);
-            
-            // ConeGeometry points +Y. Rotate -90 on X so it points -Z.
             bone.rotation.x = -Math.PI / 2;
-            // Diamond profile
             bone.rotation.y = Math.PI / 4;
             
-            const thickness = 0.5 * kScale;
-            const bLen = (fd.length / 14) * 1.15; // 14 is the base cone height, 15% overlap
+            const thickness = 0.6 * kScale;
+            const bLen = (fd.length / 14) * 1.15; 
             bone.userData = { type: 'spike', scale: new THREE.Vector3(thickness, bLen, thickness) };
             
             jointNode.add(bone);
           }
-
           currentJoint = jointNode;
         }
       });
     };
 
-    buildArm(true);
+
+        buildArm(true);
     buildArm(false);
 
     // Force global matrix calculation for the entire skeleton
