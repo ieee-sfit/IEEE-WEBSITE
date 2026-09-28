@@ -52,7 +52,7 @@ const CtrlFreakPage = () => {
       <div className="relative z-10 w-full px-8 md:px-24 pointer-events-none">
         
         {/* 00 - ARRIVAL (Hero) */}
-        <section className="h-screen flex flex-col justify-center items-start w-full md:w-1/2 pointer-events-auto">
+        <section className="min-h-screen py-24 flex flex-col justify-center items-start w-full md:w-1/2 pointer-events-auto">
           <h1 className="text-6xl md:text-8xl font-bold tracking-tighter uppercase font-sans leading-none mix-blend-difference">
             Ctrl Freak
           </h1>
@@ -91,27 +91,27 @@ const CtrlFreakPage = () => {
         </section>
 
         {/* 02 - ANC (LEFT) */}
-        <section className="h-screen flex flex-col justify-end pb-12 md:pb-0 md:justify-center items-center md:items-start w-full pointer-events-none relative z-20">
+        <section className="min-h-screen flex flex-col justify-end py-12 md:pb-0 md:justify-center items-center md:items-start w-full pointer-events-none relative z-20">
           <AncStationUI />
         </section>
 
         {/* 03 - NETWORK (RIGHT) */}
-        <section className="h-screen flex flex-col justify-end pb-12 md:pb-0 md:justify-center items-center md:items-end w-full pointer-events-none relative z-20">
+        <section className="min-h-screen flex flex-col justify-end py-12 md:pb-0 md:justify-center items-center md:items-end w-full pointer-events-none relative z-20">
           <NetworkStationUI />
         </section>
 
         {/* 04 - VISION (LEFT) */}
-        <section className="h-screen flex flex-col justify-end pb-12 md:pb-0 md:justify-center items-center md:items-start w-full pointer-events-none relative z-20">
+        <section className="min-h-screen flex flex-col justify-end py-12 md:pb-0 md:justify-center items-center md:items-start w-full pointer-events-none relative z-20">
           <VisionStationUI />
         </section>
 
         {/* 05 - LOGIC (RIGHT) */}
-        <section className="h-screen flex flex-col justify-end pb-12 md:pb-0 md:justify-center items-center md:items-end w-full pointer-events-none relative z-20">
+        <section className="min-h-screen flex flex-col justify-end py-12 md:pb-0 md:justify-center items-center md:items-end w-full pointer-events-none relative z-20">
           <LogicStationUI />
         </section>
 
         {/* 06 - THE CLOCK */}
-        <section className="h-screen flex flex-col justify-center items-center text-center w-full z-20 relative pointer-events-auto">
+        <section className="min-h-screen py-12 md:py-0 flex flex-col justify-center items-center text-center w-full z-20 relative pointer-events-auto">
           <div className="bg-black/90 backdrop-blur-lg p-12 md:p-24 border border-[#FF3333]/20 w-full max-w-3xl mx-auto">
             <div className="text-6xl md:text-8xl font-sans font-bold text-[#FF3333] mb-4">
               12:00
