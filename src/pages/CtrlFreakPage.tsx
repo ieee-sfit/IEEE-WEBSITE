@@ -22,11 +22,18 @@ const CtrlFreakPage = () => {
   return (
     <div ref={containerRef} className="relative bg-[#050505] text-white h-[800vh] font-mono selection:bg-[#FF3333] selection:text-white overflow-x-hidden">
       {/* PORTRAIT OVERLAY FOR MOBILE */}
-      <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center text-center p-8 hidden portrait:flex md:portrait:hidden">
+      <div 
+        className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center text-center p-8 hidden portrait:flex md:portrait:hidden cursor-pointer"
+        onClick={() => {
+          if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen().catch(() => {});
+          }
+        }}
+      >
         <div className="w-16 h-16 mb-8 border-4 border-[#FF3333] border-t-transparent rounded-full animate-spin"></div>
         <h2 className="text-2xl font-sans tracking-tight uppercase text-white mb-4">Rotate Device</h2>
-        <p className="text-gray-400 text-xs tracking-[0.2em] uppercase leading-relaxed max-w-xs">
-          Ctrl Freak requires a landscape viewport for optimal system visibility and interaction.
+        <p className="text-gray-400 text-xs tracking-[0.2em] uppercase leading-relaxed max-w-xs mt-4">
+          Tap to enter full screen
         </p>
       </div>
 
@@ -60,7 +67,7 @@ const CtrlFreakPage = () => {
       <div className="relative z-10 w-full px-8 md:px-24 pointer-events-none">
         
         {/* 00 - ARRIVAL (Hero) */}
-        <section className="h-screen flex flex-col justify-center items-start w-full md:w-1/2 pointer-events-auto">
+        <section className="h-[100svh] flex flex-col justify-center items-start w-full md:w-1/2 pointer-events-auto">
           <div className="scale-[0.75] md:scale-100 origin-left">
             <h1 className="text-6xl md:text-8xl font-bold tracking-tighter uppercase font-sans leading-none mix-blend-difference">
               Ctrl Freak
