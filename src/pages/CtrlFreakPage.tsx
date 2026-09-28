@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { useScroll } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { SystemCore } from '../components/ctrl-freak/SystemCore';
@@ -18,6 +18,15 @@ const CtrlFreakPage = () => {
     target: containerRef,
     offset: ["start start", "end end"]
   });
+
+  // Enable CSS scroll snapping on the document element just for this page
+  // This turns the scroll-based experience into a paginated "app-like" experience on mobile
+  useEffect(() => {
+    document.documentElement.classList.add('snap-y', 'snap-mandatory');
+    return () => {
+      document.documentElement.classList.remove('snap-y', 'snap-mandatory');
+    };
+  }, []);
 
   return (
     <div ref={containerRef} className="relative bg-[#050505] text-white h-[800vh] font-mono selection:bg-[#FF3333] selection:text-white overflow-x-hidden">
@@ -79,7 +88,7 @@ const CtrlFreakPage = () => {
       <div className="relative z-10 w-full pointer-events-none">
         
         {/* 00 - ARRIVAL (Hero) */}
-        <section className="h-[100svh] flex flex-col justify-center items-start w-full md:w-1/2 px-8 md:px-24 pointer-events-auto">
+        <section className="snap-start h-screen flex flex-col justify-center items-start w-full md:w-1/2 px-8 md:px-24 pointer-events-auto">
           <div className="w-full max-h-[90svh] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             <h1 className="text-5xl md:text-8xl font-bold tracking-tighter uppercase font-sans leading-none mix-blend-difference">
               Ctrl Freak
@@ -111,7 +120,7 @@ const CtrlFreakPage = () => {
         </section>
 
         {/* 01 - WHAT ARE YOU LOOKING AT? */}
-        <section className="h-screen flex flex-col justify-center items-center w-full">
+        <section className="snap-start h-screen flex flex-col justify-center items-center w-full">
           <div className="text-center mix-blend-difference">
             <h2 className="text-4xl md:text-6xl font-sans font-bold tracking-tight uppercase mb-8">
               OBSERVE. IDENTIFY.<br/>INTERVENE. VERIFY.
@@ -120,35 +129,35 @@ const CtrlFreakPage = () => {
         </section>
 
         {/* 02 - ANC (LEFT) */}
-        <section className="h-[100svh] w-full pointer-events-none relative z-20">
+        <section className="snap-start h-screen w-full pointer-events-none relative z-20">
           <div className="absolute top-1/2 left-0 md:left-24 -translate-y-1/2 scale-[0.65] md:scale-100 origin-left w-full max-w-md">
             <AncStationUI />
           </div>
         </section>
 
         {/* 03 - NETWORK (RIGHT) */}
-        <section className="h-[100svh] w-full pointer-events-none relative z-20">
+        <section className="snap-start h-screen w-full pointer-events-none relative z-20">
           <div className="absolute top-1/2 right-0 md:right-24 -translate-y-1/2 scale-[0.65] md:scale-100 origin-right w-full max-w-md flex justify-end">
             <NetworkStationUI />
           </div>
         </section>
 
         {/* 04 - VISION (LEFT) */}
-        <section className="h-[100svh] w-full pointer-events-none relative z-20">
+        <section className="snap-start h-screen w-full pointer-events-none relative z-20">
           <div className="absolute top-1/2 left-0 md:left-24 -translate-y-1/2 scale-[0.65] md:scale-100 origin-left w-full max-w-md">
             <VisionStationUI />
           </div>
         </section>
 
         {/* 05 - LOGIC (RIGHT) */}
-        <section className="h-[100svh] w-full pointer-events-none relative z-20">
+        <section className="snap-start h-screen w-full pointer-events-none relative z-20">
           <div className="absolute top-1/2 right-0 md:right-24 -translate-y-1/2 scale-[0.65] md:scale-100 origin-right w-full max-w-md flex justify-end">
             <LogicStationUI />
           </div>
         </section>
 
         {/* 06 - THE CLOCK */}
-        <section className="h-[100svh] w-full z-20 relative pointer-events-auto">
+        <section className="snap-start h-screen w-full z-20 relative pointer-events-auto">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-[0.65] md:scale-100 origin-center bg-black/90 backdrop-blur-lg p-6 md:p-24 border border-[#FF3333]/20 w-full max-w-3xl text-center">
             <div className="text-6xl md:text-8xl font-sans font-bold text-[#FF3333] mb-4">
               12:00
