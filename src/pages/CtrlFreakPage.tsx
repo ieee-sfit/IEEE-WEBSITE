@@ -76,10 +76,10 @@ const CtrlFreakPage = () => {
 
       {/* NARRATIVE HTML OVERLAYS (Heads Up Display) */}
       {!hideUI && (
-      <div className="relative z-10 w-full px-8 md:px-24 pointer-events-none">
+      <div className="relative z-10 w-full pointer-events-none">
         
         {/* 00 - ARRIVAL (Hero) */}
-        <section className="h-[100svh] flex flex-col justify-center items-start w-full md:w-1/2 pointer-events-auto">
+        <section className="h-[100svh] flex flex-col justify-center items-start w-full md:w-1/2 px-8 md:px-24 pointer-events-auto">
           <div className="w-full max-h-[90svh] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             <h1 className="text-5xl md:text-8xl font-bold tracking-tighter uppercase font-sans leading-none mix-blend-difference">
               Ctrl Freak
@@ -121,28 +121,28 @@ const CtrlFreakPage = () => {
 
         {/* 02 - ANC (LEFT) */}
         <section className="h-[100svh] w-full pointer-events-none relative z-20">
-          <div className="absolute top-1/2 left-8 md:left-24 -translate-y-1/2 scale-[0.65] md:scale-100 origin-left w-full max-w-md">
+          <div className="absolute top-1/2 left-0 md:left-24 -translate-y-1/2 scale-[0.65] md:scale-100 origin-left w-full max-w-md">
             <AncStationUI />
           </div>
         </section>
 
         {/* 03 - NETWORK (RIGHT) */}
         <section className="h-[100svh] w-full pointer-events-none relative z-20">
-          <div className="absolute top-1/2 right-8 md:right-24 -translate-y-1/2 scale-[0.65] md:scale-100 origin-right w-full max-w-md flex justify-end">
+          <div className="absolute top-1/2 right-0 md:right-24 -translate-y-1/2 scale-[0.65] md:scale-100 origin-right w-full max-w-md flex justify-end">
             <NetworkStationUI />
           </div>
         </section>
 
         {/* 04 - VISION (LEFT) */}
         <section className="h-[100svh] w-full pointer-events-none relative z-20">
-          <div className="absolute top-1/2 left-8 md:left-24 -translate-y-1/2 scale-[0.65] md:scale-100 origin-left w-full max-w-md">
+          <div className="absolute top-1/2 left-0 md:left-24 -translate-y-1/2 scale-[0.65] md:scale-100 origin-left w-full max-w-md">
             <VisionStationUI />
           </div>
         </section>
 
         {/* 05 - LOGIC (RIGHT) */}
         <section className="h-[100svh] w-full pointer-events-none relative z-20">
-          <div className="absolute top-1/2 right-8 md:right-24 -translate-y-1/2 scale-[0.65] md:scale-100 origin-right w-full max-w-md flex justify-end">
+          <div className="absolute top-1/2 right-0 md:right-24 -translate-y-1/2 scale-[0.65] md:scale-100 origin-right w-full max-w-md flex justify-end">
             <LogicStationUI />
           </div>
         </section>

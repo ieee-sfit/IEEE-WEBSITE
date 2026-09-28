@@ -722,32 +722,32 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
     if (progress > 0.20 && progress <= 0.35) {
       // Station 01: UI Left, Core Right
       const t = smoothstep(0.20, 0.25, progress);
-      targetOffsetX = isMobile ? 0 : 6 * t;
-      targetOffsetY = isMobile ? 12 * t : 0;
+      targetOffsetX = isMobile ? 5 * t : 6 * t;
+      targetOffsetY = isMobile ? 10 * t : 0;
       targetScale = isMobile ? 0.6 + 0.1 * t : 0.6 + 0.3 * t;
     } else if (progress > 0.35 && progress <= 0.50) {
       // Station 02: UI Right, Core Left
       const t = smoothstep(0.35, 0.40, progress);
-      targetOffsetX = isMobile ? 0 : 9 - 18 * t;
-      targetOffsetY = isMobile ? 12 : 0;
+      targetOffsetX = isMobile ? 5 - 10 * t : 9 - 18 * t;
+      targetOffsetY = isMobile ? 10 : 0;
       targetScale = isMobile ? 0.7 : 0.9;
     } else if (progress > 0.50 && progress <= 0.65) {
       // Station 03: UI Left, Core Right
       const t = smoothstep(0.50, 0.55, progress);
-      targetOffsetX = isMobile ? 0 : -9 + 18 * t;
-      targetOffsetY = isMobile ? 12 : 0;
+      targetOffsetX = isMobile ? -5 + 10 * t : -9 + 18 * t;
+      targetOffsetY = isMobile ? 10 : 0;
       targetScale = isMobile ? 0.7 : 0.9;
     } else if (progress > 0.65 && progress <= 0.80) {
       // Station 04: UI Right, Core Left
       const t = smoothstep(0.65, 0.70, progress);
-      targetOffsetX = isMobile ? 0 : 9 - 18 * t;
-      targetOffsetY = isMobile ? 12 : 0;
+      targetOffsetX = isMobile ? 5 - 10 * t : 9 - 18 * t;
+      targetOffsetY = isMobile ? 10 : 0;
       targetScale = isMobile ? 0.7 : 0.9;
     } else if (progress > 0.80 && progress <= 0.85) {
       // Return to Center
       const t = smoothstep(0.80, 0.85, progress);
-      targetOffsetX = isMobile ? 0 : -9 * (1 - t);
-      targetOffsetY = isMobile ? 12 * (1 - t) : 0;
+      targetOffsetX = isMobile ? -5 * (1 - t) : -9 * (1 - t);
+      targetOffsetY = isMobile ? 10 * (1 - t) : 0;
       targetScale = isMobile ? 0.7 - 0.1 * t : 0.9 - 0.3 * t;
     }
 
