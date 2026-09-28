@@ -22,19 +22,31 @@ const CtrlFreakPage = () => {
   return (
     <div ref={containerRef} className="relative bg-[#050505] text-white h-[800vh] font-mono selection:bg-[#FF3333] selection:text-white overflow-x-hidden">
       {/* PORTRAIT OVERLAY FOR MOBILE */}
-      <div 
-        className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center text-center p-8 hidden portrait:flex md:portrait:hidden cursor-pointer"
-        onClick={() => {
-          if (document.documentElement.requestFullscreen) {
-            document.documentElement.requestFullscreen().catch(() => {});
-          }
-        }}
-      >
+      <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center text-center p-8 hidden portrait:flex md:portrait:hidden">
         <div className="w-16 h-16 mb-8 border-4 border-[#FF3333] border-t-transparent rounded-full animate-spin"></div>
         <h2 className="text-2xl font-sans tracking-tight uppercase text-white mb-4">Rotate Device</h2>
-        <p className="text-gray-400 text-xs tracking-[0.2em] uppercase leading-relaxed max-w-xs mt-4">
-          Tap to enter full screen
+        <p className="text-gray-400 text-xs tracking-[0.2em] uppercase leading-relaxed max-w-xs mb-8">
+          Ctrl Freak requires a landscape viewport for optimal system visibility and interaction.
         </p>
+        <button
+          className="px-8 py-4 bg-[#FF3333] text-white font-bold text-xs tracking-[0.2em] uppercase hover:bg-white hover:text-black transition-colors"
+          onClick={async () => {
+            try {
+              if (document.documentElement.requestFullscreen) {
+                await document.documentElement.requestFullscreen();
+              }
+              // @ts-ignore
+              if (window.screen && window.screen.orientation && window.screen.orientation.lock) {
+                // @ts-ignore
+                await window.screen.orientation.lock("landscape");
+              }
+            } catch (err) {
+              console.error(err);
+            }
+          }}
+        >
+          Enable Fullscreen
+        </button>
       </div>
 
       {/* HEADER NAV */}
@@ -68,15 +80,15 @@ const CtrlFreakPage = () => {
         
         {/* 00 - ARRIVAL (Hero) */}
         <section className="h-[100svh] flex flex-col justify-center items-start w-full md:w-1/2 pointer-events-auto">
-          <div className="scale-[0.75] md:scale-100 origin-left max-h-[85svh] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-            <h1 className="text-6xl md:text-8xl font-bold tracking-tighter uppercase font-sans leading-none mix-blend-difference">
+          <div className="w-full max-h-[90svh] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+            <h1 className="text-5xl md:text-8xl font-bold tracking-tighter uppercase font-sans leading-none mix-blend-difference">
               Ctrl Freak
             </h1>
-            <p className="text-xl md:text-2xl text-gray-400 mt-6 tracking-widest uppercase mb-16 mix-blend-difference">
+            <p className="text-lg md:text-2xl text-gray-400 mt-4 md:mt-6 tracking-widest uppercase mb-8 md:mb-16 mix-blend-difference">
               Incident Detected
             </p>
 
-          <div className="border-t border-gray-800 w-full max-w-sm pt-8 mb-16 mix-blend-difference">
+          <div className="border-t border-gray-800 w-full max-w-sm pt-4 md:pt-8 mb-8 md:mb-16 mix-blend-difference">
             <p className="text-sm text-gray-300 uppercase tracking-widest leading-loose">
               Systems: 4
               <br/>
@@ -108,36 +120,36 @@ const CtrlFreakPage = () => {
         </section>
 
         {/* 02 - ANC (LEFT) */}
-        <section className="h-screen flex flex-col justify-center items-start w-full pointer-events-none relative z-20">
-          <div className="scale-[0.65] md:scale-100 origin-left w-full">
+        <section className="h-[100svh] flex flex-col justify-center items-start w-full pointer-events-none relative z-20">
+          <div className="w-full">
             <AncStationUI />
           </div>
         </section>
 
         {/* 03 - NETWORK (RIGHT) */}
-        <section className="h-screen flex flex-col justify-center items-end w-full pointer-events-none relative z-20">
-          <div className="scale-[0.65] md:scale-100 origin-right w-full flex justify-end">
+        <section className="h-[100svh] flex flex-col justify-center items-end w-full pointer-events-none relative z-20">
+          <div className="w-full flex justify-end">
             <NetworkStationUI />
           </div>
         </section>
 
         {/* 04 - VISION (LEFT) */}
-        <section className="h-screen flex flex-col justify-center items-start w-full pointer-events-none relative z-20">
-          <div className="scale-[0.65] md:scale-100 origin-left w-full">
+        <section className="h-[100svh] flex flex-col justify-center items-start w-full pointer-events-none relative z-20">
+          <div className="w-full">
             <VisionStationUI />
           </div>
         </section>
 
         {/* 05 - LOGIC (RIGHT) */}
-        <section className="h-screen flex flex-col justify-center items-end w-full pointer-events-none relative z-20">
-          <div className="scale-[0.65] md:scale-100 origin-right w-full flex justify-end">
+        <section className="h-[100svh] flex flex-col justify-center items-end w-full pointer-events-none relative z-20">
+          <div className="w-full flex justify-end">
             <LogicStationUI />
           </div>
         </section>
 
         {/* 06 - THE CLOCK */}
-        <section className="h-screen flex flex-col justify-center items-center text-center w-full z-20 relative pointer-events-auto">
-          <div className="bg-black/90 backdrop-blur-lg p-12 md:p-24 border border-[#FF3333]/20 w-full max-w-3xl mx-auto scale-[0.65] md:scale-100 origin-center">
+        <section className="h-[100svh] flex flex-col justify-center items-center text-center w-full z-20 relative pointer-events-auto">
+          <div className="bg-black/90 backdrop-blur-lg p-6 md:p-24 border border-[#FF3333]/20 w-full max-w-3xl mx-auto">
             <div className="text-6xl md:text-8xl font-sans font-bold text-[#FF3333] mb-4">
               12:00
             </div>
