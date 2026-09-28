@@ -68,7 +68,7 @@ const CtrlFreakPage = () => {
         
         {/* 00 - ARRIVAL (Hero) */}
         <section className="h-[100svh] flex flex-col justify-center items-start w-full md:w-1/2 pointer-events-auto">
-          <div className="scale-[0.75] md:scale-100 origin-left">
+          <div className="scale-[0.75] md:scale-100 origin-left max-h-[85svh] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             <h1 className="text-6xl md:text-8xl font-bold tracking-tighter uppercase font-sans leading-none mix-blend-difference">
               Ctrl Freak
             </h1>

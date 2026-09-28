@@ -57,7 +57,7 @@ export const VisionStationUI = () => {
   else if (alignmentPercentage > 80) status = 'LOCKING';
 
   return (
-    <div className="space-y-4 [@media(min-height:500px)]:space-y-8 bg-black/60 backdrop-blur-md p-4 [@media(min-height:500px)]:p-8 border-l border-[#FF3333] w-full max-w-md pointer-events-auto">
+    <div className="space-y-4 [@media(min-height:500px)]:space-y-8 bg-black/60 backdrop-blur-md p-4 [@media(min-height:500px)]:p-8 border-l border-[#FF3333] w-full max-w-md pointer-events-auto max-h-[85svh] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
       <div>
         <div className="text-[10px] text-[#FF3333] tracking-[0.2em] mb-4">03 // eCHALLAN VISION</div>
         <h2 className="text-2xl font-sans tracking-tight uppercase text-white">Optical Recognition</h2>
