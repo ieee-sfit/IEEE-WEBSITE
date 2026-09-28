@@ -120,36 +120,36 @@ const CtrlFreakPage = () => {
         </section>
 
         {/* 02 - ANC (LEFT) */}
-        <section className="h-[100svh] flex flex-col justify-center items-start w-full pointer-events-none relative z-20">
-          <div className="w-full">
+        <section className="h-[100svh] w-full pointer-events-none relative z-20">
+          <div className="absolute top-1/2 left-8 md:left-24 -translate-y-1/2 scale-[0.65] md:scale-100 origin-left w-full max-w-md">
             <AncStationUI />
           </div>
         </section>
 
         {/* 03 - NETWORK (RIGHT) */}
-        <section className="h-[100svh] flex flex-col justify-center items-end w-full pointer-events-none relative z-20">
-          <div className="w-full flex justify-end">
+        <section className="h-[100svh] w-full pointer-events-none relative z-20">
+          <div className="absolute top-1/2 right-8 md:right-24 -translate-y-1/2 scale-[0.65] md:scale-100 origin-right w-full max-w-md flex justify-end">
             <NetworkStationUI />
           </div>
         </section>
 
         {/* 04 - VISION (LEFT) */}
-        <section className="h-[100svh] flex flex-col justify-center items-start w-full pointer-events-none relative z-20">
-          <div className="w-full">
+        <section className="h-[100svh] w-full pointer-events-none relative z-20">
+          <div className="absolute top-1/2 left-8 md:left-24 -translate-y-1/2 scale-[0.65] md:scale-100 origin-left w-full max-w-md">
             <VisionStationUI />
           </div>
         </section>
 
         {/* 05 - LOGIC (RIGHT) */}
-        <section className="h-[100svh] flex flex-col justify-center items-end w-full pointer-events-none relative z-20">
-          <div className="w-full flex justify-end">
+        <section className="h-[100svh] w-full pointer-events-none relative z-20">
+          <div className="absolute top-1/2 right-8 md:right-24 -translate-y-1/2 scale-[0.65] md:scale-100 origin-right w-full max-w-md flex justify-end">
             <LogicStationUI />
           </div>
         </section>
 
         {/* 06 - THE CLOCK */}
-        <section className="h-[100svh] flex flex-col justify-center items-center text-center w-full z-20 relative pointer-events-auto">
-          <div className="bg-black/90 backdrop-blur-lg p-6 md:p-24 border border-[#FF3333]/20 w-full max-w-3xl mx-auto">
+        <section className="h-[100svh] w-full z-20 relative pointer-events-auto">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-[0.65] md:scale-100 origin-center bg-black/90 backdrop-blur-lg p-6 md:p-24 border border-[#FF3333]/20 w-full max-w-3xl text-center">
             <div className="text-6xl md:text-8xl font-sans font-bold text-[#FF3333] mb-4">
               12:00
             </div>

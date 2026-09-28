@@ -681,8 +681,11 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
                                useCtrlFreakStore.getState().logic.solved;
     material.depthTest = isFullySolvedState;
 
+    const isMobile = window.innerWidth < 768;
+
     // Dynamic Particle Size: Blazing dense core ONLY when fully solved, crisp 0.06 otherwise
-    const targetSize = isFullySolvedState ? 0.15 : 0.06;
+    // Scale particle size down on mobile to prevent it from clumping into a solid ball
+    const targetSize = isFullySolvedState ? (isMobile ? 0.08 : 0.15) : (isMobile ? 0.04 : 0.06);
     
     // Smoothly transition the particle size
     material.size += (targetSize - material.size) * 0.1;
@@ -712,7 +715,6 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
     // Dynamically shift the Core's position relative to the camera's right vector
     // so it always occupies the empty side of the screen (UI is alternating Left/Right).
     // Also upscale the core proportionally while it's in the station views.
-    const isMobile = window.innerWidth < 768;
     let targetOffsetX = 0; 
     let targetOffsetY = 0;
     let targetScale = 0.6;
@@ -775,6 +777,8 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
 };
 
 const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) => {
+  const isMobile = window.innerWidth < 768;
+
   // Original cinematic spline for the investigation journey
   const cameraPath = useMemo(() => {
     return new THREE.CatmullRomCurve3([
@@ -791,7 +795,7 @@ const CameraRig = ({ scrollProgress }: { scrollProgress: MotionValue<number> }) 
   // Once fully solved and user scrolls back up, use this cinematic spiral tour path
   const revealPath = useMemo(() => {
     return new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0, -30, 100),   // 0.0: The Hero Shot. Low angle, towering hands grasping the massive core.
+      new THREE.Vector3(0, -30, isMobile ? 65 : 100),   // 0.0: The Hero Shot. Bring closer on mobile so it's not tiny.
       new THREE.Vector3(70, -10, 60),   // 0.2: Sweeping out right, wide orbit
       new THREE.Vector3(90, 25, -20),   // 0.4: Deep orbit around the right forearm gauntlet
       new THREE.Vector3(30, 40, -40),   // 0.6: Sweeping over the back and far above the arches

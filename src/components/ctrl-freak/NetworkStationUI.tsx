@@ -19,7 +19,7 @@ export const NetworkStationUI = () => {
   else if (mumbai > 40) status = 'MUMBAI CRITICAL';
 
   return (
-    <div className="space-y-4 [@media(min-height:500px)]:space-y-8 bg-black/60 backdrop-blur-md p-4 [@media(min-height:500px)]:p-8 border-l border-[#FF3333] w-full max-w-md pointer-events-auto max-h-[85svh] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+    <div className="space-y-4 [@media(min-height:500px)]:space-y-8 bg-black/60 backdrop-blur-md p-4 [@media(min-height:500px)]:p-8 border-l border-[#FF3333] w-full max-w-md pointer-events-auto">
       <div className="flex justify-between items-start">
         <div>
           <div className="text-[10px] text-[#FF3333] tracking-[0.2em] mb-4">05 // F1 0-LAG STREAM</div>
