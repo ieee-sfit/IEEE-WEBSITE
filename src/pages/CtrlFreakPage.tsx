@@ -91,22 +91,22 @@ const CtrlFreakPage = () => {
         </section>
 
         {/* 02 - ANC (LEFT) */}
-        <section className="h-screen flex flex-col justify-center items-start w-full pointer-events-none relative z-20">
+        <section className="h-screen flex flex-col justify-end pb-12 md:pb-0 md:justify-center items-center md:items-start w-full pointer-events-none relative z-20">
           <AncStationUI />
         </section>
 
         {/* 03 - NETWORK (RIGHT) */}
-        <section className="h-screen flex flex-col justify-center items-end w-full pointer-events-none relative z-20">
+        <section className="h-screen flex flex-col justify-end pb-12 md:pb-0 md:justify-center items-center md:items-end w-full pointer-events-none relative z-20">
           <NetworkStationUI />
         </section>
 
         {/* 04 - VISION (LEFT) */}
-        <section className="h-screen flex flex-col justify-center items-start w-full pointer-events-none relative z-20">
+        <section className="h-screen flex flex-col justify-end pb-12 md:pb-0 md:justify-center items-center md:items-start w-full pointer-events-none relative z-20">
           <VisionStationUI />
         </section>
 
         {/* 05 - LOGIC (RIGHT) */}
-        <section className="h-screen flex flex-col justify-center items-end w-full pointer-events-none relative z-20">
+        <section className="h-screen flex flex-col justify-end pb-12 md:pb-0 md:justify-center items-center md:items-end w-full pointer-events-none relative z-20">
           <LogicStationUI />
         </section>
 

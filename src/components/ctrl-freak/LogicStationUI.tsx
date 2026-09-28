@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useCtrlFreakStore, GateType } from '../../store/useCtrlFreakStore';
 
@@ -9,6 +9,9 @@ export const LogicStationUI = () => {
 
   const slot1Ref = useRef<HTMLDivElement>(null);
   const slot2Ref = useRef<HTMLDivElement>(null);
+  
+  // Mobile-friendly click-to-select state
+  const [selectedGate, setSelectedGate] = useState<GateType | null>(null);
 
   useEffect(() => {
     checkSolved();
@@ -28,6 +31,19 @@ export const LogicStationUI = () => {
     if (gate && ['AND', 'OR', 'NAND', 'XOR'].includes(gate)) {
       setSlot(slotNum, gate);
     }
+  };
+
+  const handleSlotClick = (slotNum: 1 | 2) => {
+    if (selectedGate) {
+      setSlot(slotNum, selectedGate);
+      setSelectedGate(null); // consume selection
+    } else {
+      setSlot(slotNum, null); // remove gate if clicking without selection
+    }
+  };
+
+  const handleGateClick = (gate: GateType) => {
+    setSelectedGate(selectedGate === gate ? null : gate);
   };
 
   const gates: GateType[] = ['AND', 'OR', 'NAND', 'XOR'];
@@ -101,8 +117,9 @@ export const LogicStationUI = () => {
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, 1)}
                 className={`w-20 h-12 border-2 flex items-center justify-center transition-colors text-sm font-bold bg-gray-900 cursor-pointer
-                  ${slot1 ? 'border-[#33FF33] text-[#33FF33]' : 'border-dashed border-gray-600 text-gray-600'}`}
-                onClick={() => slot1 && setSlot(1, null)}
+                  ${slot1 ? 'border-[#33FF33] text-[#33FF33]' : 'border-dashed border-gray-600 text-gray-600'}
+                  ${selectedGate && !slot1 ? 'border-[#FF3333] animate-pulse' : ''}`}
+                onClick={() => handleSlotClick(1)}
               >
                 {slot1 || 'EMPTY'}
               </div>
@@ -115,8 +132,9 @@ export const LogicStationUI = () => {
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, 2)}
                 className={`w-20 h-12 border-2 flex items-center justify-center transition-colors text-sm font-bold bg-gray-900 cursor-pointer
-                  ${slot2 ? 'border-[#33FF33] text-[#33FF33]' : 'border-dashed border-gray-600 text-gray-600'}`}
-                onClick={() => slot2 && setSlot(2, null)}
+                  ${slot2 ? 'border-[#33FF33] text-[#33FF33]' : 'border-dashed border-gray-600 text-gray-600'}
+                  ${selectedGate && !slot2 ? 'border-[#FF3333] animate-pulse' : ''}`}
+                onClick={() => handleSlotClick(2)}
               >
                 {slot2 || 'EMPTY'}
               </div>
@@ -141,7 +159,11 @@ export const LogicStationUI = () => {
                 key={gate}
                 draggable
                 onDragStart={(e) => handleDragStart(e as unknown as React.DragEvent, gate)}
-                className="w-16 h-12 border border-[#FF3333] bg-[#FF3333]/10 flex items-center justify-center text-[#FF3333] cursor-grab active:cursor-grabbing hover:bg-[#FF3333]/20"
+                onClick={() => handleGateClick(gate)}
+                className={`w-16 h-12 border flex items-center justify-center cursor-pointer transition-colors font-bold
+                  ${selectedGate === gate 
+                    ? 'border-white text-white bg-white/20' 
+                    : 'border-[#FF3333] text-[#FF3333] bg-[#FF3333]/10 hover:bg-[#FF3333]/20'}`}
               >
                 {gate}
               </motion.div>

@@ -712,38 +712,48 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
     // Dynamically shift the Core's position relative to the camera's right vector
     // so it always occupies the empty side of the screen (UI is alternating Left/Right).
     // Also upscale the core proportionally while it's in the station views.
+    const isMobile = window.innerWidth < 768;
     let targetOffsetX = 0; 
+    let targetOffsetY = 0;
     let targetScale = 0.6;
     
     if (progress > 0.20 && progress <= 0.35) {
       // Station 01: UI Left, Core Right
       const t = smoothstep(0.20, 0.25, progress);
-      targetOffsetX = 6 * t; // Ends at +6
-      targetScale = 0.6 + 0.3 * t;
+      targetOffsetX = isMobile ? 0 : 6 * t;
+      targetOffsetY = isMobile ? 12 * t : 0;
+      targetScale = isMobile ? 0.6 + 0.1 * t : 0.6 + 0.3 * t;
     } else if (progress > 0.35 && progress <= 0.50) {
       // Station 02: UI Right, Core Left
       const t = smoothstep(0.35, 0.40, progress);
-      targetOffsetX = 9 - 18 * t; // Ends at -9
-      targetScale = 0.9;
+      targetOffsetX = isMobile ? 0 : 9 - 18 * t;
+      targetOffsetY = isMobile ? 12 : 0;
+      targetScale = isMobile ? 0.7 : 0.9;
     } else if (progress > 0.50 && progress <= 0.65) {
       // Station 03: UI Left, Core Right
       const t = smoothstep(0.50, 0.55, progress);
-      targetOffsetX = -9 + 18 * t; // Ends at +9
-      targetScale = 0.9;
+      targetOffsetX = isMobile ? 0 : -9 + 18 * t;
+      targetOffsetY = isMobile ? 12 : 0;
+      targetScale = isMobile ? 0.7 : 0.9;
     } else if (progress > 0.65 && progress <= 0.80) {
       // Station 04: UI Right, Core Left
       const t = smoothstep(0.65, 0.70, progress);
-      targetOffsetX = 9 - 18 * t; // Ends at -9
-      targetScale = 0.9;
+      targetOffsetX = isMobile ? 0 : 9 - 18 * t;
+      targetOffsetY = isMobile ? 12 : 0;
+      targetScale = isMobile ? 0.7 : 0.9;
     } else if (progress > 0.80 && progress <= 0.85) {
       // Return to Center
       const t = smoothstep(0.80, 0.85, progress);
-      targetOffsetX = -9 * (1 - t);
-      targetScale = 0.9 - 0.3 * t;
+      targetOffsetX = isMobile ? 0 : -9 * (1 - t);
+      targetOffsetY = isMobile ? 12 * (1 - t) : 0;
+      targetScale = isMobile ? 0.7 - 0.1 * t : 0.9 - 0.3 * t;
     }
 
     const rightVec = new THREE.Vector3(1, 0, 0).applyQuaternion(state.camera.quaternion);
-    const targetPos = new THREE.Vector3(0, 0, 0).add(rightVec.multiplyScalar(targetOffsetX));
+    const upVec = new THREE.Vector3(0, 1, 0).applyQuaternion(state.camera.quaternion);
+    const targetPos = new THREE.Vector3(0, 0, 0)
+      .add(rightVec.multiplyScalar(targetOffsetX))
+      .add(upVec.multiplyScalar(targetOffsetY));
     
     pointsRef.current.position.lerp(targetPos, 0.05);
     pointsRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.05);
