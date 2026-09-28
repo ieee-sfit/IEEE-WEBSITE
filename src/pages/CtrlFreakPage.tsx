@@ -21,7 +21,15 @@ const CtrlFreakPage = () => {
 
   return (
     <div ref={containerRef} className="relative bg-[#050505] text-white h-[800vh] font-mono selection:bg-[#FF3333] selection:text-white overflow-x-hidden">
-      
+      {/* PORTRAIT OVERLAY FOR MOBILE */}
+      <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center text-center p-8 hidden portrait:flex md:portrait:hidden">
+        <div className="w-16 h-16 mb-8 border-4 border-[#FF3333] border-t-transparent rounded-full animate-spin"></div>
+        <h2 className="text-2xl font-sans tracking-tight uppercase text-white mb-4">Rotate Device</h2>
+        <p className="text-gray-400 text-xs tracking-[0.2em] uppercase leading-relaxed max-w-xs">
+          Ctrl Freak requires a landscape viewport for optimal system visibility and interaction.
+        </p>
+      </div>
+
       {/* HEADER NAV */}
       <div className="fixed top-0 left-0 w-full z-50 p-6 flex justify-between items-start pointer-events-none">
         <div className="pointer-events-auto flex flex-col gap-1">
@@ -52,13 +60,14 @@ const CtrlFreakPage = () => {
       <div className="relative z-10 w-full px-8 md:px-24 pointer-events-none">
         
         {/* 00 - ARRIVAL (Hero) */}
-        <section className="min-h-screen py-24 flex flex-col justify-center items-start w-full md:w-1/2 pointer-events-auto">
-          <h1 className="text-6xl md:text-8xl font-bold tracking-tighter uppercase font-sans leading-none mix-blend-difference">
-            Ctrl Freak
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-400 mt-6 tracking-widest uppercase mb-16 mix-blend-difference">
-            Incident Detected
-          </p>
+        <section className="h-screen flex flex-col justify-center items-start w-full md:w-1/2 pointer-events-auto">
+          <div className="scale-[0.75] md:scale-100 origin-left">
+            <h1 className="text-6xl md:text-8xl font-bold tracking-tighter uppercase font-sans leading-none mix-blend-difference">
+              Ctrl Freak
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-400 mt-6 tracking-widest uppercase mb-16 mix-blend-difference">
+              Incident Detected
+            </p>
 
           <div className="border-t border-gray-800 w-full max-w-sm pt-8 mb-16 mix-blend-difference">
             <p className="text-sm text-gray-300 uppercase tracking-widest leading-loose">
@@ -79,6 +88,7 @@ const CtrlFreakPage = () => {
               <span className="transform group-hover:translate-y-1 transition-transform">↓</span>
             </div>
           </div>
+          </div>
         </section>
 
         {/* 01 - WHAT ARE YOU LOOKING AT? */}
@@ -91,28 +101,36 @@ const CtrlFreakPage = () => {
         </section>
 
         {/* 02 - ANC (LEFT) */}
-        <section className="min-h-screen flex flex-col justify-end py-12 md:pb-0 md:justify-center items-center md:items-start w-full pointer-events-none relative z-20">
-          <AncStationUI />
+        <section className="h-screen flex flex-col justify-center items-start w-full pointer-events-none relative z-20">
+          <div className="scale-[0.65] md:scale-100 origin-left w-full">
+            <AncStationUI />
+          </div>
         </section>
 
         {/* 03 - NETWORK (RIGHT) */}
-        <section className="min-h-screen flex flex-col justify-end py-12 md:pb-0 md:justify-center items-center md:items-end w-full pointer-events-none relative z-20">
-          <NetworkStationUI />
+        <section className="h-screen flex flex-col justify-center items-end w-full pointer-events-none relative z-20">
+          <div className="scale-[0.65] md:scale-100 origin-right w-full flex justify-end">
+            <NetworkStationUI />
+          </div>
         </section>
 
         {/* 04 - VISION (LEFT) */}
-        <section className="min-h-screen flex flex-col justify-end py-12 md:pb-0 md:justify-center items-center md:items-start w-full pointer-events-none relative z-20">
-          <VisionStationUI />
+        <section className="h-screen flex flex-col justify-center items-start w-full pointer-events-none relative z-20">
+          <div className="scale-[0.65] md:scale-100 origin-left w-full">
+            <VisionStationUI />
+          </div>
         </section>
 
         {/* 05 - LOGIC (RIGHT) */}
-        <section className="min-h-screen flex flex-col justify-end py-12 md:pb-0 md:justify-center items-center md:items-end w-full pointer-events-none relative z-20">
-          <LogicStationUI />
+        <section className="h-screen flex flex-col justify-center items-end w-full pointer-events-none relative z-20">
+          <div className="scale-[0.65] md:scale-100 origin-right w-full flex justify-end">
+            <LogicStationUI />
+          </div>
         </section>
 
         {/* 06 - THE CLOCK */}
-        <section className="min-h-screen py-12 md:py-0 flex flex-col justify-center items-center text-center w-full z-20 relative pointer-events-auto">
-          <div className="bg-black/90 backdrop-blur-lg p-12 md:p-24 border border-[#FF3333]/20 w-full max-w-3xl mx-auto">
+        <section className="h-screen flex flex-col justify-center items-center text-center w-full z-20 relative pointer-events-auto">
+          <div className="bg-black/90 backdrop-blur-lg p-12 md:p-24 border border-[#FF3333]/20 w-full max-w-3xl mx-auto scale-[0.65] md:scale-100 origin-center">
             <div className="text-6xl md:text-8xl font-sans font-bold text-[#FF3333] mb-4">
               12:00
             </div>
