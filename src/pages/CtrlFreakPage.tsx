@@ -103,10 +103,10 @@ const CtrlFreakPage = () => {
         {/* 00 - ARRIVAL (Hero) */}
         <section className="snap-start h-screen flex flex-col justify-center items-start w-full md:w-1/2 px-8 md:px-24 pointer-events-auto">
           <div className="w-full max-h-[90svh] overflow-y-auto overflow-x-hidden [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-            <h1 className="font-bold tracking-tighter uppercase font-sans leading-none mix-blend-difference break-words" style={{ fontSize: "clamp(2rem, 10vw, 6rem)" }}>
+            <h1 className="font-bold tracking-tighter uppercase font-sans leading-none mix-blend-difference" style={{ fontSize: "clamp(1.5rem, 8vw, 6rem)" }}>
               Ctrl Freak
             </h1>
-            <p className="text-gray-400 mt-4 md:mt-6 tracking-widest uppercase mb-8 md:mb-16 mix-blend-difference" style={{ fontSize: "clamp(1rem, 2.5vw, 1.5rem)" }}>
+            <p className="text-gray-400 mt-4 md:mt-6 tracking-widest uppercase mb-8 md:mb-16 mix-blend-difference" style={{ fontSize: "clamp(0.75rem, 2vw, 1.5rem)" }}>
               Incident Detected
             </p>
 
