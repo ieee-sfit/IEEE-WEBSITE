@@ -465,10 +465,10 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       shape1 = shapes.vision; shape2 = shapes.vision; lerpFactor = 0;
     } else if (progress < 0.66) {
       shape1 = shapes.vision; shape2 = shapes.circuit; lerpFactor = smoothstep(0.61, 0.66, progress);
-    } else if (progress < 0.76) {
+    } else if (progress < 0.80) {
       shape1 = shapes.circuit; shape2 = shapes.circuit; lerpFactor = 0;
-    } else if (progress < 0.81) {
-      shape1 = shapes.circuit; shape2 = shapes.ring; lerpFactor = smoothstep(0.76, 0.81, progress);
+    } else if (progress < 0.85) {
+      shape1 = shapes.circuit; shape2 = shapes.ring; lerpFactor = smoothstep(0.80, 0.85, progress);
     } else {
       shape1 = shapes.ring; shape2 = shapes.ring; lerpFactor = 0;
     }
@@ -737,15 +737,15 @@ const ParticleSystem = ({ scrollProgress }: { scrollProgress: MotionValue<number
       targetOffsetX = isMobile ? -5 + 10 * t : -9 + 18 * t;
       targetOffsetY = isMobile ? 10 : 0;
       targetScale = isMobile ? 0.7 : 0.9;
-    } else if (progress > 0.65 && progress <= 0.80) {
+    } else if (progress > 0.65 && progress <= 0.82) {
       // Station 04: UI Right, Core Left
       const t = smoothstep(0.65, 0.70, progress);
       targetOffsetX = isMobile ? 5 - 10 * t : 9 - 18 * t;
       targetOffsetY = isMobile ? 10 : 0;
       targetScale = isMobile ? 0.7 : 0.9;
-    } else if (progress > 0.80 && progress <= 0.85) {
+    } else if (progress > 0.82 && progress <= 0.87) {
       // Return to Center
-      const t = smoothstep(0.80, 0.85, progress);
+      const t = smoothstep(0.82, 0.87, progress);
       targetOffsetX = isMobile ? -5 * (1 - t) : -9 * (1 - t);
       targetOffsetY = isMobile ? 10 * (1 - t) : 0;
       targetScale = isMobile ? 0.7 - 0.1 * t : 0.9 - 0.3 * t;

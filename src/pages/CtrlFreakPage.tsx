@@ -32,8 +32,8 @@ const CtrlFreakPage = () => {
   const [uiScale, setUiScale] = useState(1);
   useEffect(() => {
     const handleResize = () => {
-      const wScale = window.innerWidth / 1200;
-      const hScale = window.innerHeight / 800;
+      const wScale = window.innerWidth / 1000;
+      const hScale = window.innerHeight / 750;
       setUiScale(Math.min(1, wScale, hScale));
     };
     handleResize();
@@ -143,28 +143,28 @@ const CtrlFreakPage = () => {
 
         {/* 02 - ANC (LEFT) */}
         <section className="snap-start h-screen w-full pointer-events-none relative z-20">
-          <div className="absolute top-1/2 left-4 md:left-24 -translate-y-1/2 origin-left w-full max-w-md" style={{ transform: `scale(${uiScale})` }}>
+          <div className="absolute top-1/2 left-4 md:left-24 origin-left w-full max-w-md" style={{ transform: `translateY(-50%) scale(${uiScale})` }}>
             <AncStationUI />
           </div>
         </section>
 
         {/* 03 - NETWORK (RIGHT) */}
         <section className="snap-start h-screen w-full pointer-events-none relative z-20">
-          <div className="absolute top-1/2 right-4 md:right-24 -translate-y-1/2 origin-right w-full max-w-md flex justify-end" style={{ transform: `scale(${uiScale})` }}>
+          <div className="absolute top-1/2 right-4 md:right-24 origin-right w-full max-w-md flex justify-end" style={{ transform: `translateY(-50%) scale(${uiScale})` }}>
             <NetworkStationUI />
           </div>
         </section>
 
         {/* 04 - VISION (LEFT) */}
         <section className="snap-start h-screen w-full pointer-events-none relative z-20">
-          <div className="absolute top-1/2 left-4 md:left-24 -translate-y-1/2 origin-left w-full max-w-md" style={{ transform: `scale(${uiScale})` }}>
+          <div className="absolute top-1/2 left-4 md:left-24 origin-left w-full max-w-md" style={{ transform: `translateY(-50%) scale(${uiScale})` }}>
             <VisionStationUI />
           </div>
         </section>
 
         {/* 05 - LOGIC (RIGHT) */}
         <section className="snap-start h-screen w-full pointer-events-none relative z-20">
-          <div className="absolute top-1/2 right-4 md:right-24 -translate-y-1/2 origin-right w-full max-w-md flex justify-end" style={{ transform: `scale(${uiScale})` }}>
+          <div className="absolute top-1/2 right-4 md:right-24 origin-right w-full max-w-md flex justify-end" style={{ transform: `translateY(-50%) scale(${uiScale})` }}>
             <LogicStationUI />
           </div>
         </section>
