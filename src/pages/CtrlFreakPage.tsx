@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useScroll } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { SystemCore } from '../components/ctrl-freak/SystemCore';
@@ -26,6 +26,19 @@ const CtrlFreakPage = () => {
     return () => {
       document.documentElement.classList.remove('snap-y', 'snap-mandatory');
     };
+  }, []);
+
+  // Compute dynamic scale for UI panels
+  const [uiScale, setUiScale] = useState(1);
+  useEffect(() => {
+    const handleResize = () => {
+      const wScale = window.innerWidth / 1200;
+      const hScale = window.innerHeight / 800;
+      setUiScale(Math.min(1, wScale, hScale));
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   return (
@@ -130,35 +143,35 @@ const CtrlFreakPage = () => {
 
         {/* 02 - ANC (LEFT) */}
         <section className="snap-start h-screen w-full pointer-events-none relative z-20">
-          <div className="absolute top-1/2 left-4 md:left-24 -translate-y-1/2 origin-left w-full max-w-md" style={{ transform: "scale(min(1, min(100vw / 1200, 100vh / 800)))" }}>
+          <div className="absolute top-1/2 left-4 md:left-24 -translate-y-1/2 origin-left w-full max-w-md" style={{ transform: `scale(${uiScale})` }}>
             <AncStationUI />
           </div>
         </section>
 
         {/* 03 - NETWORK (RIGHT) */}
         <section className="snap-start h-screen w-full pointer-events-none relative z-20">
-          <div className="absolute top-1/2 right-4 md:right-24 -translate-y-1/2 origin-right w-full max-w-md flex justify-end" style={{ transform: "scale(min(1, min(100vw / 1200, 100vh / 800)))" }}>
+          <div className="absolute top-1/2 right-4 md:right-24 -translate-y-1/2 origin-right w-full max-w-md flex justify-end" style={{ transform: `scale(${uiScale})` }}>
             <NetworkStationUI />
           </div>
         </section>
 
         {/* 04 - VISION (LEFT) */}
         <section className="snap-start h-screen w-full pointer-events-none relative z-20">
-          <div className="absolute top-1/2 left-4 md:left-24 -translate-y-1/2 origin-left w-full max-w-md" style={{ transform: "scale(min(1, min(100vw / 1200, 100vh / 800)))" }}>
+          <div className="absolute top-1/2 left-4 md:left-24 -translate-y-1/2 origin-left w-full max-w-md" style={{ transform: `scale(${uiScale})` }}>
             <VisionStationUI />
           </div>
         </section>
 
         {/* 05 - LOGIC (RIGHT) */}
         <section className="snap-start h-screen w-full pointer-events-none relative z-20">
-          <div className="absolute top-1/2 right-4 md:right-24 -translate-y-1/2 origin-right w-full max-w-md flex justify-end" style={{ transform: "scale(min(1, min(100vw / 1200, 100vh / 800)))" }}>
+          <div className="absolute top-1/2 right-4 md:right-24 -translate-y-1/2 origin-right w-full max-w-md flex justify-end" style={{ transform: `scale(${uiScale})` }}>
             <LogicStationUI />
           </div>
         </section>
 
         {/* 06 - THE CLOCK */}
         <section className="snap-start h-screen w-full z-20 relative pointer-events-auto">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 origin-center bg-black/90 backdrop-blur-lg p-6 md:p-24 border border-[#FF3333]/20 w-full max-w-3xl text-center" style={{ transform: "translate(-50%, -50%) scale(min(1, min(100vw / 1200, 100vh / 800)))" }}>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 origin-center bg-black/90 backdrop-blur-lg p-6 md:p-24 border border-[#FF3333]/20 w-full max-w-3xl text-center" style={{ transform: `translate(-50%, -50%) scale(${uiScale})` }}>
             <div className="font-sans font-bold text-[#FF3333] mb-4" style={{ fontSize: "clamp(4rem, 15vw, 6rem)", lineHeight: 1 }}>
               12:00
             </div>
