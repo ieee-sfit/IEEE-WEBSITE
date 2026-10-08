@@ -90,10 +90,10 @@ const CtrlFreakPage = () => {
         {/* 00 - ARRIVAL (Hero) */}
         <section className="snap-start h-screen flex flex-col justify-center items-start w-full md:w-1/2 px-8 md:px-24 pointer-events-auto">
           <div className="w-full max-h-[90svh] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-            <h1 className="text-5xl md:text-8xl font-bold tracking-tighter uppercase font-sans leading-none mix-blend-difference">
+            <h1 className="font-bold tracking-tighter uppercase font-sans leading-none mix-blend-difference" style={{ fontSize: "clamp(3rem, 12vw, 6rem)" }}>
               Ctrl Freak
             </h1>
-            <p className="text-lg md:text-2xl text-gray-400 mt-4 md:mt-6 tracking-widest uppercase mb-8 md:mb-16 mix-blend-difference">
+            <p className="text-gray-400 mt-4 md:mt-6 tracking-widest uppercase mb-8 md:mb-16 mix-blend-difference" style={{ fontSize: "clamp(1.125rem, 3vw, 1.5rem)" }}>
               Incident Detected
             </p>
 
@@ -120,9 +120,9 @@ const CtrlFreakPage = () => {
         </section>
 
         {/* 01 - WHAT ARE YOU LOOKING AT? */}
-        <section className="snap-start h-screen flex flex-col justify-center items-center w-full">
+        <section className="snap-start h-screen flex flex-col justify-center items-center w-full px-4">
           <div className="text-center mix-blend-difference">
-            <h2 className="text-4xl md:text-6xl font-sans font-bold tracking-tight uppercase mb-8">
+            <h2 className="font-sans font-bold tracking-tight uppercase mb-8" style={{ fontSize: "clamp(2rem, 8vw, 3.75rem)", lineHeight: 1.1 }}>
               OBSERVE. IDENTIFY.<br/>INTERVENE. VERIFY.
             </h2>
           </div>
@@ -130,36 +130,36 @@ const CtrlFreakPage = () => {
 
         {/* 02 - ANC (LEFT) */}
         <section className="snap-start h-screen w-full pointer-events-none relative z-20">
-          <div className="absolute top-1/2 left-0 md:left-24 -translate-y-1/2 scale-[0.65] md:scale-100 origin-left w-full max-w-md">
+          <div className="absolute top-1/2 left-4 md:left-24 -translate-y-1/2 origin-left w-full max-w-md" style={{ transform: "scale(min(1, min(100vw / 1200, 100vh / 800)))" }}>
             <AncStationUI />
           </div>
         </section>
 
         {/* 03 - NETWORK (RIGHT) */}
         <section className="snap-start h-screen w-full pointer-events-none relative z-20">
-          <div className="absolute top-1/2 right-0 md:right-24 -translate-y-1/2 scale-[0.65] md:scale-100 origin-right w-full max-w-md flex justify-end">
+          <div className="absolute top-1/2 right-4 md:right-24 -translate-y-1/2 origin-right w-full max-w-md flex justify-end" style={{ transform: "scale(min(1, min(100vw / 1200, 100vh / 800)))" }}>
             <NetworkStationUI />
           </div>
         </section>
 
         {/* 04 - VISION (LEFT) */}
         <section className="snap-start h-screen w-full pointer-events-none relative z-20">
-          <div className="absolute top-1/2 left-0 md:left-24 -translate-y-1/2 scale-[0.65] md:scale-100 origin-left w-full max-w-md">
+          <div className="absolute top-1/2 left-4 md:left-24 -translate-y-1/2 origin-left w-full max-w-md" style={{ transform: "scale(min(1, min(100vw / 1200, 100vh / 800)))" }}>
             <VisionStationUI />
           </div>
         </section>
 
         {/* 05 - LOGIC (RIGHT) */}
         <section className="snap-start h-screen w-full pointer-events-none relative z-20">
-          <div className="absolute top-1/2 right-0 md:right-24 -translate-y-1/2 scale-[0.65] md:scale-100 origin-right w-full max-w-md flex justify-end">
+          <div className="absolute top-1/2 right-4 md:right-24 -translate-y-1/2 origin-right w-full max-w-md flex justify-end" style={{ transform: "scale(min(1, min(100vw / 1200, 100vh / 800)))" }}>
             <LogicStationUI />
           </div>
         </section>
 
         {/* 06 - THE CLOCK */}
         <section className="snap-start h-screen w-full z-20 relative pointer-events-auto">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-[0.65] md:scale-100 origin-center bg-black/90 backdrop-blur-lg p-6 md:p-24 border border-[#FF3333]/20 w-full max-w-3xl text-center">
-            <div className="text-6xl md:text-8xl font-sans font-bold text-[#FF3333] mb-4">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 origin-center bg-black/90 backdrop-blur-lg p-6 md:p-24 border border-[#FF3333]/20 w-full max-w-3xl text-center" style={{ transform: "translate(-50%, -50%) scale(min(1, min(100vw / 1200, 100vh / 800)))" }}>
+            <div className="font-sans font-bold text-[#FF3333] mb-4" style={{ fontSize: "clamp(4rem, 15vw, 6rem)", lineHeight: 1 }}>
               12:00
             </div>
             
