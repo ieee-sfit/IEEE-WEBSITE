@@ -77,15 +77,13 @@ const Footer = () => {
                   IEEE×WIE SFIT
                 </h3>
                 <p className={`text-gray-400 dark:text-gray-500 text-sm transition-all duration-1000 ${sloganVisible ? 'animate-fade-in-left opacity-100' : 'opacity-70'
-                  }`}>Empowering Women in Engineering</p>
+                  }`}>Advancing Technology • Championing Diversity</p>
               </div>
             </div>
 
             <p className={`text-gray-300 leading-relaxed mb-6 max-w-md transition-all duration-700 ${footerVisible ? 'animate-fade-in-right opacity-100' : 'opacity-0 translate-x-8'
               } animation-delay-300`}>
-              The IEEE Women in Engineering Student Branch at St. Francis Institute of Technology
-              is dedicated to inspiring and empowering women engineers through innovative programs,
-              mentorship, and professional development opportunities.
+              IEEE SFIT Student Branch & WIE Affinity Group at St. Francis Institute of Technology — advancing technical excellence across all disciplines while championing diversity, equity, and leadership in engineering.
             </p>
 
             <div

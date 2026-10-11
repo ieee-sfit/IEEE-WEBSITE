@@ -55,7 +55,7 @@ const Hero = () => {
             heroVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0 translate-y-8'
           }`}>
             <Sparkles className="w-4 h-4 text-purple-600 mr-2 animate-pulse" />
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Empowering Women in Engineering</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Advancing Technology • Championing Diversity</span>
           </div>
 
           {/* Main Heading */}
@@ -73,8 +73,7 @@ const Hero = () => {
           <p className={`text-xl md:text-2xl text-gray-600 dark:text-gray-400 mb-8 max-w-3xl mx-auto leading-relaxed transition-all duration-700 ${
             heroVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0 translate-y-8'
           } animation-delay-600`}>
-            St. Francis Institute of Technology's IEEE Women in Engineering Committee -
-            Inspiring innovation, fostering collaboration, and building the future of technology.
+            St. Francis Institute of Technology's premier technical community. Empowering engineers of all disciplines through the IEEE Student Branch, while championing diversity, equity, and leadership through our WIE Affinity Group.
           </p>
 
           {/* CTA Buttons */}
