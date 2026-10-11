@@ -71,14 +71,14 @@ const Header = () => {
     </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-4 lg:space-x-6 xl:space-x-7">
             {navItems.map((item, index) => {
               if (item.type === 'route') {
                 return (
                   <Link
                     key={item.name}
                     to={item.href}
-                    className={`relative text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 group py-2 px-1 ${
+                    className={`relative text-sm lg:text-base text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 group py-2 px-1 font-medium ${
                       location.pathname === item.href ? 'text-blue-600 dark:text-blue-400' : ''
                     }`}
                     style={{ animationDelay: `${index * 100}ms` }}
@@ -97,7 +97,7 @@ const Header = () => {
                   <button
                     key={item.name}
                     onClick={() => handleNavClick(item)}
-                    className="relative text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 group py-2 px-1"
+                    className="relative text-sm lg:text-base text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 group py-2 px-1 font-medium"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
                     <span className="relative z-10 transition-transform duration-300 group-hover:scale-105">
@@ -109,7 +109,47 @@ const Header = () => {
                 );
               }
             })}
-            <div className="pl-4 border-l border-gray-200 dark:border-gray-700">
+
+            {/* CYBER ANOMALY PILL: CTRL FREAK */}
+            <Link
+              to="/ctrl-freak"
+              className="group relative inline-flex items-center gap-2 px-3 py-1.5 rounded-full font-mono text-xs tracking-wider select-none overflow-hidden transition-all duration-300 bg-black/90 dark:bg-black/95 text-gray-200 border border-[#FF3333]/50 hover:border-[#FF3333] hover:text-white shadow-[0_0_14px_rgba(255,51,51,0.25)] hover:shadow-[0_0_24px_rgba(255,51,51,0.55)] hover:scale-[1.03]"
+              title="CTRL FREAK: Mosaic '26 - 4 Stations Interactive Experience"
+            >
+              {/* Scanline laser shine swipe */}
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-[#FF3333]/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out pointer-events-none" />
+
+              {/* Pulsing Red Radar Beacon */}
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF3333] opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF3333]" />
+              </span>
+
+              {/* Monospace Bracketed Title */}
+              <span className="flex items-center font-bold tracking-wider">
+                <span className="text-[#FF3333] transition-transform duration-300 group-hover:-translate-x-0.5">[</span>
+                <span className="text-[#FF3333] group-hover:text-white transition-colors duration-200">CTRL</span>
+                <span className="text-gray-400 mx-0.5 group-hover:text-white transition-colors duration-200">_</span>
+                <span className="text-white">FREAK</span>
+                <span className="text-[#FF3333]/80 ml-1 text-[11px]">//</span>
+                <span className="text-[#FF3333] transition-transform duration-300 group-hover:translate-x-0.5">]</span>
+              </span>
+
+              {/* Mosaic '26 Badge */}
+              <span className="hidden xl:inline-block px-1.5 py-0.5 text-[9px] font-semibold tracking-tighter uppercase rounded bg-[#FF3333]/20 text-[#FF3333] border border-[#FF3333]/40">
+                M'26
+              </span>
+
+              {/* 4 Micro-LED Station Pips */}
+              <span className="flex items-center gap-1 pl-1 border-l border-white/20" title="ANC • NET • VIS • LOGIC">
+                <span className="w-1.5 h-1.5 rounded-full bg-sky-400 shadow-[0_0_4px_#38bdf8] group-hover:scale-125 transition-transform" />
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-400 shadow-[0_0_4px_#c084fc] group-hover:scale-125 transition-transform" />
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_4px_#4ade80] group-hover:scale-125 transition-transform" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#FF3333] shadow-[0_0_4px_#FF3333] group-hover:scale-125 transition-transform" />
+              </span>
+            </Link>
+
+            <div className="pl-2 border-l border-gray-200 dark:border-gray-700">
               <ThemeToggle />
             </div>
           </nav>
@@ -150,9 +190,50 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         <div className={`md:hidden absolute top-full left-0 right-0 bg-white dark:bg-slate-900 shadow-xl transition-all duration-300 origin-top overflow-hidden ${
-          isMenuOpen ? 'max-h-[400px] border-t border-gray-100 dark:border-slate-800' : 'max-h-0'
+          isMenuOpen ? 'max-h-[500px] border-t border-gray-100 dark:border-slate-800' : 'max-h-0'
         }`}>
           <nav className="py-4 px-4 space-y-2">
+            {/* FEATURED CYBER TERMINAL BANNER */}
+            <Link
+              to="/ctrl-freak"
+              onClick={() => setIsMenuOpen(false)}
+              className="relative group block p-3.5 mb-3 rounded-xl bg-[#080808] border border-[#FF3333]/50 text-white shadow-[0_0_16px_rgba(255,51,51,0.25)] overflow-hidden font-mono"
+            >
+              {/* Scanline laser shine swipe */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#FF3333]/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out pointer-events-none" />
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2.5">
+                  {/* Blinking radar beacon */}
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF3333] opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#FF3333]" />
+                  </span>
+                  <div>
+                    <div className="flex items-center space-x-1.5">
+                      <span className="text-[#FF3333] font-bold">[</span>
+                      <span className="font-bold tracking-wider text-sm text-white">CTRL_FREAK</span>
+                      <span className="text-[#FF3333] font-bold">//]</span>
+                      <span className="px-1.5 py-0.5 text-[9px] font-bold tracking-tighter uppercase rounded bg-[#FF3333]/20 text-[#FF3333] border border-[#FF3333]/40">
+                        MOSAIC '26
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-gray-400 tracking-wider mt-0.5">
+                      4-STATION 3D INTERACTIVE SIMULATION
+                    </p>
+                  </div>
+                </div>
+
+                {/* 4 Station LED cluster */}
+                <div className="flex items-center gap-1.5 bg-black/60 px-2 py-1 rounded-md border border-white/10">
+                  <span className="w-1.5 h-1.5 rounded-full bg-sky-400 shadow-[0_0_4px_#38bdf8]" title="ANC" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-purple-400 shadow-[0_0_4px_#c084fc]" title="Network" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_4px_#4ade80]" title="Vision" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#FF3333] shadow-[0_0_4px_#FF3333]" title="Logic" />
+                </div>
+              </div>
+            </Link>
+
             {navItems.map((item) => {
               if (item.type === 'route') {
                 return (
