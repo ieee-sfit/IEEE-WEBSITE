@@ -45,7 +45,7 @@ const CtrlFreakInfoPage = () => {
             </div>
             <div className="flex justify-between border-b border-gray-800 pb-2">
               <span className="text-gray-500">PARTICIPATION FEE</span>
-              <span className="text-right">₹50</span>
+              <span className="text-right">₹70 Per Person</span>
             </div>
             <div className="flex justify-between border-b border-gray-800 pb-2">
               <span className="text-gray-500">THROUGHPUT</span>
