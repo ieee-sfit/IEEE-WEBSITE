@@ -159,7 +159,7 @@ const EventDetailPage: React.FC = () => {
               <motion.section variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1}>
                 <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-5 flex items-center gap-2">
                   <span className="w-1 h-6 bg-gradient-to-b from-blue-600 to-purple-600 rounded-full inline-block" />
-                  What You'll Learn
+                  {event.category === 'Workshop' ? "What You'll Learn" : "Key Highlights"}
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {event.highlights.map((h, i) => (
@@ -396,7 +396,9 @@ const EventDetailPage: React.FC = () => {
                 custom={1}
                 className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl shadow-lg p-6"
               >
-                <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">Speakers</h3>
+                <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">
+                  {event.category === 'Competition' || event.category === 'Hackathon' ? 'Judges & Evaluators' : 'Speakers'}
+                </h3>
                 <ul className="space-y-2">
                   {event.speakers.map((sp, i) => (
                     <li key={i} className="flex items-center gap-3 text-gray-700 dark:text-gray-300 text-sm">

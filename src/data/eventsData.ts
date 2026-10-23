@@ -52,21 +52,32 @@ export const eventsData: EventData[] = [
     registrations: 420,
     category: 'Hackathon',
     status: 'completed',
-    description: "The internal hackathon for SFIT's SIH 2026 participation. Around 70 teams registered and 66 teams presented their solutions.",
-    detailedDescription: "Navkriti 26 is the internal hackathon for SFIT's Smart India Hackathon 2026 participation, organized by IEEExWIE, RAW, and IIC at St. Francis Institute of Technology. Teams of 6 (with at least 1 female member) pitched their ideas using the prescribed SIH template.\n\nA total of 70 teams registered for the event. During the presentation rounds, 66 teams successfully showcased their problem statements and proposed solutions to the evaluating panel.",
+    description: "The internal hackathon for SFIT's SIH 2026 participation. 69 teams registered and 66 teams presented their solutions.",
+    detailedDescription: "Navkriti 26 is the internal hackathon for SFIT's Smart India Hackathon 2026 participation, organized at St. Francis Institute of Technology. Teams of 6 (with at least 1 female member) pitched their ideas using the prescribed SIH template.\n\nA total of 69 teams registered for the event. During the presentation rounds, 66 teams successfully showcased their problem statements and proposed solutions to the evaluating panel.",
     image: 'https://i.ytimg.com/vi/znMbKz6ZPno/maxresdefault.jpg',
     featured: false,
     highlights: [
       "Internal hackathon for SFIT's SIH 2026 participation",
-      '70 teams registered (6 members per team)',
+      '69 teams registered (6 members per team with mandatory female representation)',
       '66 teams presented their ideas to the judges',
       'Idea presentation using SIH template',
-      'Top teams shortlisted for SIH 2026'
+      'Top teams shortlisted for SIH 2026 nomination',
     ],
-    speakers: [],
-    topics: ['Hackathon', 'SIH 2026', 'Innovation'],
+    speakers: ['Internal and External Judges'],
+    topics: ['Hackathon', 'SIH 2026', 'Innovation', 'Ideation', 'Pitching', 'Prototyping'],
+    satisfaction: 90,
     form: '',
-    organizer: 'IEEExWIE, RAW & IIC SFIT',
+    organizer: 'IEEE SFIT x WIE Student Branch',
+    attendance: {
+      total: 396,
+      breakdown: [
+        { department: 'CMPN', count: 230 },
+        { department: 'INFT', count: 156 },
+        { department: 'EXTC', count: 6 },
+        { department: 'AIML', count: 2 },
+        { department: 'ECS', count: 2 },
+      ],
+    },
   },
   {
     id: 2,
@@ -355,7 +366,6 @@ export const eventsData: EventData[] = [
     detailedDescription:
       "Debugging Your Communication Skills\nConducted by IEEE × WIE Student Branch, SFIT\n\nThe IEEE X WIE Student Branch (ISSB) conducts a Technical Communication Session titled \"Debugging Your Communication Skills\" on 6th March 2026 from 3:00 PM to 5:00 PM in Room No. 618 for a minimum of 30 students. The session is conducted by Ishita Dcosta in an interactive mode.\n\nThis session aims to help technical students understand the importance of effective communication in the professional world and equip them with practical strategies to enhance verbal and non-verbal skills.\n\nSession Flow\n\nThe session begins with an engaging ice breaker to warm up the room and set an open, interactive tone.\n\nPart I — Verbal Communication\n\nFocuses on clarity, structured responses, and confident speaking. Participants work through a practical activity designed to practise concise, organised expression under real-time conditions.\n\nPart II — Non-Verbal Communication\n\nCovers body language, eye contact, posture, and voice modulation — the silent signals that shape how you are perceived. A hands-on activity helps participants recognise and refine their non-verbal cues.\n\nPart III — Practical Techniques\n\nIntroduces actionable strategies to improve clarity, confidence, and fluency, and reduce nervousness. The part concludes with a reinforcement activity to consolidate all three skill areas.\n\nThe session wraps up with a brief feedback and reflection segment, giving participants a moment to internalise what they have learned and identify one habit to carry forward.\n\nBy the end of the session, students are expected to better understand the role of communication in technical careers, identify common gaps, and gain practical tools to improve their professional interactions.",
     image: 'https://i.postimg.cc/KjSQPWRr/Whats-App-Image-2026-06-06-at-15-47-39.jpg',
-    gallery: [],
     featured: false,
     highlights: [
       'Interactive ice breaker to kick off the session',
@@ -398,7 +408,6 @@ export const eventsData: EventData[] = [
     detailedDescription:
       "Brainstorm – Women in History\nWIE Quiz Competition\n\nThe WIE Student Branch seeks to conduct \"Brainstorm – Women in History\", a women-centric quiz competition on 8th April 2026 from 1:00 PM to 5:00 PM in Room No. 618 for a minimum of 40 students.\n\nThis flagship WIE event is themed \"Women in History\", focusing on women's contributions in technology. The quiz aims to recognise and celebrate pioneering women in science, engineering, computing, research, and innovation.\n\nEvent Format\n\nThe competition will be conducted in an interactive format consisting of multiple rounds:\n\n• Women in Computing & Innovation — questions on the achievements and breakthroughs of women in computing, software, and innovation\n• Women in Engineering & Research — covering contributions of women in engineering disciplines and scientific research\n• Rapid Fire Round — fast-paced questions to test recall and quick thinking\n• Audience Engagement Round — ensures attendees are as engaged as competitors, making the event a shared celebration\n\nObjectives\n\n• Promote awareness about women leaders in technology\n• Inspire female students to pursue technical excellence\n• Encourage research and knowledge about historical and modern-day women innovators\n• Foster confidence, participation, and healthy competition\n\nStudents and audience members will be provided grace attendance as per institutional norms to encourage active participation and engagement.",
     image: 'https://i.postimg.cc/MK2CWPZh/Screenshot-2026-06-06-165628.png',
-    gallery: [],
     featured: false,
     highlights: [
       'Celebrates pioneering women in science, engineering, computing, research & innovation',

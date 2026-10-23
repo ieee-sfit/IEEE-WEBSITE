@@ -315,10 +315,12 @@ const EventsPage = () => {
                         <Users className="w-5 h-5 text-blue-500" />
                         <span className="font-medium">{featuredEvent.registrations}/{featuredEvent.attendees}</span>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <Award className="w-5 h-5 text-green-500" />
-                        <span className="font-medium">{featuredEvent.satisfaction}%</span>
-                      </div>
+                      {featuredEvent.satisfaction ? (
+                        <div className="flex items-center gap-3">
+                          <Award className="w-5 h-5 text-green-500" />
+                          <span className="font-medium">{featuredEvent.satisfaction}%</span>
+                        </div>
+                      ) : null}
                     </div>
                     <div className="mb-8">
                       <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-3 select-none">Featured Speakers</h4>
